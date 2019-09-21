@@ -1,0 +1,230 @@
+[
+  {
+    "sysinfo": {
+      "version": "0.9.2",
+      "timestamp": "2019-09-01T14:21:50.176574495+08:00"
+    },
+    "node": {
+      "hostname": "localhost.localdomain",
+      "machineid": "58f3668f4de84be0b34a18761dded013"
+    },
+    "os": {
+      "name": "CentOS Linux 7 (Core)",
+      "vendor": "centos",
+      "version": "7",
+      "release": "7.5.1804",
+      "architecture": "amd64"
+    },
+    "kernel": {
+      "release": "3.10.0-862.el7.x86_64",
+      "version": "#1 SMP Fri Apr 20 16:44:24 UTC 2018",
+      "architecture": "x86_64"
+    },
+    "product": {
+      "name": "X10DRi",
+      "vendor": "Supermicro",
+      "version": "123456789",
+      "serial": "123456789"
+    },
+    "board": {
+      "name": "X10DRi",
+      "vendor": "Supermicro",
+      "version": "1.02B",
+      "serial": "NM177S504844",
+      "assettag": "Default string"
+    },
+    "chassis": {
+      "type": 23,
+      "vendor": "Default string",
+      "version": "Default string",
+      "serial": "Default string",
+      "assettag": "Default string"
+    },
+    "bios": {
+      "vendor": "American Megatrends Inc.",
+      "version": "2.1a",
+      "date": "05/05/2017"
+    },
+    "cpu": {
+      "vendor": "GenuineIntel",
+      "model": "Intel(R) Xeon(R) CPU E5-2682 v4 @ 2.50GHz",
+      "speed": 2500,
+      "cache": 40960,
+      "cpus": 2,
+      "cores": 32,
+      "threads": 64
+    },
+    "memory": {
+      "type": "DDR4",
+      "speed": 2400,
+      "size": 131072
+    },
+    "storage": [
+      {
+        "name": "sda",
+        "driver": "sd",
+        "vendor": "LSI",
+        "model": "MR9271-8i",
+        "serial": "600605b00cd11980212dd5be0ed64834",
+        "size": 1438
+      }
+    ],
+    "network": [
+      {
+        "name": "enp3s0f0",
+        "driver": "igb",
+        "macaddress": "ac:1f:6b:03:58:52",
+        "port": "tp",
+        "speed": 1000
+      },
+      {
+        "name": "enp3s0f1",
+        "driver": "igb",
+        "macaddress": "ac:1f:6b:03:58:53",
+        "port": "tp",
+        "speed": 1000
+      }
+    ]
+  },
+  {
+    "sysinfo": {
+      "version": "0.9.2",
+      "timestamp": "2019-09-01T16:01:57.369427187+08:00"
+    },
+    "node": {
+      "hostname": "localhost.localdomain",
+      "machineid": "d6d273e4b6394128a1ccaee2c55e0647",
+      "hypervisor": "vmware"
+    },
+    "os": {
+      "name": "CentOS Linux 7 (Core)",
+      "vendor": "centos",
+      "version": "7",
+      "release": "7.4.1708",
+      "architecture": "amd64"
+    },
+    "kernel": {
+      "release": "3.10.0-693.el7.x86_64",
+      "version": "#1 SMP Tue Aug 22 21:09:27 UTC 2017",
+      "architecture": "x86_64"
+    },
+    "product": {
+      "name": "VMware Virtual Platform",
+      "vendor": "VMware, Inc.",
+      "version": "None",
+      "serial": "VMware-56 4d 29 6b e3 91 ac 1b-e5 b7 ad 97 dc 3b 26 90"
+    },
+    "board": {
+      "name": "440BX Desktop Reference Platform",
+      "vendor": "Intel Corporation",
+      "version": "None",
+      "serial": "None"
+    },
+    "chassis": {
+      "type": 1,
+      "vendor": "No Enclosure",
+      "version": "N/A",
+      "serial": "None",
+      "assettag": "No Asset Tag"
+    },
+    "bios": {
+      "vendor": "Phoenix Technologies LTD",
+      "version": "6.00",
+      "date": "07/02/2015"
+    },
+    "cpu": {
+      "vendor": "GenuineIntel",
+      "model": "Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz",
+      "speed": 3400,
+      "cache": 8192,
+      "threads": 2
+    },
+    "memory": {
+      "type": "DRAM",
+      "size": 2048
+    },
+    "storage": [
+      {
+        "name": "sda",
+        "driver": "sd",
+        "vendor": "VMware,",
+        "model": "VMware Virtual S",
+        "size": 42
+      }
+    ],
+    "network": [
+      {
+        "name": "ens32",
+        "driver": "e1000",
+        "macaddress": "00:0c:29:3b:26:90",
+        "port": "tp",
+        "speed": 1000
+      }
+    ]
+  },
+  {
+    "sysinfo": {
+      "version": "0.9.2",
+      "timestamp": "2019-09-01T14:18:13.345816119+08:00"
+    },
+    "node": {
+      "hostname": "iz2ze7pln5iifzwumezp25z",
+      "machineid": "f0f31005fb5a436d88e3c6cbf54e25aa",
+      "hypervisor": "kvm",
+      "timezone": "Asia/Shanghai"
+    },
+    "os": {
+      "name": "CentOS Linux 7 (Core)",
+      "vendor": "centos",
+      "version": "7",
+      "release": "7.4.1708",
+      "architecture": "amd64"
+    },
+    "kernel": {
+      "release": "3.10.0-693.2.2.el7.x86_64",
+      "version": "#1 SMP Tue Sep 12 22:26:13 UTC 2017",
+      "architecture": "x86_64"
+    },
+    "product": {
+      "name": "Alibaba Cloud ECS",
+      "vendor": "Alibaba Cloud",
+      "version": "pc-i440fx-2.1",
+      "serial": "5cfe47e7-1c9a-449c-afbe-c122cea30033"
+    },
+    "board": {},
+    "chassis": {
+      "type": 1,
+      "vendor": "Alibaba Cloud",
+      "version": "pc-i440fx-2.1"
+    },
+    "bios": {
+      "vendor": "SeaBIOS",
+      "version": "rel-1.7.5-0-ge51488c-20140602_164612-nilsson.home.kraxel.org",
+      "date": "04/01/2014"
+    },
+    "cpu": {
+      "vendor": "GenuineIntel",
+      "model": "Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz",
+      "cache": 33792,
+      "threads": 1
+    },
+    "memory": {
+      "type": "RAM",
+      "size": 2048
+    },
+    "storage": [
+      {
+        "name": "vda",
+        "driver": "virtio_blk",
+        "size": 42
+      }
+    ],
+    "network": [
+      {
+        "name": "eth0",
+        "driver": "virtio_net",
+        "macaddress": "00:16:3e:03:55:8d"
+      }
+    ]
+  }
+]

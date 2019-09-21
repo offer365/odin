@@ -1,0 +1,15 @@
+[Unit]
+Description=odin server daemon
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/home/admin/odin/odin -f /home/admin/odin/odin.json
+WorkingDirectory=/home/admin/odin
+ExecStop=kill -9 $MAINPID
+
+[Install]
+Alias=odin
+WantedBy=multi-user.target
+
