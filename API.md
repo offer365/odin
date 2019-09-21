@@ -3,7 +3,7 @@
 
 # *序列号*
 ### 获取序列号
-`curl-k -s -X GET --user admin:123 https://127.0.0.1:9999/odin/api/v1/server/code`
+`curl-k -s -X GET --user admin:123 https://10.0.0.200:8888/odin/api/v1/server/code`
 ###### 返回示例:
 `{
      "code": 200,
@@ -15,7 +15,7 @@
  }`
 
 ### 重置序列号
-`curl -k -s -X POST --user admin:123 https://127.0.0.1:9999/odin/api/v1/server/code`
+`curl -k -s -X POST --user admin:123 https://10.0.0.200:8888/odin/api/v1/server/code`
 ###### 返回示例:
 `{
      "code": 200,
@@ -27,7 +27,7 @@
  }`
 
 ### 获取序列号二维码
-`curl -k -s -X GET --user admin:123 -o qr-code.jpg https://127.0.0.1:9999/odin/api/v1/server/qr-code`
+`curl -k -s -X GET --user admin:123 -o qr-code.jpg https://10.0.0.200:8888/odin/api/v1/server/qr-code`
 ###### 返回示例:
 `二维码图片`
 
@@ -35,12 +35,12 @@
 
 # *授权码*
 ### 导入授权码
-`curl -k -s -X POST --user admin:123 -F key="授权码" https://127.0.0.1:9999/odin/api/v1/server/license`
+`curl -k -s -X POST --user admin:123 -F key="授权码" https://10.0.0.200:8888/odin/api/v1/server/license`
 ###### 返回示例:
 ` {"code":200,"msg":"激活成功。"}`
 
 ### 查看授权信息
-`curl -k -s -X GET --user admin:123 https://127.0.0.1:9999/odin/api/v1/server/license`
+`curl -k -s -X GET --user admin:123 https://10.0.0.200:8888/odin/api/v1/server/license`
 ###### 返回示例:
 `{
      "code": 200,
@@ -108,12 +108,12 @@
  }`
 
 ### 注销授权
-`curl -k -s -X DELETE --user admin:123 https://127.0.0.1:9999/odin/api/v1/server/license`
+`curl -k -s -X DELETE --user admin:123 https://10.0.0.200:8888/odin/api/v1/server/license`
 ###### 返回示例:
 `{"code":200,"msg":"mVxvD8OmBo8Jjco2UDz+BEqM68H1dBcz77hB/g61tBkEJ+fsDxsNkWCC/mgitVoDs01OS3y9QYgNFTBHPk2NFxNHSB1vQkB5awvjW6oKxwBo8Hq2ISyp+X9feIt5nX+jJwEqFenGJB4fFMWrYDJDE3DkZ19WnDRpu9av03n/MFKBtwZAvvi8IdJ7PQcMw1AzK98zg9Y7rY3K0Sd18UTvmO6J5ZpUp6qzpES3Q1KSRF332AV9Wl0wEd68WS8y+pIMbQ+Z3pb97vjWRbagsps8+8K5mDaS0j6hYQP5dqDkkvbMfsM1UkCbfhu65D0rh7Z1Ok2dSTp9Ps/D1xvrB2fGNvu1kQ9WYBnE8LTvSpSv6haNdysn+uxVaiyjyVo6n2YpyaPd/ZrJcX0KzNFHLYwwAQqCa59udiMpX0TdA/GrUYSc+n+5vaywLHQ28A0kJfgBGttttyYV2nglvybxwIIZkpfXp6pLmf50vINaVT+dwX+QD24cePt/KKBHZPM0dAPwPoGf2Wh8VPHFcDpMSpaeuBPy3wg6cnfl+NdZWwNF6UpKNy6PdJADOKowPZhJZnxXi59pMeuGEV5akW2eF9KmnFKuyBU1ZTte58/ttZ3T46xDE3n1QZJgN2JmeHO4cTKnnto/1SUtsk2f9HyKhonP0oYxdCtNOepSL9aqtw7t4rbQFbLjRbbfGc2vNzX77hmA"}`
 
 ### 获取注销二维码
-`curl -k -s -X GET --user admin:123 -o qr-license.jpg https://127.0.0.1:9999/odin/api/v1/server/qr-license`
+`curl -k -s -X GET --user admin:123 -o qr-license.jpg https://10.0.0.200:8888/odin/api/v1/server/qr-license`
 ###### 返回示例:
 `二维码图片`
 
@@ -121,7 +121,7 @@
 
 # *节点状态*
 ### 查看节点状态
-`curl -k -s -X GET --user admin:123 https://127.0.0.1:9999/odin/api/v1/server/nodes`
+`curl -k -s -X GET --user admin:123 https://10.0.0.200:8888/odin/api/v1/server/nodes`
 ###### 返回示例:
 `{
      "code": 200,
@@ -146,23 +146,23 @@
 
 # *配置接口*
 ### 新增配置
-`curl -k -s -X POST --user admin:123 -F text=demo https://127.0.0.1:9999/odin/api/v1/client/conf/{name}`
+`curl -k -s -X POST --user admin:123 -F text=demo https://10.0.0.200:8888/odin/api/v1/client/conf/{name}`
 ###### 返回示例:
 `{"code":200,"msg":"Post or Put key success."}`
 ### 删除配置
-`curl -k -s -X DELETE --user admin:123 https://127.0.0.1:9999/odin/api/v1/client/conf/aa`
+`curl -k -s -X DELETE --user admin:123 https://10.0.0.200:8888/odin/api/v1/client/conf/aa`
 ###### 返回示例:
 `{"code":200,"msg":"Delete key success."}`
 ### 修改配置
-`curl -k -s -X PUT --user admin:123 -F text=foobar https://127.0.0.1:9999/odin/api/v1/client/conf/aa`
+`curl -k -s -X PUT --user admin:123 -F text=foobar https://10.0.0.200:8888/odin/api/v1/client/conf/aa`
 ###### 返回示例:
 `{"code":200,"msg":"Post or Put key success."}`
 ### 获取配置
-`curl -k -s -X GET --user admin:123 https://127.0.0.1:9999/odin/api/v1/client/conf/aa`
+`curl -k -s -X GET --user admin:123 https://10.0.0.200:8888/odin/api/v1/client/conf/aa`
 ###### 返回示例:
 `{"code":200,"data":[{"name":"aa","text":"bb"}]}`
 ### 获取所有配置
-`curl -k -s -X GET --user admin:123 https://127.0.0.1:9999/odin/api/v1/client/conf/`
+`curl -k -s -X GET --user admin:123 https://10.0.0.200:8888/odin/api/v1/client/conf/`
 ###### 返回示例:
 `{"code":200,"data":[{"name":"aa","text":"foobar"},{"name":"bb","text":"demo"}]}`
 
@@ -170,26 +170,83 @@
 
 # *Client接口*
 ### 获取认证
-`curl -k -s -X POST --user admin:123 https://127.0.0.1:9999/odin/api/v1/client/auth/demo1/aa`
+`curl -k -s -X POST --user admin:123 https://10.0.0.200:8888/odin/api/v1/client/auth/demo1/aa`
 ###### 返回示例:
-`{"auth":"自定义授权的信息。","code":200,"lease":6479673129519462465,"msg":"PAayxQu4UWzd9Tw6YTanGGouEBxVo1gtM9k7ZG4bNbJYRE2J5+de1Cq6GgGN3VQb7fa/ionnpbC97XiZawYcKDc68+abkx3EWeZoc33PWeWQRPb59+hAAo46s7iEgQS9y1joMN08oPxyP/Ns6M9vhNtZEcSNUd9rOWE3fAu7VL9zq3XdoouQxoi2cQRgoxzW0HIFfjP2KqVnRmoK/SsyOM5BPgrr+jGr9D2DQpLWPSMCy65qHVqzYraVJSnIyck+XSfzwp5bLE1QNoKJlzLxf+gNxiVSXGgZqtTgkiUrHP5OtwQgdeLCZOASzbzlHJ7p4SwfGqT8vFvQM8Ryg48Nw4coVLWWDRzBjZo2PxU2Exk="}`
+`{
+     "code": 200,
+     "data": {
+         "auth": "CnS6v03p35u27XbfCCF4WdN+h9dkyk6NUrC4dXPPgAh2nWrcfGUV9DTEpSLlr5OzhZj6I23bfBfXCTgIrMWNJg3cH+P2PlpqfX8rNacwtUsZx35toFYULm021RtVwI/z56bID7xZUh+FEb1in3AgbuHydy7UZeuyYV/vi4px5IuJTKIL099tbakHE/OPYNExw+1qaM5tlC7rqbDoiFO1q9tb4WEM9eWJn7UU/wll2ooQFtCPcPR4nmaNkavzsXSqfK1V5+GGX6o5RiKaU6j7FK2oNVCLUpJQ4+TMSZ25JxfkmcbKtV6LQaMz8AokF7oDbgTNskvTdsiTIzUtoR+7WSR3hl7USerPDytHeIxpgl8=",
+         "lease": 6479674172846204226,
+         "cipher": "FOrMMgjfKSpk7jvIirnuXK7uPdey0H3PpUoV1aIQcFBdPlHXa1VJZGhU4VH/oqrfCBbqMcOP9yohYK64Rd/mfWhD5IMTtYN+fMRsr0H+r0p28nkNrxoB6j1qwsoGOAn7/JEE643yBq3ZKlWXBVnyu8JXT3VIGqId3zWihTtA7pZaZi8cFZkx6msv3jZ6paUYbYOjuIdvpcfwodRSQbTMNFduAilh09epwOieW8z6JbVTH3YjdeJBjvZ9ReN/wH1HIPFJ9e1/LlfpTU5AC7fb06v+pXqNV3UcFcDRZcHcboJcyKCs2i5azrM6U9xVT06dsyIFZUyeY00ikarXUQKp8qpNvTPI+jDKtCwtiYg4qDg="
+     },
+     "msg": "success"
+ }`
 ### 心跳
-`curl -k -s -X PUT --user admin:123 -d '{"uid":"741f9919-27e6-49d0-a6f8-1116a713f271","lease":6479673129519463168,"auth":""}' https://127.0.0.1:9999/odin/api/v1/client/auth/demo1/aa`
+`curl -k -s -X PUT --user admin:123 -d '{"uid":"741f9919-27e6-49d0-a6f8-1116a713f271","lease":6479673129519463168,"auth":""}' https://10.0.0.200:8888/odin/api/v1/client/auth/app1/aa`
 ###### 返回示例:
-`{"auth":"自定义授权信息","code":200,"lease":6479673129519462606,"msg":"Successful renewal."}`
+`{"code":200,"data":{"auth":"","lease":6479674172846204816,"cipher":""},"msg":"Successful renewal."}`
 ### 关闭
-`curl -k -s -X DELETE --user admin:123 -d '{"uid":"741f9919-27e6-49d0-a6f8-1116a713f271","lease":6479673129519463168,"auth":""}' https://127.0.0.1:9999/odin/api/v1/client/auth/demo1/aa`
+`curl -k -s -X DELETE --user admin:123 -d '{"uid":"741f9919-27e6-49d0-a6f8-1116a713f271","lease":6479673129519463168,"auth":""}' https://10.0.0.200:8888/odin/api/v1/client/auth/app1/aa`
 ###### 返回示例:
-`{"code":200,"lease":6479673129519463168,"msg":"Deleting an instance succeed."}`
+`{"code":200,"data":{"auth":"","lease":6479674172846204672,"cipher":""},"msg":"Deleting an instance succeed."}`
 
 ---
 
 # *Client在线信息接口*
 ### 在线信息
-`curl -k -s -X GET --user admin:123 https://127.0.0.1:9999/odin/api/v1/client/online/demo1`
-`curl -k -s -X GET --user admin:123 https://127.0.0.1:9999/odin/api/v1/client/online/`
+`curl -k -s -X GET --user admin:123 https://10.0.0.200:8888/odin/api/v1/client/online/demo1`
+`curl -k -s -X GET --user admin:123 https://10.0.0.200:8888/odin/api/v1/client/online/`
 ###### 返回示例:
-`[{"id":"demo1/aa","online":"节点:aa(10.0.0.115) demo1 在线 00天00小时00分钟15秒."}]`
+`{
+     "code": 200,
+     "data": [
+         {
+             "id": "app1/a0",
+             "info": "节点:a0(10.0.0.254) app1 在线 00天00小时00分钟05秒."
+         },
+         {
+             "id": "app1/a1",
+             "info": "节点:a1(10.0.0.254) app1 在线 00天00小时00分钟05秒."
+         },
+         {
+             "id": "app1/a10",
+             "info": "节点:a10(10.0.0.254) app1 在线 00天00小时00分钟00秒."
+         },
+         {
+             "id": "app1/a2",
+             "info": "节点:a2(10.0.0.254) app1 在线 00天00小时00分钟04秒."
+         },
+         {
+             "id": "app1/a3",
+             "info": "节点:a3(10.0.0.254) app1 在线 00天00小时00分钟04秒."
+         },
+         {
+             "id": "app1/a4",
+             "info": "节点:a4(10.0.0.254) app1 在线 00天00小时00分钟03秒."
+         },
+         {
+             "id": "app1/a5",
+             "info": "节点:a5(10.0.0.254) app1 在线 00天00小时00分钟03秒."
+         },
+         {
+             "id": "app1/a6",
+             "info": "节点:a6(10.0.0.254) app1 在线 00天00小时00分钟02秒."
+         },
+         {
+             "id": "app1/a7",
+             "info": "节点:a7(10.0.0.254) app1 在线 00天00小时00分钟02秒."
+         },
+         {
+             "id": "app1/a8",
+             "info": "节点:a8(10.0.0.254) app1 在线 00天00小时00分钟01秒."
+         },
+         {
+             "id": "app1/a9",
+             "info": "节点:a9(10.0.0.254) app1 在线 00天00小时00分钟01秒."
+         }
+     ],
+     "msg": "success"
+ }`
 
 
 

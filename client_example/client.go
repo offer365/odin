@@ -77,8 +77,6 @@ tNBT2he8EJWiBzyZ31nGwTt/pQ==
 var url = "https://10.0.0.200:8888/odin/api/v1/client/auth/"
 var app string
 
-
-
 func main() {
 	app = "app1"
 	Example(GetCliWithNum(url, app, 12)...)
@@ -106,47 +104,46 @@ func Example(cli ...*Client) {
 
 func NewCli(url, app, id string) *Client {
 	return &Client{
-		Attr:&Attr{
-			Url:   url+app+"/"+id,
-			App:   app,
-			ID:    id,
-			Uid:   "",
+		Attr: &Attr{
+			Url: url + app + "/" + id,
+			App: app,
+			ID:  id,
+			Uid: "",
 		},
-		Result:new(Result),
+		Result: new(Result),
 	}
 }
 
 type Client struct {
 	*Attr
 	*Result
-	tls    *tls.Config
+	tls *tls.Config
 }
 
 type Attr struct {
-	Url string
-	App string
-	ID string
-	Uid string
+	Url      string
+	App      string
+	ID       string
+	Uid      string
 	AuthInfo string
 }
 
-
 type Result struct {
-	Code  int    `json:"code"`
-	Data  `json:"data"`
-	Msg   string `json:"msg"`
+	Code int `json:"code"`
+	Data `json:"data"`
+	Msg  string `json:"msg"`
 	//{"code": 200, "lease": lease, "msg": str}
 }
 
 type Data struct {
-	Auth string `json:"auth"`
-	Lease int64 `json:"lease"`
+	Auth   string `json:"auth"`
+	Lease  int64  `json:"lease"`
 	Cipher string `json:"cipher"`
 }
 
 type Body struct {
 	Lease int64
-	Uid string
+	Uid   string
 }
 
 func (cli *Client) Tls() {
@@ -175,45 +172,44 @@ func (cli *Client) POST() {
 	//cli.Body.Lease = cli.result.Data.Lease
 	//
 
-
 	//auth 与 cipher 可以使用不通的加密算法。
-	if cli.Cipher!=""{
+	if cli.Cipher != "" {
 		cli.Uid, _ = endeaesrsa.PubDecrypt(cli.Cipher, endecrypt.PubkeyClient2048, endecrypt.AesKeyClient2)
 	}
-	if cli.Auth!=""{
+	if cli.Auth != "" {
 		cli.AuthInfo, _ = endeaesrsa.PubDecrypt(cli.Auth, endecrypt.PubkeyClient2048, endecrypt.AesKeyClient2)
 	}
 
-	fmt.Println("认证..",cli.ID, cli.App, cli.Uid, cli.Lease, cli.AuthInfo,cli.Msg)
+	fmt.Println("认证..", cli.ID, cli.App, cli.Uid, cli.Lease, cli.AuthInfo, cli.Msg)
 }
 
 func (cli *Client) PUT() {
-	body:=&Body{
+	body := &Body{
 		Lease: cli.Lease,
 		Uid:   cli.Uid,
 	}
 	byt, _ := json.Marshal(body)
 	result := httplib.Put(cli.Url).SetTimeout(2*time.Second, 3*time.Second).Debug(false).SetBasicAuth("admin", "123").SetTLSClientConfig(cli.tls).Body(byt).Header("Content-Type", "application/json; charset=utf-8")
-	str,err:=result.String()
-	fmt.Println("心跳..",cli.ID,cli.App,cli.Uid,cli.Lease,str,err)
+	str, err := result.String()
+	fmt.Println("心跳..", cli.ID, cli.App, cli.Uid, cli.Lease, str, err)
 }
 
 func (cli *Client) DELETE() {
-	body:=&Body{
+	body := &Body{
 		Lease: cli.Lease,
 		Uid:   cli.Uid,
 	}
 	byt, _ := json.Marshal(body)
 	result := httplib.Delete(cli.Url).SetTimeout(2*time.Second, 3*time.Second).Body(byt).Debug(false).SetBasicAuth("admin", "123").SetTLSClientConfig(cli.tls).Body(byt).Header("Content-Type", "Application/json; charset=utf-8")
-	str,err:=result.String()
-	fmt.Println("注销..",cli.ID,cli.App,cli.Uid,cli.Lease,str,err)
+	str, err := result.String()
+	fmt.Println("注销..", cli.ID, cli.App, cli.Uid, cli.Lease, str, err)
 }
 
 func (cli *Client) RunExample() {
 	cli.Tls()
 	cli.POST() // 认证
 
-	for i := 0; i < 800; i++ {
+	for i := 0; i < 8; i++ {
 		mr.Seed(time.Now().Unix())
 		n := mr.Intn(8000)
 		time.Sleep(time.Duration(n) * time.Millisecond)

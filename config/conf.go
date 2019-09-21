@@ -1,9 +1,9 @@
 package config
 
 import (
-	"../log"
 	"encoding/json"
 	"flag"
+	"github.com/offer365/odin/log"
 	"io/ioutil"
 	"strconv"
 )
@@ -15,16 +15,16 @@ var (
 
 type Config struct {
 	Name   string
-	Addr   string   `json:"addr"`
-	Peer   string   `json:"peer"`
-	Client string   `json:"client"`
-	Web    string   `json:"web"`
-	Rpc    string   `json:"rpc"`
+	Addr   string `json:"addr"`
+	Peer   string `json:"peer"`
+	Client string `json:"client"`
+	Web    string `json:"web"`
+	Rpc    string `json:"rpc"`
 	//Ntp    bool     `json:"ntp"`
-	Dir    string   `json:"dir"`
-	Peers  []string `json:"peers"`
-	State  string   `json:"state"`
-	Pwd    string   `json:"pwd"`
+	Dir   string   `json:"dir"`
+	Peers []string `json:"peers"`
+	State string   `json:"state"`
+	Pwd   string   `json:"pwd"`
 }
 
 func (cfg *Config) LoadConfig(filename string) {
@@ -34,11 +34,11 @@ func (cfg *Config) LoadConfig(filename string) {
 	)
 	//读取配置文件
 	if content, err = ioutil.ReadFile(filename); err != nil {
-		goto ERR
+		log.Sugar.Fatal("failed to read configuration file. error: ", err.Error())
 	}
 	// json反序列化
 	if err = json.Unmarshal(content, cfg); err != nil {
-		goto ERR
+		log.Sugar.Fatal("failed to unmarshal configuration file. error: ", err.Error())
 	}
 
 	for id, ip := range cfg.Peers {
@@ -46,13 +46,6 @@ func (cfg *Config) LoadConfig(filename string) {
 			cfg.Name = "odin" + strconv.Itoa(id)
 		}
 	}
-	return
-ERR:
-	cfg.Addr = "127.0.0.1"
-	cfg.Peers = []string{"127.0.0.1"}
-	cfg.Peer = "12380"
-	cfg.Client = "12379"
-	log.Sugar.Error("Failed to load configuration file. error: ", err.Error())
 	return
 }
 

@@ -9,7 +9,7 @@ urlShutdown   = `http://10.0.0.200:9999/odin/api/client/collection/shutdown`
 
 访问流程
 1, 身份验证
-客户端 携带id与token    发送认证请求  到服务器 
+客户端 携带id与token    发送认证请求  到服务器
 例: http://10.0.0.200:9999/odin/api/client/collection/auth?id=bjszy001&token=f65490272577bbf04ef029ea7a4669230b
 服务器正常返回:
 {"code":200,"conf":"ZVjJ+eA/qXBpmSQuMEl2d6rLpCt8X9JvMo8G9fNK3nBX4pXFM6vYUI69yfk6fsqj2VT6Mg1GJhY1Bch+aFGG/4u+/iKo+re69LRJyYSZyaOap0mDlmE3B6upSeBt63Zi/R+OnHBd4uCncT+wVZ//6Bu0WHnjm7iCgQzdNoXrk145/9HEwdlXM/8xEZevS5N/Zxht2P0OjOE86rljintl6cKCNL+KGt4o3LpKKBZzUte8GxHBPl68i2uK6hVzeSVNYk/PmOINt+LgMk+nnJKgIk+hAjXwBwzOl9yCf7ZWgedY3rCjGEoyJ7UzlC2RUFPAU327V9iI/91+CVaYOq+HNqSueZURon/zFatwESK8vd4Sjh+7f8q6UK//m6ba5KdE2MfBxQhDuAyy6OjCZXuuF9XAQCb6EgIjHQqtjzD9CN+VlUY1cXJxsbPCj/S7cCMNegZIi9nRM+lZ9hMPcmqgLjBOfEQ351hdifDkXQd4NmNOW5FLm9fWgiAsOm6TTmzSvzpapczJ8wgoUVGqhBJmV4hHA+thTvVP09+sX9ev3J/GaQsMSU5c/pUwhNzgYwK8DDvExZTKv6ssfPlbeXvsVuXOfRhfkELfV5Fr3rYQsBQboLuvPbZPbtW+nbTmcaKqS0RvlB+8Ne+vtnNlVMMxVg+wS/LmKiMtC1GmSIDT3z+fbCyuq2KhVQbhm0yJ8H4Y","expire":"2019-03-25 14:17:33","lease":1686714280076933163,"msg":"auth: Verification passed."}
@@ -26,7 +26,7 @@ conf 要经过 aescbc 解密，与rsa 公钥解密。
 {"code":500,"expire":"0","lease":0,"msg":"","err":"auth: auth: Authorization encryption failed."}  服务器加密配置文件失败
 {"code":500,"expire":"0","lease":0,"msg":"","err":"auth: auth: The client instance failed to put."}  服务器put客户端失败
 {"code":400,"expire":"0","lease":0,"msg":"","err":"auth: Token verification failed."}  验证token 失败。
-{"code":404,"expire":"0","lease":0,"msg":"","err":"default: bad Request."} url 错误 
+{"code":404,"expire":"0","lease":0,"msg":"","err":"default: bad Request."} url 错误
 {"code":400,"err":"Authorization expired.","expire":"0","lease":0,"msg":""}  授权到期
 2, 存活心跳
 客户端 携带 id lease identity 发送 请求  到服务器

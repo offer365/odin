@@ -1,13 +1,13 @@
 package embedder
 
 import (
+	"../log"
 	"context"
 	"fmt"
 	"go.etcd.io/etcd/auth/authpb"
 	"go.etcd.io/etcd/embed"
 	"go.etcd.io/etcd/etcdserver/etcdserverpb"
 	"go.etcd.io/etcd/pkg/types"
-	"../log"
 	"strconv"
 	"time"
 )

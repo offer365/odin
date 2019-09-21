@@ -1,6 +1,11 @@
 package controller
 
 import (
+	"../log"
+	"../logic"
+	"../model"
+	"../pkg/qrcode"
+	"../pkg/tools"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
@@ -8,13 +13,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/offer365/endecrypt"
 	"github.com/offer365/endecrypt/endeaesrsa"
+	"github.com/satori/go.uuid"
 	"io/ioutil"
 	"net/http"
-	"../log"
-	"../logic"
-	"../model"
-	"../pkg/qrcode"
-	"../pkg/tools"
 	"sort"
 	"strings"
 	"sync"
@@ -22,7 +23,7 @@ import (
 )
 
 const (
-	success int = 200
+	success   int = 200
 	methodErr int = iota + 410
 	notExistErr
 	existErr
@@ -43,17 +44,17 @@ var Lock sync.Mutex
 type Body struct {
 	Uid   string `json:"uid"`
 	Lease int64  `json:"lease"`
-	Auth string `json:"auth"`
+	Auth  string `json:"auth"`
 }
 
 type result struct {
-	Auth string `json:"auth"`
-	Lease int64 `json:"lease"`
+	Auth   string `json:"auth"`
+	Lease  int64  `json:"lease"`
 	Cipher string `json:"cipher"`
 }
 
 type online struct {
-	ID string `json:"id"`
+	ID   string `json:"id"`
 	Info string `json:"info"`
 }
 
@@ -279,7 +280,7 @@ func ClientAPI(c *gin.Context) {
 		key := app + "/" + id
 		// 判断app 是否在授权中 && 是否到期
 		if !logic.LoadLic().CheckTime(app) {
-			c.JSON(200, gin.H{"code": notExistErr, "data": result{Lease:0}, "msg": "APP does not exist or authorization expires.",})
+			c.JSON(200, gin.H{"code": notExistErr, "data": result{Lease: 0}, "msg": "APP does not exist or authorization expires.",})
 			return
 		}
 		// 判断当前的客户端是否已经存在
@@ -290,7 +291,7 @@ func ClientAPI(c *gin.Context) {
 			Lock.Lock()
 			defer Lock.Unlock()
 			if cli != nil {
-				c.JSON(200, gin.H{"code": existErr, "data": result{Lease:0}, "msg": "The id app already exists."})
+				c.JSON(200, gin.H{"code": existErr, "data": result{Lease: 0}, "msg": "The id app already exists."})
 				return
 			}
 			//if  logic.CliM.Len()>=logic.RealTimeLicense.APPs[app].Instance{
@@ -307,109 +308,109 @@ func ClientAPI(c *gin.Context) {
 			// 获取cli的实例个数
 			num, err := logic.ClientCount(app)
 			if err != nil {
-				c.JSON(200, gin.H{"code": getErr, "data": result{Lease:0}, "msg": "Failed to get the number of app instances." + err.Error()})
+				c.JSON(200, gin.H{"code": getErr, "data": result{Lease: 0}, "msg": "Failed to get the number of app instances." + err.Error()})
 				return
 			}
 			// 检查实例是否超出授权个数
 			if int(num) >= logic.LoadLic().APPs[app].Instance {
-				c.JSON(200, gin.H{"code": excessErr, "data": result{Lease:0}, "msg": "The app has insufficient remaining instances."})
+				c.JSON(200, gin.H{"code": excessErr, "data": result{Lease: 0}, "msg": "The app has insufficient remaining instances."})
 				return
 			}
 
 			// 生成密文
 			cipher, err := endeaesrsa.PriEncrypt([]byte(nc.Uuid), endecrypt.PirkeyClient2048, endecrypt.AesKeyClient2)
 			if err != nil {
-				c.JSON(200, gin.H{"code": cipherErr, "data": result{Lease:0}, "msg": "The app failed to generate cipher." + err.Error()})
+				c.JSON(200, gin.H{"code": cipherErr, "data": result{Lease: 0}, "msg": "The app failed to generate cipher." + err.Error()})
 				return
 			}
 			// 这个租约id 在PutClient里面赋值
 			lease, err := logic.PutClient(key, nc)
 			if err != nil {
-				c.JSON(200, gin.H{"code": saveErr, "data": result{Lease:0}, "msg": "This app failed to save the instance." + err.Error()})
+				c.JSON(200, gin.H{"code": saveErr, "data": result{Lease: 0}, "msg": "This app failed to save the instance." + err.Error()})
 				return
 			}
-			attr:=logic.LoadLic().APPs[app].Attr
+			attr := logic.LoadLic().APPs[app].Attr
 			// 没有时间意义，混淆作用
-			attr["time"]=time.Now().UnixNano()
-			byt,_:=json.Marshal(attr)
-			auth,err:=endeaesrsa.PriEncrypt(byt, endecrypt.PirkeyClient2048, endecrypt.AesKeyClient2)
+			attr["time"] = time.Now().UnixNano()
+			byt, _ := json.Marshal(attr)
+			auth, err := endeaesrsa.PriEncrypt(byt, endecrypt.PirkeyClient2048, endecrypt.AesKeyClient2)
 			if err != nil {
-				c.JSON(200, gin.H{"code": cipherErr, "data": result{Lease:0}, "msg": "The app failed to generate cipher." + err.Error()})
+				c.JSON(200, gin.H{"code": cipherErr, "data": result{Lease: 0}, "msg": "The app failed to generate cipher." + err.Error()})
 				return
 			}
 			// 生成的auth 与 cipher 可以使用不通的加密算法。
-			c.JSON(200, gin.H{"code": success, "data": result{auth,lease, cipher}, "msg": "success",})
+			c.JSON(200, gin.H{"code": success, "data": result{auth, lease, cipher}, "msg": "success",})
 			return
 		case "PUT": // 心跳
 			// 实例不存在
 			if !exist {
-				c.JSON(200, gin.H{"code": notExistErr, "data": result{Lease:0}, "msg": "The client does not exist."})
+				c.JSON(200, gin.H{"code": notExistErr, "data": result{Lease: 0}, "msg": "The client does not exist."})
 				return
 			}
 			data, err := ioutil.ReadAll(c.Request.Body)
 			if err != nil {
-				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease:0}, "msg": "The request body data error." + err.Error()})
+				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request body data error." + err.Error()})
 				return
 			}
 			body := new(Body)
 			err = json.Unmarshal(data, body)
 			if err != nil {
-				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease:0}, "msg": "The request body data error." + err.Error()})
+				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request body data error." + err.Error()})
 				return
 			}
 			// uuid不匹配
 			if body.Uid != cli.Uuid {
-				c.JSON(200, gin.H{"code": uuidErr, "data": result{Lease:0}, "msg": "The client uuid error."})
+				c.JSON(200, gin.H{"code": uuidErr, "data": result{Lease: 0}, "msg": "The client uuid error."})
 				return
 			}
 			// 租约id不匹配
 			if body.Lease != cli.Lease {
-				c.JSON(200, gin.H{"code": leaseErr, "data": result{Lease:0}, "msg": "The client lease error."})
+				c.JSON(200, gin.H{"code": leaseErr, "data": result{Lease: 0}, "msg": "The client lease error."})
 				return
 			}
 			// 续租失败
 			if err = logic.KeepAliveClient(key, body.Lease); err != nil {
-				c.JSON(200, gin.H{"code": renErr, "data": result{Lease:body.Lease}, "msg": "Renewal failed." + err.Error()})
+				c.JSON(200, gin.H{"code": renErr, "data": result{Lease: body.Lease}, "msg": "Renewal failed." + err.Error()})
 				return
 			}
 			// 自定义 auth 返回重要的信息等等
-			c.JSON(200, gin.H{"code": success, "data": result{"",body.Lease,""}, "msg": "Successful renewal."})
+			c.JSON(200, gin.H{"code": success, "data": result{"", body.Lease, ""}, "msg": "Successful renewal."})
 			return
 		case "DELETE": // 关闭
 			if !exist {
-				c.JSON(200, gin.H{"code": notExistErr, "data": result{Lease:0}, "msg": "The client does not exist."})
+				c.JSON(200, gin.H{"code": notExistErr, "data": result{Lease: 0}, "msg": "The client does not exist."})
 				return
 			}
 			data, err := ioutil.ReadAll(c.Request.Body)
 			if err != nil {
-				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease:0}, "msg": "The request body data error." + err.Error()})
+				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request body data error." + err.Error()})
 				return
 			}
 			body := new(Body)
 			err = json.Unmarshal(data, body)
 			if err != nil {
-				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease:0}, "msg": "The request body data error." + err.Error()})
+				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request body data error." + err.Error()})
 				return
 			}
 			// uuid不匹配
 			if body.Uid != cli.Uuid {
-				c.JSON(200, gin.H{"code": uuidErr, "data": result{Lease:0}, "msg": "The client uuid error."})
+				c.JSON(200, gin.H{"code": uuidErr, "data": result{Lease: 0}, "msg": "The client uuid error."})
 				return
 			}
 			// 租约id不匹配
 			if body.Lease != cli.Lease {
-				c.JSON(200, gin.H{"code": leaseErr, "data": result{Lease:0}, "msg": "The client lease error."})
+				c.JSON(200, gin.H{"code": leaseErr, "data": result{Lease: 0}, "msg": "The client lease error."})
 				return
 			}
 			// 删掉此客户端实例
 			if err := logic.DelClient(key, body.Lease); err != nil {
-				c.JSON(200, gin.H{"code": delErr, "data": result{Lease:body.Lease}, "msg": "Deleting an instance failed." + err.Error()})
+				c.JSON(200, gin.H{"code": delErr, "data": result{Lease: body.Lease}, "msg": "Deleting an instance failed." + err.Error()})
 				return
 			}
-			c.JSON(200, gin.H{"code": 200, "data": result{Lease:body.Lease}, "msg": "Deleting an instance succeed."})
+			c.JSON(200, gin.H{"code": 200, "data": result{Lease: body.Lease}, "msg": "Deleting an instance succeed."})
 			return
 		default:
-			c.JSON(200, gin.H{"code": methodErr, "data": result{Lease:0}, "msg": "Method error."})
+			c.JSON(200, gin.H{"code": methodErr, "data": result{Lease: 0}, "msg": "Method error."})
 		}
 	}
 }
@@ -432,10 +433,10 @@ func CliOnlineAPI(c *gin.Context) {
 				}
 			}
 			for id, info := range tmp {
-				lines = append(lines, online{id,info})
+				lines = append(lines, online{id, info})
 			}
 			sort.Slice(lines, func(i, j int) bool {
-				return lines[i].ID<lines[j].ID
+				return lines[i].ID < lines[j].ID
 			})
 			c.JSON(http.StatusOK, gin.H{"code": 200, "data": lines, "msg": "success"})
 		}

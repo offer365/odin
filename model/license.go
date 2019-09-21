@@ -41,12 +41,12 @@ type License struct {
 }
 
 type APP struct {
-	Url          string         `json:"url"`
-	Name         string         `json:"name" title:"服务"`
+	Url          string           `json:"url"`
+	Name         string           `json:"name" title:"服务"`
 	Attr         map[string]int64 `json:"attr"`                          // 自定义内容
-	Instance     int            `json:"instance" title:"最大实例"`         // 实例
-	ExpireTime   time.Time      `json:"expire_time" title:"到期时间"`      // 授权到期的时间戳
-	MaxLifeCycle int64          `json:"max_life_cycle" title:"最大生存周期"` // 最大生存周期 (授权到期时间-生成授权时间)/周期时间60s
+	Instance     int              `json:"instance" title:"最大实例"`         // 实例
+	ExpireTime   time.Time        `json:"expire_time" title:"到期时间"`      // 授权到期的时间戳
+	MaxLifeCycle int64            `json:"max_life_cycle" title:"最大生存周期"` // 最大生存周期 (授权到期时间-生成授权时间)/周期时间60s
 	rv           reflect.Value
 	rt           reflect.Type
 	mu           sync.RWMutex
