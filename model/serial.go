@@ -1,10 +1,10 @@
 package model
 
 import (
-	"../node"
 	"encoding/json"
 	"github.com/offer365/endecrypt"
 	"github.com/offer365/endecrypt/endeaesrsa"
+	"github.com/offer365/odin/node"
 	"github.com/satori/go.uuid"
 	"time"
 )

@@ -1,9 +1,9 @@
 package logic
 
 import (
-	"../log"
-	"../model"
 	"encoding/json"
+	"github.com/offer365/odin/log"
+	"github.com/offer365/odin/model"
 	"go.etcd.io/etcd/clientv3"
 	"strings"
 )

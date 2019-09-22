@@ -1,11 +1,6 @@
 package controller
 
 import (
-	"../log"
-	"../logic"
-	"../model"
-	"../pkg/qrcode"
-	"../pkg/tools"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
@@ -13,6 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/offer365/endecrypt"
 	"github.com/offer365/endecrypt/endeaesrsa"
+	"github.com/offer365/odin/log"
+	"github.com/offer365/odin/logic"
+	"github.com/offer365/odin/model"
+	"github.com/offer365/odin/pkg/qrcode"
+	"github.com/offer365/odin/pkg/tools"
 	"github.com/satori/go.uuid"
 	"io/ioutil"
 	"net/http"

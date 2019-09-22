@@ -1,7 +1,7 @@
 package logic
 
 import (
-	"../log"
+	"github.com/offer365/odin/log"
 	"go.etcd.io/etcd/clientv3"
 	"strings"
 )

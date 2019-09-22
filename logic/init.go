@@ -1,12 +1,12 @@
 package logic
 
 import (
-	"../config"
-	"../dao"
-	"../embedder"
-	"../model"
-	"../node"
 	"context"
+	"github.com/offer365/odin/config"
+	"github.com/offer365/odin/dao"
+	"github.com/offer365/odin/embedder"
+	"github.com/offer365/odin/model"
+	"github.com/offer365/odin/node"
 	"time"
 )
 

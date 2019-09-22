@@ -1,15 +1,15 @@
 package odinmain
 
 import (
-	"../asset"
-	"../config"
-	"../log"
-	"../logic"
-	"../model"
-	"../node"
 	"fmt"
 	"github.com/gorhill/cronexpr"
-	//"../ntpd"
+	"github.com/offer365/odin/asset"
+	"github.com/offer365/odin/config"
+	"github.com/offer365/odin/log"
+	"github.com/offer365/odin/logic"
+	"github.com/offer365/odin/model"
+	"github.com/offer365/odin/node"
+	//"github.com/offer365/odin/ntpd"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -58,7 +58,7 @@ func RestoreAsset() {
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	fmt.Println(logo)
-	//RestoreAsset()
+	RestoreAsset()
 }
 
 func Main() {

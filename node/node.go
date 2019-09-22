@@ -1,12 +1,12 @@
 package node
 
 import (
-	"../log"
 	"context"
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"github.com/offer365/odin/log"
 	"github.com/zcalusic/sysinfo"
 	"net"
 	"net/rpc"

@@ -1,12 +1,12 @@
 package odinmain
 
 import (
-	"../config"
-	"../controller"
-	"../log"
 	"crypto/rand"
 	"crypto/tls"
 	"github.com/gin-gonic/gin"
+	"github.com/offer365/odin/config"
+	"github.com/offer365/odin/controller"
+	"github.com/offer365/odin/log"
 	"net/http"
 	"time"
 )

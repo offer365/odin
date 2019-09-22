@@ -1,7 +1,7 @@
 package logic
 
 import (
-	"../model"
+	"github.com/offer365/odin/model"
 	"go.etcd.io/etcd/clientv3"
 	"time"
 )

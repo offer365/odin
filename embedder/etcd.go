@@ -1,9 +1,9 @@
 package embedder
 
 import (
-	"../log"
 	"context"
 	"fmt"
+	"github.com/offer365/odin/log"
 	"go.etcd.io/etcd/auth/authpb"
 	"go.etcd.io/etcd/embed"
 	"go.etcd.io/etcd/etcdserver/etcdserverpb"

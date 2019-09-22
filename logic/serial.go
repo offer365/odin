@@ -1,10 +1,10 @@
 package logic
 
 import (
-	"../config"
-	"../log"
-	"../node"
 	"context"
+	"github.com/offer365/odin/config"
+	"github.com/offer365/odin/log"
+	"github.com/offer365/odin/node"
 	"go.etcd.io/etcd/clientv3"
 	"strconv"
 	"sync"

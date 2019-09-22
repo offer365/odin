@@ -1,11 +1,11 @@
 package dao
 
 import (
-	"../log"
 	"context"
 	"crypto/md5"
 	"encoding/base64"
 	"errors"
+	"github.com/offer365/odin/log"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/clientv3/concurrency"
 	"go.etcd.io/etcd/mvcc/mvccpb"
