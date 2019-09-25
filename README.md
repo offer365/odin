@@ -13,10 +13,7 @@
 
 ## 安装运行 ##
 #### 安装odin
-<<<<<<< HEAD
-=======
 
->>>>>>> 33a979a811a548be4eeb561a04c035a55586b28d
 ```
 unzip odin-xxx-linux.amd64.zip
 
@@ -29,13 +26,10 @@ sh install.sh
 ./appctl.sh getcode
 
 ```
-<<<<<<< HEAD
 
 访问 127.0.0.1:8888
-=======
 >
 > 访问 https://127.0.0.1:8888
->>>>>>> 33a979a811a548be4eeb561a04c035a55586b28d
 
 
 #### 相关说明
