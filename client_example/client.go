@@ -78,7 +78,7 @@ var url = "https://10.0.0.200:8888/odin/api/v1/client/auth/"
 var app string
 
 func main() {
-	app = "app1"
+	app = "nlp"
 	Example(GetCliWithNum(url, app, 12)...)
 	//app = "test_app"
 	//Example(GetCliWithNum(url, app, 50)...)

@@ -3,22 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="aa8a0eed-f415-4285-8944-9e75331cac68" name="默认更改列表" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appctl.sh" beforeDir="false" afterPath="$PROJECT_DIR$/appctl.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controller/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/etcd.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/etcd.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedder/etcd.go" beforeDir="false" afterPath="$PROJECT_DIR$/embedder/etcd.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/clearLicense.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/clearLicense.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/init.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/init.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/license.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/license.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/serial.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/serial.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/serial.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/serial.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node/node.go" beforeDir="false" afterPath="$PROJECT_DIR$/node/node.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/odinmain/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/odinmain/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/odinmain/web.go" beforeDir="false" afterPath="$PROJECT_DIR$/odinmain/web.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/bindata.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/bindata.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_example/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/client_example/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/license.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/license.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -54,7 +40,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.go build github.com/offer365/odin">
+  <component name="RunManager" selected="Go Build.go build github.com/offer365/odin/client_example">
     <configuration name="go build github.com/offer365/odin" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="odin" />
       <working_directory value="$PROJECT_DIR$/" />
@@ -75,8 +61,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build github.com/offer365/odin" />
         <item itemvalue="Go Build.go build github.com/offer365/odin/client_example" />
+        <item itemvalue="Go Build.go build github.com/offer365/odin" />
       </list>
     </recent_temporary>
   </component>

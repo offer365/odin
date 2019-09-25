@@ -112,12 +112,12 @@ func (a *APP) fieldName() item {
 
 func (a *APP) fieldAttr() (items []item) {
 	var (
-		value map[string]int
+		value map[string]int64
 	)
-	value, ok := a.rv.FieldByName("Attr").Interface().(map[string]int)
+	value, ok := a.rv.FieldByName("Attr").Interface().(map[string]int64)
 	if ok {
 		for k, v := range value {
-			items = append(items, item{Title: k, Value: strconv.Itoa(v)})
+			items = append(items, item{Title: k, Value: strconv.Itoa(int(v))})
 		}
 	}
 	return
