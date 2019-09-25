@@ -13,19 +13,21 @@
 
 ## 安装运行 ##
 #### 安装odin
-> `cd /home/admin`
+
+```
+unzip odin-xxx-linux.amd64.zip
+
+cd odin
+
+sh install.sh
+
+./appctl.sh resetcode 
+
+./appctl.sh getcode
+
+```
 >
-> `git clone git@github.com:offer365/odin.git`
->
-> `cd odin;go build`
->
->`cp scripts/odin.service /usr/lib/systemd/system/`
->
->`systemctl enable odin`
->
->`systemctl start odin`
->
-> 访问 ip:8888
+> 访问 https://127.0.0.1:8888
 
 
 #### 相关说明
