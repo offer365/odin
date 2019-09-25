@@ -41,7 +41,7 @@ const (
 var secrets = gin.H{"admin": nil}
 var Lock sync.Mutex
 
-type Body struct {
+type body struct {
 	Uid   string `json:"uid"`
 	Lease int64  `json:"lease"`
 	Auth  string `json:"auth"`
@@ -56,6 +56,11 @@ type result struct {
 type online struct {
 	ID   string `json:"id"`
 	Info string `json:"info"`
+}
+
+type status struct {
+	ID     string `json:"id"`
+	Online string `json:"online"`
 }
 
 // 序列号Api
@@ -199,18 +204,18 @@ func LicenseAPI(c *gin.Context) {
 // 运行状态Api
 func NodeStatusAPI(c *gin.Context) {
 	var (
-		nodeList = make([]gin.H, 0)
+		nodeL = make([]status, 0)
 	)
 	user := c.MustGet(gin.AuthUserKey).(string)
 	if _, ok := secrets[user]; ok {
-		nodes := logic.GetAllNodes()
-		for _, n := range nodes {
-			nodeList = append(nodeList, gin.H{
-				"id":     n.Name,
-				"online": fmt.Sprintf("节点:%s ip:%s %s", n.Name, n.IP, tools.RunTime(n.Now, n.Start)),
-			})
+		nodeM := logic.GetAllNodes()
+		for _, n := range nodeM {
+			nodeL = append(nodeL, status{n.Name, fmt.Sprintf("节点:%s ip:%s %s", n.Name, n.IP, tools.RunTime(n.Now, n.Start))})
 		}
-		c.JSON(http.StatusOK, gin.H{"code": 200, "data": nodeList, "msg": "success",})
+		sort.Slice(nodeL, func(i, j int) bool {
+			return nodeL[i].ID < nodeL[j].ID
+		})
+		c.JSON(http.StatusOK, gin.H{"code": 200, "data": nodeL, "msg": "success",})
 	}
 }
 
@@ -349,32 +354,32 @@ func ClientAPI(c *gin.Context) {
 			}
 			data, err := ioutil.ReadAll(c.Request.Body)
 			if err != nil {
-				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request body data error." + err.Error()})
+				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request bd data error." + err.Error()})
 				return
 			}
-			body := new(Body)
-			err = json.Unmarshal(data, body)
+			bd := new(body)
+			err = json.Unmarshal(data, bd)
 			if err != nil {
-				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request body data error." + err.Error()})
+				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request bd data error." + err.Error()})
 				return
 			}
 			// uuid不匹配
-			if body.Uid != cli.Uuid {
+			if bd.Uid != cli.Uuid {
 				c.JSON(200, gin.H{"code": uuidErr, "data": result{Lease: 0}, "msg": "The client uuid error."})
 				return
 			}
 			// 租约id不匹配
-			if body.Lease != cli.Lease {
+			if bd.Lease != cli.Lease {
 				c.JSON(200, gin.H{"code": leaseErr, "data": result{Lease: 0}, "msg": "The client lease error."})
 				return
 			}
 			// 续租失败
-			if err = logic.KeepAliveClient(key, body.Lease); err != nil {
-				c.JSON(200, gin.H{"code": renErr, "data": result{Lease: body.Lease}, "msg": "Renewal failed." + err.Error()})
+			if err = logic.KeepAliveClient(key, bd.Lease); err != nil {
+				c.JSON(200, gin.H{"code": renErr, "data": result{Lease: bd.Lease}, "msg": "Renewal failed." + err.Error()})
 				return
 			}
 			// 自定义 auth 返回重要的信息等等
-			c.JSON(200, gin.H{"code": success, "data": result{"", body.Lease, ""}, "msg": "Successful renewal."})
+			c.JSON(200, gin.H{"code": success, "data": result{"", bd.Lease, ""}, "msg": "Successful renewal."})
 			return
 		case "DELETE": // 关闭
 			if !exist {
@@ -383,31 +388,31 @@ func ClientAPI(c *gin.Context) {
 			}
 			data, err := ioutil.ReadAll(c.Request.Body)
 			if err != nil {
-				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request body data error." + err.Error()})
+				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request bd data error." + err.Error()})
 				return
 			}
-			body := new(Body)
-			err = json.Unmarshal(data, body)
+			bd := new(body)
+			err = json.Unmarshal(data, bd)
 			if err != nil {
-				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request body data error." + err.Error()})
+				c.JSON(200, gin.H{"code": bodyErr, "data": result{Lease: 0}, "msg": "The request bd data error." + err.Error()})
 				return
 			}
 			// uuid不匹配
-			if body.Uid != cli.Uuid {
+			if bd.Uid != cli.Uuid {
 				c.JSON(200, gin.H{"code": uuidErr, "data": result{Lease: 0}, "msg": "The client uuid error."})
 				return
 			}
 			// 租约id不匹配
-			if body.Lease != cli.Lease {
+			if bd.Lease != cli.Lease {
 				c.JSON(200, gin.H{"code": leaseErr, "data": result{Lease: 0}, "msg": "The client lease error."})
 				return
 			}
 			// 删掉此客户端实例
-			if err := logic.DelClient(key, body.Lease); err != nil {
-				c.JSON(200, gin.H{"code": delErr, "data": result{Lease: body.Lease}, "msg": "Deleting an instance failed." + err.Error()})
+			if err := logic.DelClient(key, bd.Lease); err != nil {
+				c.JSON(200, gin.H{"code": delErr, "data": result{Lease: bd.Lease}, "msg": "Deleting an instance failed." + err.Error()})
 				return
 			}
-			c.JSON(200, gin.H{"code": 200, "data": result{Lease: body.Lease}, "msg": "Deleting an instance succeed."})
+			c.JSON(200, gin.H{"code": 200, "data": result{Lease: bd.Lease}, "msg": "Deleting an instance succeed."})
 			return
 		default:
 			c.JSON(200, gin.H{"code": methodErr, "data": result{Lease: 0}, "msg": "Method error."})

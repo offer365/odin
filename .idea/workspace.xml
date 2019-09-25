@@ -2,19 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa8a0eed-f415-4285-8944-9e75331cac68" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/scripts/install.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/appctl.sh" beforeDir="false" afterPath="$PROJECT_DIR$/appctl.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/asset/asset.go" beforeDir="false" afterPath="$PROJECT_DIR$/asset/asset.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client_example/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/client_example/client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/conf.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/conf.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/log/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/log/log.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/clearLicense.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/clearLicense.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/init.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/init.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/license.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/license.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/odinmain/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/odinmain/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedder/etcd.go" beforeDir="false" afterPath="$PROJECT_DIR$/embedder/etcd.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/bindata.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/bindata.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/odin.service" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/odin.service" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
