@@ -39,12 +39,6 @@ func PutLicense(val string) (err error) {
 		log.Sugar.Error("put license failed. error: ", err)
 		return
 	}
-	IsAuth = true
-	// 将授权状态变为 true
-	if _, err = store.Put(licenseStatusKEY, "true"); err != nil {
-		log.Sugar.Error("get license status failed. error: ", err)
-		return
-	}
 	return
 }
 
@@ -52,12 +46,6 @@ func PutLicense(val string) (err error) {
 func DelLicense() (err error) {
 	if _, err = store.Del(licenseKey); err != nil {
 		log.Sugar.Error("del license failed. error: ", err)
-		return
-	}
-	IsAuth = false
-	// 将授权状态变为 false
-	if _, err = store.Put(licenseStatusKEY, "false"); err != nil {
-		log.Sugar.Error("get license status failed. error: ", err)
 		return
 	}
 	return
@@ -102,30 +90,44 @@ func lic2str(lic interface{}) (text string, err error) {
 // 重置license
 func ResetLicense() (err error) {
 	var (
-		text string
+		cipher string
+		lic    *model.License
 	)
-	if !IsAuth {
-		return nil
+	if cipher, err = GetLicense(); err != nil {
+		log.Sugar.Error("get lic failed. error: ", err.Error())
+		return
 	}
+	if cipher == "" {
+		return
+	}
+	if lic, err = Str2lic(cipher); err != nil {
+		log.Sugar.Error("in reset lic,get lic failed. error: ", err.Error())
+		return
+	}
+	if lic.Lid == "" {
+		return
+	}
+
 	now := time.Now()
-	lic := LoadLic()
 	num := (now.Unix() - lic.GenerationTime.Unix()) / 60
+	// 这里限制了 LifeCycle 只能不断的增大
 	if num > lic.LifeCycle {
 		lic.LifeCycle = num
 	} else {
 		lic.LifeCycle += 1
 	}
 
+	// 这里限制了 UpdateTime 只能不断的增大
 	if now.After(lic.UpdateTime) {
 		lic.UpdateTime = now
 	} else {
 		lic.UpdateTime.Add(60 * time.Second)
 	}
-	if text, err = lic2str(lic); err != nil {
+	if cipher, err = lic2str(lic); err != nil {
 		log.Sugar.Error("reset lic failed. error: ", err.Error())
 		return
 	}
-	if err = PutLicense(text); err != nil {
+	if err = PutLicense(cipher); err != nil {
 		log.Sugar.Error("reset lic failed. error: ", err.Error())
 	}
 	StoreLic(lic)
@@ -135,7 +137,6 @@ func ResetLicense() (err error) {
 // 监听license
 func WatchLicense() {
 	putFunc := func(event *clientv3.Event) error {
-		IsAuth = true
 		if !Device.IsLeader() {
 			lic, err := Str2lic(string(event.Kv.Value))
 			if err == nil {
@@ -146,7 +147,6 @@ func WatchLicense() {
 		return nil
 	}
 	delFunc := func(event *clientv3.Event) error {
-		IsAuth = false
 		lic := LoadLic()
 		lic.APPs = make(map[string]*model.APP, 0)
 		StoreLic(lic)
@@ -204,31 +204,6 @@ func ChkLicense(cipher string) (lic *model.License, ok bool, msg string) {
 	}
 	ok = true
 	msg = "授权码正确"
-	return
-}
-
-// 获取授权状态
-func GetLicenseStatus() (err error) {
-	var (
-		resp *clientv3.GetResponse
-	)
-	if resp, err = store.Get(licenseStatusKEY); err != nil {
-		IsAuth = false
-		return
-	}
-	if len(resp.Kvs) > 0 {
-		if string(resp.Kvs[0].Value) == "true" {
-			IsAuth = true
-		}
-	}
-
-	if resp, err = store.Count(licenseKey); err != nil {
-		IsAuth = false
-		return
-	}
-	if resp.Count == 0 {
-		IsAuth = false
-	}
 	return
 }
 

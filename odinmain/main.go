@@ -160,15 +160,15 @@ func loadLic() (err error) {
 		cipher string
 		lic    *model.License
 	)
-	err = logic.GetLicenseStatus()
-	if err != nil {
-		log.Sugar.Error("get license status failed. error: ", err.Error())
-	}
 	if cipher, err = logic.GetLicense(); err != nil {
 		log.Sugar.Error("get license failed. error: ", err.Error())
 	}
 
-	lic, err = logic.Str2lic(cipher)
+	if cipher == "" {
+		lic = new(model.License)
+	} else {
+		lic, err = logic.Str2lic(cipher)
+	}
 	logic.StoreLic(lic)
 
 	return

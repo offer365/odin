@@ -11,9 +11,8 @@ import (
 )
 
 const (
-	licenseKey       = "/odin/license"
-	clearLicenseKey  = "/odin/clear_license"
-	licenseStatusKEY = "/odin/license_status"
+	licenseKey      = "/odin/license"
+	clearLicenseKey = "/odin/clear_license"
 
 	clientConfigKeyPrefix = "/odin/client_config/"
 	clientKeyPrefix       = "/odin/client/"
@@ -26,7 +25,6 @@ var (
 	Device embedder.Embed
 	//license *model.License
 	Serial *model.SerialNum
-	IsAuth bool
 	Self   *node.Node
 )
 

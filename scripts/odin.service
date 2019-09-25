@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 Restart=always
-ExecStart=/home/admin/odin/odin -f /home/admin/odin/odin.json
-WorkingDirectory=/home/admin/odin
+ExecStart=PATH/odin -f PATH/odin.json
+WorkingDirectory=PATH
 ExecStop=kill -9 $MAINPID
 
 [Install]

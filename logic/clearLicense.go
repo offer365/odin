@@ -19,7 +19,7 @@ func GenClearLicense() (text string, err error) {
 		return
 	}
 	obj := make(map[string]interface{})
-	obj["real_time_license"] = LoadLic()
+	obj["real_time_license"] = lic
 	obj["license"] = text
 	obj["date"] = time.Now().Format("2006-01-02 15:04:05")
 	text, err = lic2str(obj)
