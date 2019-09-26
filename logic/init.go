@@ -32,7 +32,6 @@ var (
 
 func init() {
 	store = dao.NewStore()
-	//License = new(model.License)
 	Serial = new(model.SerialNum)
 	Self = node.NewNode(config.Cfg.Name, config.Cfg.Addr)
 

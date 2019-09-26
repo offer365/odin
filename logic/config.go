@@ -77,6 +77,12 @@ func MemberConf() {
 		byt []byte
 		ips map[string]string
 	)
+	defer func() {
+		if err := recover(); err != nil {
+			log.Sugar.Error("run member conf failed. error: ", err)
+			return
+		}
+	}()
 	if mbs, err = GetConfig(membersKey); err != nil {
 		log.Sugar.Error("get config members failed. error: ", err)
 		return
