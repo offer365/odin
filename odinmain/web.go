@@ -126,7 +126,7 @@ func route() (r *gin.Engine) {
 	}))
 
 	// 序列号
-	api.Any("/server/code", controller.RankCodeAPI)
+	api.Any("/server/code", controller.SerialNumAPI)
 	// 序列号二维码
 	api.GET("/server/qr-code", controller.QrCodeAPI)
 	// 授权码

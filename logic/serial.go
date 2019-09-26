@@ -20,7 +20,8 @@ func GetSerialNum() (info string, err error) {
 	var (
 		getResp *clientv3.GetResponse
 	)
-	if getResp, err = store.Get(rankCodeKey); err != nil {
+	info = "请重新获取序列号。"
+	if getResp, err = store.Get(serialNumKey); err != nil {
 		return
 	}
 	if len(getResp.Kvs) > 0 {
@@ -31,7 +32,7 @@ func GetSerialNum() (info string, err error) {
 
 // 写入序列号
 func PutSerialNum(val string) (err error) {
-	if _, err = store.Put(rankCodeKey, val); err != nil {
+	if _, err = store.Put(serialNumKey, val); err != nil {
 		log.Sugar.Error("put serial num failed. error: ", err.Error())
 	}
 	return nil

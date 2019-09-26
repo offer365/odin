@@ -96,21 +96,21 @@ func Server() {
 	if err = logic.InitStore(config.Cfg.Addr, config.Cfg.Client, Username, Password, time.Second*3); err != nil {
 		log.Sugar.Error("init store failed. error: ", err.Error())
 	}
-	// 生成机器码
-	//if err = initHardware(); err != nil {
-	//	log.Error("Failed to generate rank code when service starts. error: ", err.Error())
-	//}
 
 	// 从etcd加载license
 	if err := loadLic(); err != nil {
 		log.Sugar.Error("init license failed. error: ", err.Error())
 	}
+	logic.DefaultConf()
+	logic.MemberConf()
 
 	// 间隔1分钟更新授权
 	go func() {
 		ticker := time.Tick(1 * time.Minute) // 1分钟
 		expr := cronexpr.MustParse("* * * * *")
 		for range ticker {
+			// 成员列表
+			logic.MemberConf()
 			now := time.Now()
 			next := expr.Next(now)
 			time.AfterFunc(next.Sub(now), func() {

@@ -35,11 +35,11 @@ func GetClient(key string) (cli *model.Cli, ok bool) {
 }
 
 // 获取所有Client
-func GetAllClient(product string) (all map[string]string, err error) {
+func GetAllClient(app string) (all map[string]string, err error) {
 	var (
 		getResp *clientv3.GetResponse
 	)
-	key := clientKeyPrefix + product
+	key := clientKeyPrefix + app
 	if getResp, err = store.GetAll(key); err != nil {
 		log.Sugar.Error("get all client failed. error: ", err.Error())
 		return
@@ -54,11 +54,11 @@ func GetAllClient(product string) (all map[string]string, err error) {
 }
 
 // 获取所有Client个数
-func ClientCount(product string) (count int64, err error) {
+func ClientCount(app string) (count int64, err error) {
 	var (
 		resp *clientv3.GetResponse
 	)
-	key := clientKeyPrefix + product
+	key := clientKeyPrefix + app
 	if resp, err = store.Count(key); err != nil {
 		log.Sugar.Error("get all client failed. error: ", err.Error())
 		return

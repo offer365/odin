@@ -246,26 +246,3 @@ func GetRemoteNode(ctx context.Context, name, ip, port string) (node *Node, err 
 		return
 	}
 }
-
-func GetRemoteNode2(ctx context.Context, name, ip, port string) (node *Node, err error) {
-	ch := make(chan struct{}, 1)
-	go func() {
-		var cli *rpc.Client
-		cli, err = rpc.Dial("tcp", ip+":"+port)
-		if err != nil {
-			ch <- struct{}{}
-			return
-		}
-		node = NewNode(name, ip)
-		err = cli.Call("Node.Status", Args{name, ip}, node)
-		cli.Close()
-		ch <- struct{}{}
-		return
-	}()
-	select {
-	case <-ctx.Done():
-		return nil, errors.New("Call timeout error.")
-	case <-ch:
-		return
-	}
-}

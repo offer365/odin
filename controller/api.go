@@ -63,8 +63,13 @@ type status struct {
 	Online string `json:"online"`
 }
 
+type conf struct {
+	Name string `json:"name"`
+	Text string `json:"text"`
+}
+
 // 序列号Api
-func RankCodeAPI(c *gin.Context) {
+func SerialNumAPI(c *gin.Context) {
 	var (
 		key string
 		err error
@@ -222,7 +227,7 @@ func NodeStatusAPI(c *gin.Context) {
 // 客户端配置Api
 func ConfAPI(c *gin.Context) {
 	var (
-		list       = make([]gin.H, 0)
+		list       = make([]conf, 0)
 		all        map[string]string
 		err        error
 		name, text string
@@ -240,7 +245,8 @@ func ConfAPI(c *gin.Context) {
 					c.JSON(200, gin.H{"code": 412, "msg": "Code value error." + err.Error(), "data": ""})
 					return
 				}
-				c.JSON(200, gin.H{"code": 200, "data": []gin.H{{"name": name, "text": text}}, "msg": "success"})
+				list = append(list, conf{name, text})
+				c.JSON(200, gin.H{"code": 200, "data": list, "msg": "success"})
 				return
 			}
 			// 获取多个config
@@ -248,11 +254,11 @@ func ConfAPI(c *gin.Context) {
 				all = map[string]string{"default": err.Error()}
 			}
 			for name, text := range all {
-				list = append(list, gin.H{
-					"name": name,
-					"text": text,
-				})
+				list = append(list, conf{name, text})
 			}
+			sort.Slice(list, func(i, j int) bool {
+				return list[i].Name < list[j].Name
+			})
 			c.JSON(200, gin.H{"code": 200, "data": list, "msg": "success"})
 
 		case "DELETE":
@@ -263,13 +269,17 @@ func ConfAPI(c *gin.Context) {
 			c.JSON(200, gin.H{"code": 200, "msg": "Delete key success.", "data": ""})
 
 		case "POST", "PUT":
+			_, ok := logic.PutWhiteList[name]
+			if ok {
+				c.JSON(200, gin.H{"code": 200, "msg": "The key " + name + " can only be accessed and cannot be edited.", "data": ""})
+				return
+			}
 			text = c.PostForm("text")
 			if err = logic.PutConfig(name, text); err != nil {
 				c.JSON(200, gin.H{"code": 200, "msg": err.Error(), "data": "",})
 				return
 			}
 			c.JSON(200, gin.H{"code": 200, "msg": "Post or Put key success.", "data": ""})
-
 		default:
 			c.JSON(200, gin.H{"code": 1, "msg": "Method error.", "data": ""})
 		}
@@ -299,10 +309,6 @@ func ClientAPI(c *gin.Context) {
 				c.JSON(200, gin.H{"code": existErr, "data": result{Lease: 0}, "msg": "The id app already exists."})
 				return
 			}
-			//if  logic.CliM.Len()>=logic.RealTimeLicense.APPs[app].Instance{
-			//	c.JSON(200, gin.H{"code": 416, "lease": 0, "msg": "The app has insufficient remaining instances."})
-			//	return
-			//}
 
 			nc := new(model.Cli)
 			nc.App = app
@@ -335,7 +341,7 @@ func ClientAPI(c *gin.Context) {
 				return
 			}
 			attr := logic.LoadLic().APPs[app].Attr
-			// 没有时间意义，混淆作用
+			// 没有意义，混淆作用
 			attr["time"] = time.Now().UnixNano()
 			byt, _ := json.Marshal(attr)
 			auth, err := endeaesrsa.PriEncrypt(byt, endecrypt.PirkeyClient2048, endecrypt.AesKeyClient2)
@@ -343,7 +349,7 @@ func ClientAPI(c *gin.Context) {
 				c.JSON(200, gin.H{"code": cipherErr, "data": result{Lease: 0}, "msg": "The app failed to generate cipher." + err.Error()})
 				return
 			}
-			// 生成的auth 与 cipher 可以使用不通的加密算法。
+			// 生成的auth 与 cipher 可以使用不同的加密算法。
 			c.JSON(200, gin.H{"code": success, "data": result{auth, lease, cipher}, "msg": "success",})
 			return
 		case "PUT": // 心跳

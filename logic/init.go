@@ -11,21 +11,23 @@ import (
 )
 
 const (
-	licenseKey      = "/odin/license"
-	clearLicenseKey = "/odin/clear_license"
-
+	licenseKey            = "/odin/license"
+	clearLicenseKey       = "/odin/clear_license"
 	clientConfigKeyPrefix = "/odin/client_config/"
 	clientKeyPrefix       = "/odin/client/"
-
-	rankCodeKey = "/odin/rank_code"
+	serialNumKey          = "/odin/serial_num"
+	membersKey            = "members"
+	defaultKey            = "default"
 )
 
 var (
-	store  dao.Store
-	Device embedder.Embed
-	//license *model.License
-	Serial *model.SerialNum
-	Self   *node.Node
+	store         dao.Store
+	Device        embedder.Embed
+	Serial        *model.SerialNum
+	Self          *node.Node
+	members       = make(map[string]string, 0)
+	confWhiteList = map[string]string{"default": "", "members": ""} // 在白名单的配置无法删除
+	PutWhiteList  = map[string]string{"members": ""}                // 在白名单的配置外部无法编辑
 )
 
 func init() {
@@ -33,6 +35,7 @@ func init() {
 	//License = new(model.License)
 	Serial = new(model.SerialNum)
 	Self = node.NewNode(config.Cfg.Name, config.Cfg.Addr)
+
 }
 
 func InitStore(ip, port, user, pwd string, timeout time.Duration) (err error) {

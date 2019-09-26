@@ -74,12 +74,13 @@ tNBT2he8EJWiBzyZ31nGwTt/pQ==
 `
 )
 
-var url = "https://10.0.0.200:8888/odin/api/v1/client/auth/"
+var member []string = []string{"10.0.0.200", "10.0.0.201", "10.0.0.202"}
+var format = "https://%s:8888/odin/api/v1/client/auth/"
 var app string
 
 func main() {
 	app = "nlp"
-	Example(GetCliWithNum(url, app, 12)...)
+	Example(GetCliWithNum(app, 1000)...)
 	//app = "test_app"
 	//Example(GetCliWithNum(url, app, 50)...)
 	//app = "demo3"
@@ -87,17 +88,20 @@ func main() {
 	select {}
 }
 
-func GetCliWithNum(url, pro string, n int) []*Client {
+func GetCliWithNum(app string, n int) []*Client {
 	cli := make([]*Client, 0)
 	for i := 0; i < n; i++ {
-		cli = append(cli, NewCli(url, pro, "a"+strconv.Itoa(i)))
+		index := i % len(member)
+		ip := member[index]
+		url := fmt.Sprintf(format, ip)
+		cli = append(cli, NewCli(url, app, "a"+strconv.Itoa(i)))
 	}
 	return cli
 }
 
 func Example(cli ...*Client) {
 	for _, c := range cli {
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(500 * time.Millisecond)
 		go c.RunExample()
 	}
 }
@@ -180,7 +184,7 @@ func (cli *Client) POST() {
 		cli.AuthInfo, _ = endeaesrsa.PubDecrypt(cli.Auth, endecrypt.PubkeyClient2048, endecrypt.AesKeyClient2)
 	}
 
-	fmt.Println("认证..", cli.ID, cli.App, cli.Uid, cli.Lease, cli.AuthInfo, cli.Msg)
+	fmt.Println("认证..", cli.ID, cli.App, cli.Uid, cli.Lease, cli.AuthInfo, cli.Msg, cli.Url)
 }
 
 func (cli *Client) PUT() {
@@ -188,10 +192,15 @@ func (cli *Client) PUT() {
 		Lease: cli.Lease,
 		Uid:   cli.Uid,
 	}
+	res := new(Result)
 	byt, _ := json.Marshal(body)
 	result := httplib.Put(cli.Url).SetTimeout(2*time.Second, 3*time.Second).Debug(false).SetBasicAuth("admin", "123").SetTLSClientConfig(cli.tls).Body(byt).Header("Content-Type", "application/json; charset=utf-8")
 	str, err := result.String()
-	fmt.Println("心跳..", cli.ID, cli.App, cli.Uid, cli.Lease, str, err)
+	result.ToJSON(res)
+	if res.Code != 200 {
+		fmt.Println("心跳..", cli.ID, cli.App, cli.Uid, cli.Lease, str, err, cli.Url)
+	}
+
 }
 
 func (cli *Client) DELETE() {
@@ -207,12 +216,15 @@ func (cli *Client) DELETE() {
 
 func (cli *Client) RunExample() {
 	cli.Tls()
+	mr.Seed(time.Now().UnixNano())
+	n := mr.Intn(5000)
+	time.Sleep(time.Duration(n+3000) * time.Millisecond)
 	cli.POST() // 认证
 
-	for i := 0; i < 8; i++ {
-		mr.Seed(time.Now().Unix())
-		n := mr.Intn(8000)
-		time.Sleep(time.Duration(n) * time.Millisecond)
+	for i := 0; i < 800000000000000; i++ {
+		mr.Seed(time.Now().UnixNano())
+		n := mr.Intn(5000)
+		time.Sleep(time.Duration(n+3000) * time.Millisecond)
 		cli.PUT() // 心跳
 	}
 	cli.DELETE() // 退出

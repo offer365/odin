@@ -1,6 +1,8 @@
 package logic
 
 import (
+	"encoding/json"
+	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/log"
 	"go.etcd.io/etcd/clientv3"
 	"strings"
@@ -56,9 +58,67 @@ func PutConfig(key, info string) (err error) {
 
 // 删除配置
 func DelConfig(key string) (err error) {
+	_, ok := confWhiteList[key]
+	if ok {
+		return
+	}
 	key = clientConfigKeyPrefix + key
 	if _, err = store.Del(key); err != nil {
 		log.Sugar.Error("del config failed. error: ", err.Error())
 	}
 	return
+}
+
+// 节点成员列表
+func MemberConf() {
+	var (
+		mbs string
+		err error
+		byt []byte
+		ips map[string]string
+	)
+	if mbs, err = GetConfig(membersKey); err != nil {
+		log.Sugar.Error("get config members failed. error: ", err)
+		return
+	}
+	if mbs != "" {
+		if err = json.Unmarshal([]byte(mbs), &members); err != nil {
+			log.Sugar.Error("unmarshal members failed. error: ", err)
+			return
+		}
+	}
+	ips = make(map[string]string, 0)
+	nodes := GetAllNodes()
+	for _, n := range nodes {
+		if n.IP == Self.IP {
+			ips[n.IP] = config.Cfg.Web
+		} else {
+			ips[n.IP] = members[n.IP]
+		}
+	}
+
+	if byt, err = json.Marshal(ips); err != nil {
+		log.Sugar.Error("marshal members failed. error: ", err)
+	}
+	if err = PutConfig(membersKey, string(byt)); err != nil {
+		log.Sugar.Error("put config members failed. error: ", err)
+	}
+}
+
+func DefaultConf() {
+	var (
+		df  string
+		err error
+	)
+
+	if df, err = GetConfig(defaultKey); err != nil {
+		log.Sugar.Error("get config default failed. error: ", err)
+		return
+	}
+	if df == "" {
+		if err = PutConfig(defaultKey, defaultKey); err != nil {
+			log.Sugar.Error("put config default failed. error: ", err)
+			return
+		}
+	}
 }
