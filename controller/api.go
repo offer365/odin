@@ -148,7 +148,7 @@ func QrLicenseAPI(c *gin.Context) {
 	buf := bytes.NewBuffer(make([]byte, 0))
 	err = qrcode.NewQrEncode([]byte(code), buf)
 	if err != nil {
-		log.Sugar.Error("Failed to generate QR code image. ", err.Error())
+		log.Sugar.Error("Failed to generate QR code image. ", err)
 	}
 	extraHeaders := map[string]string{
 		"Content-Disposition": `attachment; filename="clear-qr-code.jpg"`,
@@ -188,7 +188,7 @@ func LicenseAPI(c *gin.Context) {
 			}
 			err = logic.PutLicense(cipher)
 			if err != nil {
-				c.JSON(200, gin.H{"code": 510, "msg": err.Error(), "data": ""})
+				c.JSON(200, gin.H{"code": 510, "msg": err, "data": ""})
 				return
 			}
 			logic.StoreLic(lic)
@@ -196,7 +196,7 @@ func LicenseAPI(c *gin.Context) {
 		case "DELETE":
 			code, err := logic.GenClearLicense()
 			if err != nil {
-				c.JSON(200, gin.H{"code": 511, "msg": err.Error(), "data": map[string]string{"key": code}})
+				c.JSON(200, gin.H{"code": 511, "msg": err, "data": map[string]string{"key": code}})
 				return
 			}
 			c.JSON(200, gin.H{"code": 200, "msg": "", "data": map[string]string{"key": code}})
@@ -213,7 +213,7 @@ func NodeStatusAPI(c *gin.Context) {
 	)
 	user := c.MustGet(gin.AuthUserKey).(string)
 	if _, ok := secrets[user]; ok {
-		nodeM := logic.GetAllNodes()
+		nodeM := logic.GetAllNode()
 		for _, n := range nodeM {
 			nodeL = append(nodeL, status{n.Name, fmt.Sprintf("节点:%s ip:%s %s", n.Name, n.IP, tools.RunTime(n.Now, n.Start))})
 		}
@@ -263,7 +263,7 @@ func ConfAPI(c *gin.Context) {
 
 		case "DELETE":
 			if err = logic.DelConfig(name); err != nil {
-				c.JSON(200, gin.H{"code": 200, "msg": err.Error(), "data": ""})
+				c.JSON(200, gin.H{"code": 200, "msg": err, "data": ""})
 				return
 			}
 			c.JSON(200, gin.H{"code": 200, "msg": "Delete key success.", "data": ""})
@@ -276,7 +276,7 @@ func ConfAPI(c *gin.Context) {
 			}
 			text = c.PostForm("text")
 			if err = logic.PutConfig(name, text); err != nil {
-				c.JSON(200, gin.H{"code": 200, "msg": err.Error(), "data": "",})
+				c.JSON(200, gin.H{"code": 200, "msg": err, "data": "",})
 				return
 			}
 			c.JSON(200, gin.H{"code": 200, "msg": "Post or Put key success.", "data": ""})
@@ -295,7 +295,7 @@ func ClientAPI(c *gin.Context) {
 		key := app + "/" + id
 		// 判断app 是否在授权中 && 是否到期
 		if !logic.LoadLic().CheckTime(app) {
-			c.JSON(200, gin.H{"code": notExistErr, "data": result{Lease: 0}, "msg": "APP does not exist or authorization expires.",})
+			c.JSON(200, gin.H{"code": notExistErr, "data": result{Lease: 0}, "msg": "APP does not exist or authorization expires."})
 			return
 		}
 		// 判断当前的客户端是否已经存在
@@ -305,7 +305,7 @@ func ClientAPI(c *gin.Context) {
 			//TODO 原子操作代替锁
 			Lock.Lock()
 			defer Lock.Unlock()
-			if cli != nil {
+			if cli != nil || exist {
 				c.JSON(200, gin.H{"code": existErr, "data": result{Lease: 0}, "msg": "The id app already exists."})
 				return
 			}

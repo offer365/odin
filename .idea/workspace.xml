@@ -2,9 +2,34 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa8a0eed-f415-4285-8944-9e75331cac68" name="默认更改列表" comment="">
+      <change afterPath="$PROJECT_DIR$/config/config_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/node/rpc.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/odin.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appctl.sh" beforeDir="false" afterPath="$PROJECT_DIR$/appctl.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asset/asset.go" beforeDir="false" afterPath="$PROJECT_DIR$/asset/asset.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_example/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/client_example/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/conf.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/conf.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dao/dao_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/dao_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dao/etcd.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/etcd.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dao/store.go" beforeDir="false" afterPath="$PROJECT_DIR$/dao/store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedder/embed.go" beforeDir="false" afterPath="$PROJECT_DIR$/embedder/embed.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedder/embed_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/embedder/embed_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedder/etcd.go" beforeDir="false" afterPath="$PROJECT_DIR$/embedder/etcd.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/html/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logic/clearLicense.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/clearLicense.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logic/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logic/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/config.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logic/init.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/init.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logic/license.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/license.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logic/serial.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/serial.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/license.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/license.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node/node.go" beforeDir="false" afterPath="$PROJECT_DIR$/node/node.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/odin.json" beforeDir="false" afterPath="$PROJECT_DIR$/odin.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/odinmain/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/odinmain/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/odinmain/web.go" beforeDir="false" afterPath="$PROJECT_DIR$/odinmain/web.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/bindata.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/bindata.sh" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -12,12 +37,20 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
   <component name="GOROOT" path="D:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1R9QvdwYD0BcVEZO90ajx6WVivE" />
   <component name="PropertiesComponent">
+    <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="configurable.Global.GOPATH.is.expanded" value="true" />
     <property name="configurable.Project.GOPATH.is.expanded" value="true" />
@@ -45,7 +78,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.go build github.com/offer365/odin/client_example">
+  <component name="RunManager" selected="Go Build.go build github.com/offer365/odin">
     <configuration name="go build github.com/offer365/odin" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="odin" />
       <working_directory value="$PROJECT_DIR$/" />
@@ -64,10 +97,22 @@
       <directory value="$PROJECT_DIR$/" />
       <method v="2" />
     </configuration>
+    <configuration name="TestNewEmbed in github.com/offer365/odin/embedder" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="odin" />
+      <working_directory value="$PROJECT_DIR$/embedder" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/offer365/odin/embedder" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestNewEmbed$" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build github.com/offer365/odin/client_example" />
         <item itemvalue="Go Build.go build github.com/offer365/odin" />
+        <item itemvalue="Go Test.TestNewEmbed in github.com/offer365/odin/embedder" />
+        <item itemvalue="Go Build.go build github.com/offer365/odin/client_example" />
       </list>
     </recent_temporary>
   </component>

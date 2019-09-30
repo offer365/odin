@@ -10,6 +10,7 @@ import (
 	"github.com/offer365/endecrypt/endeaesrsa"
 	"log"
 	mr "math/rand"
+	"os"
 	"strconv"
 	"time"
 )
@@ -80,12 +81,15 @@ var app string
 
 func main() {
 	app = "nlp"
-	Example(GetCliWithNum(app, 1000)...)
+	Example(GetCliWithNum(app, 800)...)
 	//app = "test_app"
 	//Example(GetCliWithNum(url, app, 50)...)
 	//app = "demo3"
 	//Example(GetCliWithNum(url, app, 50)...)
-	select {}
+	select {
+	case <-time.After(14 * time.Hour):
+		os.Exit(0)
+	}
 }
 
 func GetCliWithNum(app string, n int) []*Client {
@@ -153,7 +157,7 @@ type Body struct {
 func (cli *Client) Tls() {
 	crt, err := tls.X509KeyPair([]byte(cert_pem), []byte(key_pem))
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Fatalln(err)
 	}
 	tlsConfig := &tls.Config{}
 	tlsConfig.Certificates = []tls.Certificate{crt}
@@ -184,7 +188,7 @@ func (cli *Client) POST() {
 		cli.AuthInfo, _ = endeaesrsa.PubDecrypt(cli.Auth, endecrypt.PubkeyClient2048, endecrypt.AesKeyClient2)
 	}
 
-	fmt.Println("认证..", cli.ID, cli.App, cli.Uid, cli.Lease, cli.AuthInfo, cli.Msg, cli.Url)
+	fmt.Println("认证..", now(), cli.ID, cli.App, cli.Uid, cli.Lease, cli.AuthInfo, cli.Msg, cli.Url)
 }
 
 func (cli *Client) PUT() {
@@ -198,7 +202,7 @@ func (cli *Client) PUT() {
 	str, err := result.String()
 	result.ToJSON(res)
 	if res.Code != 200 {
-		fmt.Println("心跳..", cli.ID, cli.App, cli.Uid, cli.Lease, str, err, cli.Url)
+		fmt.Println("心跳..", now(), cli.ID, cli.App, cli.Uid, cli.Lease, str, err, cli.Url)
 	}
 
 }
@@ -211,21 +215,25 @@ func (cli *Client) DELETE() {
 	byt, _ := json.Marshal(body)
 	result := httplib.Delete(cli.Url).SetTimeout(2*time.Second, 3*time.Second).Body(byt).Debug(false).SetBasicAuth("admin", "123").SetTLSClientConfig(cli.tls).Body(byt).Header("Content-Type", "Application/json; charset=utf-8")
 	str, err := result.String()
-	fmt.Println("注销..", cli.ID, cli.App, cli.Uid, cli.Lease, str, err)
+	fmt.Println("注销..", now(), cli.ID, cli.App, cli.Uid, cli.Lease, str, err)
 }
 
 func (cli *Client) RunExample() {
 	cli.Tls()
 	mr.Seed(time.Now().UnixNano())
-	n := mr.Intn(5000)
+	n := mr.Intn(3000)
 	time.Sleep(time.Duration(n+3000) * time.Millisecond)
 	cli.POST() // 认证
 
 	for i := 0; i < 800000000000000; i++ {
 		mr.Seed(time.Now().UnixNano())
-		n := mr.Intn(5000)
+		n := mr.Intn(3000)
 		time.Sleep(time.Duration(n+3000) * time.Millisecond)
 		cli.PUT() // 心跳
 	}
 	cli.DELETE() // 退出
+}
+
+func now() string {
+	return time.Now().Format("2006-01-02 15:04:05")
 }

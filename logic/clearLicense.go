@@ -34,7 +34,7 @@ func GetClearLicense() (info string, err error) {
 	var (
 		getResp *clientv3.GetResponse
 	)
-	if getResp, err = store.Get(clearLicenseKey); err != nil {
+	if getResp, err = store.Get(clearLicenseKey, true); err != nil {
 		return
 	}
 	if len(getResp.Kvs) > 0 {
@@ -45,6 +45,6 @@ func GetClearLicense() (info string, err error) {
 
 // 写入注销码
 func PutClearLicense(info string) (err error) {
-	_, err = store.Put(clearLicenseKey, info)
+	_, err = store.Put(clearLicenseKey, info, true)
 	return
 }

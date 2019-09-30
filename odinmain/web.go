@@ -3,6 +3,7 @@ package odinmain
 import (
 	"crypto/rand"
 	"crypto/tls"
+	"github.com/DeanThompson/ginpprof"
 	"github.com/gin-gonic/gin"
 	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/controller"
@@ -78,14 +79,14 @@ tNBT2he8EJWiBzyZ31nGwTt/pQ==
 // 启动 gin web
 func RunWebWithHttp(port string) {
 	if err := route().Run(":" + port); err != nil {
-		log.Sugar.Fatal("starting gin web service failed. error: ", err.Error())
+		log.Sugar.Fatal("starting gin web service failed. error: ", err)
 	}
 }
 
 func RunWebWithHttps(port string) {
 	crt, err := tls.X509KeyPair([]byte(cert_pem), []byte(key_pem))
 	if err != nil {
-		log.Sugar.Fatal(err.Error())
+		log.Sugar.Fatal(err)
 	}
 	tlsConfig := &tls.Config{}
 	tlsConfig.Certificates = []tls.Certificate{crt}
@@ -99,11 +100,11 @@ func RunWebWithHttps(port string) {
 	tlsConfig.Rand = rand.Reader
 	l, err := tls.Listen("tcp", ":"+port, tlsConfig)
 	if err != nil {
-		log.Sugar.Fatal(err.Error())
+		log.Sugar.Fatal(err)
 	}
 	err = http.Serve(l, route())
 	if err != nil {
-		log.Sugar.Fatal(err.Error())
+		log.Sugar.Fatal(err)
 	}
 }
 
@@ -160,5 +161,6 @@ func route() (r *gin.Engine) {
 	})
 
 	r.StaticFile("/favicon.ico", AssetPath+"static/favicon.ico")
+	ginpprof.Wrap(r)
 	return
 }

@@ -99,10 +99,10 @@ func (a *APP) fieldName() item {
 		title string
 		value string
 	)
-	name, ok := a.rt.FieldByName("Name")
+	name, ok := a.rt.FieldByName("name")
 	if ok {
 		title = name.Tag.Get("title")
-		value = a.rv.FieldByName("Name").Interface().(string)
+		value = a.rv.FieldByName("name").Interface().(string)
 	}
 	return item{
 		Title: title,

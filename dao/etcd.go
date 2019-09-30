@@ -9,6 +9,7 @@ import (
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/clientv3/concurrency"
 	"go.etcd.io/etcd/mvcc/mvccpb"
+	"sync"
 	"time"
 )
 
@@ -18,9 +19,8 @@ type etcdStore struct {
 	config   clientv3.Config
 	client   *clientv3.Client
 	kv       clientv3.KV
-	leaseMap map[string]clientv3.Lease
+	leaseMap sync.Map
 	timeout  time.Duration
-	//CliM             CliManger
 }
 
 func (es *etcdStore) Init(ctx context.Context, opts ...Option) (err error) {
@@ -37,11 +37,11 @@ func (es *etcdStore) Init(ctx context.Context, opts ...Option) (err error) {
 	}
 	es.timeout = es.options.Timeout
 	if es.client, err = clientv3.New(es.config); err != nil {
-		log.Sugar.Error("create client failed. error: ", err.Error())
+		log.Sugar.Error("create client failed. error: ", err)
 		return
 	}
 	es.kv = clientv3.NewKV(es.client)
-	es.leaseMap = make(map[string]clientv3.Lease, 0)
+	//es.leaseMap = make(map[string]clientv3.Lease, 0)
 	//es.CliM = CliManger{
 	//	M: make(map[string]*Cli, 0),
 	//	L: sync.RWMutex{},
@@ -49,72 +49,105 @@ func (es *etcdStore) Init(ctx context.Context, opts ...Option) (err error) {
 	return
 }
 
-func (es *etcdStore) Get(key string) (resp *clientv3.GetResponse, err error) {
-	unlock, err := es.lock(es.md5(key))
-	defer unlock()
+func (es *etcdStore) Get(key string, lock bool) (resp *clientv3.GetResponse, err error) {
+	var unlock func()
+	if lock {
+		unlock, err = es.lock(es.md5(key))
+		defer unlock()
+	}
 	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
 	return es.kv.Get(ctx, key)
 }
 
-func (es *etcdStore) GetAll(prefix string) (resp *clientv3.GetResponse, err error) {
-	unlock, err := es.lock(es.md5(prefix))
-	defer unlock()
+func (es *etcdStore) GetAll(prefix string, lock bool) (resp *clientv3.GetResponse, err error) {
+	var unlock func()
+	if lock {
+		unlock, err = es.lock(es.md5(prefix))
+		defer unlock()
+	}
 	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
 	return es.kv.Get(ctx, prefix, clientv3.WithPrefix())
 }
 
-func (es *etcdStore) Count(prefix string) (resp *clientv3.GetResponse, err error) {
-	unlock, err := es.lock(es.md5(prefix))
-	defer unlock()
+func (es *etcdStore) Count(prefix string, lock bool) (resp *clientv3.GetResponse, err error) {
+	var unlock func()
+	if lock {
+		unlock, err = es.lock(es.md5(prefix))
+		defer unlock()
+	}
 	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
 	return es.kv.Get(ctx, prefix, clientv3.WithPrefix(), clientv3.WithCountOnly())
 }
 
-func (es *etcdStore) Put(key, val string) (resp *clientv3.PutResponse, err error) {
-	unlock, err := es.lock(es.md5(key))
-	defer unlock()
+func (es *etcdStore) Put(key, val string, lock bool) (resp *clientv3.PutResponse, err error) {
+	var unlock func()
+	if lock {
+		unlock, err = es.lock(es.md5(key))
+		defer unlock()
+	}
 	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
 	return es.kv.Put(ctx, key, val)
 }
 
 func (es *etcdStore) Lease(key string, ttl int64) (resp *clientv3.LeaseGrantResponse, err error) {
 	lease := clientv3.NewLease(es.client)
-	es.leaseMap[key] = lease
+	es.leaseMap.Store(key, lease)
 	if resp, err = lease.Grant(context.Background(), ttl); err != nil {
 		return
 	}
 	return
 }
 
-func (es *etcdStore) PutWithLease(key, val string, id clientv3.LeaseID) (resp *clientv3.PutResponse, err error) {
-	unlock, err := es.lock(es.md5(key))
-	defer unlock()
+func (es *etcdStore) PutWithLease(key, val string, id clientv3.LeaseID, lock bool) (resp *clientv3.PutResponse, err error) {
+	var unlock func()
+	if lock {
+		unlock, err = es.lock(es.md5(key))
+		defer unlock()
+	}
 	ctx2, _ := context.WithTimeout(context.Background(), es.timeout)
 	return es.kv.Put(ctx2, key, val, clientv3.WithLease(id))
 }
 
-func (es *etcdStore) Del(key string) (resp *clientv3.DeleteResponse, err error) {
-	unlock, err := es.lock(es.md5(key))
-	defer unlock()
+func (es *etcdStore) Del(key string, lock bool) (resp *clientv3.DeleteResponse, err error) {
+	var unlock func()
+	if lock {
+		unlock, err = es.lock(es.md5(key))
+		defer unlock()
+	}
 	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
 	return es.kv.Delete(ctx, key)
 }
 
-func (es *etcdStore) DelWithLease(key string, leaseId int64) (resp *clientv3.DeleteResponse, err error) {
-	lease, ok := es.leaseMap[key]
-	unlock, err := es.lock(es.md5(key))
-	defer unlock()
-	if ok {
+//func (es *etcdStore) DelAll(prefix string, lock bool) (resp *clientv3.DeleteResponse, err error) {
+//	var unlock func()
+//	if lock {
+//		unlock, err = es.lock(es.md5(prefix))
+//		defer unlock()
+//	}
+//	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
+//	return es.kv.Delete(ctx, prefix,clientv3.WithPrefix())
+//}
+
+func (es *etcdStore) DelWithLease(key string, leaseId int64, lock bool) (resp *clientv3.DeleteResponse, err error) {
+	var unlock func()
+	if lock {
+		unlock, err = es.lock(es.md5(key))
+		defer unlock()
+	}
+	val, exist := es.leaseMap.Load(key)
+	lease, ok := val.(clientv3.Lease)
+	if exist && ok {
 		if _, err := lease.Revoke(context.TODO(), clientv3.LeaseID(leaseId)); err != nil {
-			log.Sugar.Error("cancel lease failed. error: ", err.Error())
+			log.Sugar.Error("cancel lease failed. error: ", err)
 		}
 	}
 	return es.kv.Delete(context.TODO(), key)
 }
 
 func (es *etcdStore) KeepOnce(key string, leaseId int64) (resp *clientv3.LeaseKeepAliveResponse, err error) {
-	lease, ok := es.leaseMap[key]
-	if !ok {
+	val, exist := es.leaseMap.Load(key)
+	lease, ok := val.(clientv3.Lease)
+	if !exist || !ok {
 		err = errors.New("not found this lease id")
 		return
 	}
@@ -178,11 +211,11 @@ func (es *etcdStore) Watch(key string, putFunc EventFunc, delFunc EventFunc) {
 			switch event.Type {
 			case mvccpb.PUT:
 				if err = putFunc(event); err != nil {
-					log.Sugar.Errorf("watch %s exec put-func failed. err:%s.", key, err.Error())
+					log.Sugar.Errorf("watch %s exec put-func failed. err:%s.", key, err)
 				}
 			case mvccpb.DELETE:
 				if err = delFunc(event); err != nil {
-					log.Sugar.Errorf("watch %s exec del-func failed. err:%s.", key, err.Error())
+					log.Sugar.Errorf("watch %s exec del-func failed. err:%s.", key, err)
 				}
 			}
 		}
@@ -194,15 +227,15 @@ func (es *etcdStore) lock(name string) (func(), error) {
 	// 创建一个10s的租约(lease)
 	//res, err := eh.client.Grant(context.Background(), 10)
 	//if err != nil {
-	//	log.Error("lock get grant error. ", err.Error())
+	//	log.Error("lock get grant error. ", err)
 	//	return nil, err
 	//}
 	//ctx,cancel:=context.WithTimeout(context.TODO(),eh.wait*2)
 	// 利用上面创建的租约ID创建一个session
-	//session, err := concurrency.NewSession(eh.client, concurrency.WithLease(res.Name),concurrency.WithContext(ctx))
+	//session, err := concurrency.NewSession(eh.client, concurrency.WithLease(res.name),concurrency.WithContext(ctx))
 	session, err := concurrency.NewSession(es.client)
 	if err != nil {
-		log.Sugar.Error("create lock new session failed. error: ", err.Error())
+		log.Sugar.Error("create lock new session failed. error: ", err)
 		return nil, err
 	}
 	mutex := concurrency.NewMutex(session, name)
@@ -213,7 +246,7 @@ func (es *etcdStore) lock(name string) (func(), error) {
 	if err = mutex.Lock(ctx); err != nil {
 		mutex.Unlock(ctx)
 		session.Close()
-		log.Sugar.Errorf("locking key:%s failed. error: ", err.Error())
+		log.Sugar.Errorf("locking key:%s failed. error: ", err)
 		return nil, err
 	}
 

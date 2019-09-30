@@ -29,42 +29,46 @@ func (e *etcdEmbed) Init(ctx context.Context, opts ...Option) (err error) {
 		opt(e.options)
 	}
 	e.conf = embed.NewConfig()
-	e.conf.Name = e.options.Name
-	e.conf.Dir = e.options.Dir
+	e.conf.Name = e.options.name
+	e.conf.Dir = e.options.dir
 	e.conf.InitialClusterToken = "odin-token"
-	e.conf.ClusterState = e.options.ClusterState // "new" or "existing"
+	e.conf.ClusterState = e.options.clusterState // "new" or "existing"
 	e.conf.EnablePprof = false
 	e.conf.TickMs = 200
 	e.conf.ElectionMs = 2000
 	e.conf.EnableV2 = false
+	// 压缩数据
+	e.conf.AutoCompactionMode = "periodic"
+	e.conf.AutoCompactionRetention = "1h"
+	e.conf.QuotaBackendBytes = 8 * 1024 * 1024 * 1024
 
-	e.conf.HostWhitelist = e.hostWhitelist(e.options.Cluster)
-	e.conf.CORS = e.hostWhitelist(e.options.Cluster)
-	e.conf.InitialCluster = e.initialCluster(e.options.PeerPort, e.options.Cluster)
+	e.conf.HostWhitelist = e.hostWhitelist(e.options.cluster)
+	e.conf.CORS = e.hostWhitelist(e.options.cluster)
+	e.conf.InitialCluster = e.initialCluster(e.options.peerPort, e.options.cluster)
 
-	// Metrics 监控
-	//e.conf.Metrics = "basic" //  "extensive"
-	//if e.conf.ListenMetricsUrls, err = types.NewURLs([]string{"http://127.0.0.1:1111"}); err != nil {
-	//	return
-	//}
+	// metrics 监控
+	if e.options.metricsUrl != "" {
+		e.conf.Metrics = e.options.metrics //  "extensive" or "base"
+		if e.conf.ListenMetricsUrls, err = types.NewURLs([]string{e.options.metricsUrl}); err != nil {
+			return
+		}
+	}
 
-	//cfg.QuotaBackendBytes : c.cfg.DataQuota
-	//cfg.ClusterState : "new"
 	e.conf.Logger = "zap"    // Logger is logger options: "zap", "capnslog".
 	e.conf.LogLevel = "warn" // "debug" "info" "warn" "error"
 
-	if e.conf.LCUrls, err = types.NewURLs([]string{"http://" + e.options.IP + ":" + e.options.ClientPort}); err != nil {
+	if e.conf.LCUrls, err = types.NewURLs([]string{"http://" + e.options.ip + ":" + e.options.clientPort}); err != nil {
 		return
 	}
 
-	if e.conf.ACUrls, err = types.NewURLs([]string{"http://" + e.options.IP + ":" + e.options.ClientPort}); err != nil {
+	if e.conf.ACUrls, err = types.NewURLs([]string{"http://" + e.options.ip + ":" + e.options.clientPort}); err != nil {
 		return
 	}
 
-	if e.conf.LPUrls, err = types.NewURLs([]string{"http://" + e.options.IP + ":" + e.options.PeerPort}); err != nil {
+	if e.conf.LPUrls, err = types.NewURLs([]string{"http://" + e.options.ip + ":" + e.options.peerPort}); err != nil {
 		return
 	}
-	if e.conf.APUrls, err = types.NewURLs([]string{"http://" + e.options.IP + ":" + e.options.PeerPort}); err != nil {
+	if e.conf.APUrls, err = types.NewURLs([]string{"http://" + e.options.ip + ":" + e.options.peerPort}); err != nil {
 		return
 	}
 	return
@@ -178,11 +182,11 @@ func (e *etcdEmbed) hostWhitelist(cluster []string) (list map[string]struct{}) {
 //	em = new(etcdEmbed)
 //
 //	em.conf = embed.NewConfig()
-//	em.conf.Name = id
-//	em.conf.Dir = dir
+//	em.conf.name = id
+//	em.conf.dir = dir
 //
 //	em.conf.InitialClusterToken = "odin-token"
-//	em.conf.ClusterState = "new"
+//	em.conf.clusterState = "new"
 //	em.conf.EnablePprof = false
 //	em.conf.TickMs = 200
 //	em.conf.ElectionMs = 2000
@@ -200,9 +204,9 @@ func (e *etcdEmbed) hostWhitelist(cluster []string) (list map[string]struct{}) {
 //	em.conf.InitialCluster = em.initialCluster(pp, cluster)
 //
 //	//cfg.ListenMetricsUrls = metricsURLs(c.cfg.PrivateAddress)
-//	em.conf.Metrics = "extensive"
+//	em.conf.metrics = "extensive"
 //	//cfg.QuotaBackendBytes = c.cfg.DataQuota
-//	//cfg.ClusterState = "new"
+//	//cfg.clusterState = "new"
 //	em.Ready = make(chan struct{})
 //
 //	//em.conf.PeerAutoTLS=true

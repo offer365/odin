@@ -6,50 +6,52 @@ import (
 )
 
 type Options struct {
-	Name         string
-	Dir          string
-	IP           string
-	ClientPort   string
-	PeerPort     string
-	Cluster      []string
-	ClusterState string // "new" or "existing"
+	name         string
+	dir          string
+	ip           string
+	clientPort   string
+	peerPort     string
+	cluster      []string
+	clusterState string // "new" or "existing"
+	metrics      string
+	metricsUrl   string
 }
 
 type Option func(opts *Options)
 
 func WithName(name string) Option {
 	return func(opts *Options) {
-		opts.Name = name
+		opts.name = name
 	}
 }
 
 func WithDir(dir string) Option {
 	return func(opts *Options) {
-		opts.Dir = dir
+		opts.dir = dir
 	}
 }
 
 func WithIP(ip string) Option {
 	return func(opts *Options) {
-		opts.IP = ip
+		opts.ip = ip
 	}
 }
 
 func WithClientPort(cp string) Option {
 	return func(opts *Options) {
-		opts.ClientPort = cp
+		opts.clientPort = cp
 	}
 }
 
 func WithPeerPort(pp string) Option {
 	return func(opts *Options) {
-		opts.PeerPort = pp
+		opts.peerPort = pp
 	}
 }
 
 func WithCluster(clu []string) Option {
 	return func(opts *Options) {
-		opts.Cluster = clu
+		opts.cluster = clu
 	}
 }
 
@@ -57,10 +59,28 @@ func WithClusterState(state string) Option {
 	return func(opts *Options) {
 		// "new" or "existing"
 		if strings.HasPrefix(state, "exist") {
-			opts.ClusterState = "existing"
+			opts.clusterState = "existing"
 		} else {
-			opts.ClusterState = "new"
+			opts.clusterState = "new"
 		}
+	}
+}
+
+func WithMetrics(addr string, mode string) Option {
+	return func(opts *Options) {
+		switch {
+		case strings.HasPrefix(mode, "b"):
+			opts.metrics = "base"
+		case strings.HasPrefix(mode, "e"):
+			opts.metrics = "extensive"
+		default:
+			opts.metrics = "base"
+		}
+		if addr != "" && !strings.HasPrefix(addr, "http://") {
+			opts.metricsUrl = "http://" +opts.ip+":"+ addr
+			return
+		}
+		opts.metricsUrl = addr
 	}
 }
 

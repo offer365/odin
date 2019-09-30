@@ -1,0 +1,29 @@
+nodes:
+  # 本节点IP地址
+  addr: "10.0.0.200"
+  # 各节点IP地址，顺序必须一样
+  peers:
+    - "10.0.0.200"
+    - "10.0.0.201"
+    - "10.0.0.202"
+
+# 各端口
+ports:
+  peer: "12379"
+  client: "12380"
+  web: "9527"
+  rpc: "9528"
+  # 监控端口,留空则不开启
+  metrics: ""
+
+# 前端 web 页面访问密码，BasicAuth 密码
+pwd: "123"
+dir: "disk/default"
+# new or exist
+state: "new"
+
+
+
+
+
+

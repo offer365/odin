@@ -2,8 +2,8 @@ package config
 
 import (
 	"encoding/json"
-	"flag"
 	"github.com/offer365/odin/log"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"strconv"
 )
@@ -15,30 +15,38 @@ var (
 
 type Config struct {
 	Name   string
-	Addr   string `json:"addr"`
-	Peer   string `json:"peer"`
-	Client string `json:"client"`
-	Web    string `json:"web"`
-	Rpc    string `json:"rpc"`
-	//Ntp    bool     `json:"ntp"`
+	Nodes
+	Ports
 	Dir   string   `json:"dir"`
-	Peers []string `json:"peers"`
 	State string   `json:"state"`
 	Pwd   string   `json:"pwd"`
 }
 
-func (cfg *Config) LoadConfig(filename string) {
+type Nodes struct {
+	Addr   string `json:"addr"`
+	Peers []string `json:"peers"`
+}
+
+type Ports struct {
+	Peer   string `json:"peer"`
+	Client string `json:"client"`
+	Web    string `json:"web"`
+	Rpc    string `json:"rpc"`
+	Metrics string `json:"metrics"`
+}
+
+func (cfg *Config) LoadJson(filename string) {
 	var (
 		content []byte
 		err     error
 	)
 	//读取配置文件
 	if content, err = ioutil.ReadFile(filename); err != nil {
-		log.Sugar.Fatal("failed to read configuration file. error: ", err.Error())
+		log.Sugar.Fatal("failed to read configuration file. error: ", err)
 	}
 	// json反序列化
 	if err = json.Unmarshal(content, cfg); err != nil {
-		log.Sugar.Fatal("failed to unmarshal configuration file. error: ", err.Error())
+		log.Sugar.Fatal("failed to unmarshal configuration file. error: ", err)
 	}
 
 	for id, ip := range cfg.Peers {
@@ -49,11 +57,26 @@ func (cfg *Config) LoadConfig(filename string) {
 	return
 }
 
-func args() {
-	flag.StringVar(&ConfFilePath, "f", "odin.json", "Config file path.")
-	flag.Parse()
+func (cfg *Config) LoadYaml(filename string)  {
+	var (
+		content []byte
+		err     error
+	)
+	//读取配置文件
+	if content, err = ioutil.ReadFile(filename); err != nil {
+		log.Sugar.Fatal("failed to read configuration file. error: ", err)
+	}
+	// json反序列化
+	if err = yaml.Unmarshal(content, cfg); err != nil {
+		log.Sugar.Fatal("failed to unmarshal configuration file. error: ", err)
+	}
+
+	for id, ip := range cfg.Peers {
+		if ip == cfg.Addr {
+			cfg.Name = "odin" + strconv.Itoa(id)
+		}
+	}
+	return
 }
-func init() {
-	args()
-	Cfg.LoadConfig(ConfFilePath)
-}
+
+

@@ -18,9 +18,9 @@ func GetClient(key string) (cli *model.Cli, ok bool) {
 		resp *clientv3.GetResponse
 	)
 	key = clientKeyPrefix + key
-	resp, err := store.Get(key)
+	resp, err := store.Get(key, false)
 	if err != nil {
-		log.Sugar.Error("get client failed. error: ", err.Error())
+		log.Sugar.Error("get client failed. error: ", err)
 		return
 	}
 	if len(resp.Kvs) > 0 {
@@ -40,8 +40,8 @@ func GetAllClient(app string) (all map[string]string, err error) {
 		getResp *clientv3.GetResponse
 	)
 	key := clientKeyPrefix + app
-	if getResp, err = store.GetAll(key); err != nil {
-		log.Sugar.Error("get all client failed. error: ", err.Error())
+	if getResp, err = store.GetAll(key, false); err != nil {
+		log.Sugar.Error("get all client failed. error: ", err)
 		return
 	}
 	all = make(map[string]string, 0)
@@ -59,8 +59,8 @@ func ClientCount(app string) (count int64, err error) {
 		resp *clientv3.GetResponse
 	)
 	key := clientKeyPrefix + app
-	if resp, err = store.Count(key); err != nil {
-		log.Sugar.Error("get all client failed. error: ", err.Error())
+	if resp, err = store.Count(key, true); err != nil {
+		log.Sugar.Error("get all client failed. error: ", err)
 		return
 	}
 	return resp.Count, err
@@ -79,7 +79,7 @@ func PutClient(key string, cli *model.Cli) (lease int64, err error) {
 	if err != nil {
 		return
 	}
-	if _, err = store.PutWithLease(key, string(byt), lg.ID); err != nil {
+	if _, err = store.PutWithLease(key, string(byt), lg.ID, false); err != nil {
 		return
 	}
 	lease = int64(lg.ID)
@@ -89,7 +89,7 @@ func PutClient(key string, cli *model.Cli) (lease int64, err error) {
 // 删除Client
 func DelClient(key string, leaseId int64) (err error) {
 	key = clientKeyPrefix + key
-	_, err = store.DelWithLease(key, leaseId)
+	_, err = store.DelWithLease(key, leaseId, false)
 	return
 }
 

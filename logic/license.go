@@ -6,6 +6,7 @@ import (
 	"github.com/offer365/endecrypt/endeaesrsa"
 	"github.com/offer365/odin/log"
 	"github.com/offer365/odin/model"
+	"github.com/offer365/odin/node"
 	"go.etcd.io/etcd/clientv3"
 	"sync/atomic"
 	"time"
@@ -23,7 +24,7 @@ func GetLicense() (cipher string, err error) {
 		resp *clientv3.GetResponse
 	)
 
-	if resp, err = store.Get(licenseKey); err != nil {
+	if resp, err = store.Get(licenseKey, true); err != nil {
 		log.Sugar.Error("get license failed. error: ", err)
 		return
 	}
@@ -35,7 +36,7 @@ func GetLicense() (cipher string, err error) {
 
 // 刷新license
 func PutLicense(val string) (err error) {
-	if _, err = store.Put(licenseKey, val); err != nil {
+	if _, err = store.Put(licenseKey, val, true); err != nil {
 		log.Sugar.Error("put license failed. error: ", err)
 		return
 	}
@@ -44,7 +45,7 @@ func PutLicense(val string) (err error) {
 
 // 删除license
 func DelLicense() (err error) {
-	if _, err = store.Del(licenseKey); err != nil {
+	if _, err = store.Del(licenseKey, true); err != nil {
 		log.Sugar.Error("del license failed. error: ", err)
 		return
 	}
@@ -61,7 +62,7 @@ func Str2lic(text string) (lic *model.License, err error) {
 		}
 	}()
 	if text, err = endeaesrsa.PubDecrypt(text, endecrypt.PubkeyServer2048, endecrypt.AesKeyServer2); err != nil {
-		log.Sugar.Errorf("decrypt license failed. error: ", err.Error())
+		log.Sugar.Errorf("decrypt license failed. error: ", err)
 		return
 	}
 	//lic.Devices = make(map[string]string)
@@ -78,7 +79,7 @@ func lic2str(lic interface{}) (text string, err error) {
 		src []byte
 	)
 	if src, err = json.Marshal(lic); err != nil {
-		log.Sugar.Errorf("pack license failed. error: ", err.Error())
+		log.Sugar.Errorf("pack license failed. error: ", err)
 		return
 	}
 	if text, err = endeaesrsa.PriEncrypt(src, endecrypt.PirkeyServer2048, endecrypt.AesKeyServer2); err != nil {
@@ -94,14 +95,14 @@ func ResetLicense() (err error) {
 		lic    *model.License
 	)
 	if cipher, err = GetLicense(); err != nil {
-		log.Sugar.Error("get lic failed. error: ", err.Error())
+		log.Sugar.Error("get lic failed. error: ", err)
 		return
 	}
 	if cipher == "" {
 		return
 	}
 	if lic, err = Str2lic(cipher); err != nil {
-		log.Sugar.Error("in reset lic,get lic failed. error: ", err.Error())
+		log.Sugar.Error("in reset lic,get lic failed. error: ", err)
 		return
 	}
 	if lic.Lid == "" {
@@ -124,11 +125,11 @@ func ResetLicense() (err error) {
 		lic.UpdateTime.Add(60 * time.Second)
 	}
 	if cipher, err = lic2str(lic); err != nil {
-		log.Sugar.Error("reset lic failed. error: ", err.Error())
+		log.Sugar.Error("reset lic failed. error: ", err)
 		return
 	}
 	if err = PutLicense(cipher); err != nil {
-		log.Sugar.Error("reset lic failed. error: ", err.Error())
+		log.Sugar.Error("reset lic failed. error: ", err)
 	}
 	StoreLic(lic)
 	return
@@ -167,8 +168,8 @@ func ChkLicense(cipher string) (lic *model.License, ok bool, msg string) {
 		return
 	}
 	// 当前机器是否在授权中
-	allHw := GetAllNodes()
-	if len(allHw) != len(lic.Devices) {
+	nodes := node.GetAllNodes(Self.Rpc,Self.Peers)
+	if len(nodes) != len(lic.Devices) {
 		msg = "节点数量不一致。"
 		return
 	}

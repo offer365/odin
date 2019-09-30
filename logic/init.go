@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/dao"
 	"github.com/offer365/odin/embedder"
 	"github.com/offer365/odin/model"
@@ -33,22 +32,28 @@ var (
 func init() {
 	store = dao.NewStore()
 	Serial = new(model.SerialNum)
-	Self = node.NewNode(config.Cfg.Name, config.Cfg.Addr)
 
+
+}
+
+func InitNode(name,addr,rpc string,peers []string)  {
+	Self = node.NewNode(name,addr,rpc,peers)
 }
 
 func InitStore(ip, port, user, pwd string, timeout time.Duration) (err error) {
 	return store.Init(context.Background(), dao.WithHost(ip), dao.WithPort(port), dao.WithUsername(user), dao.WithPassword(pwd), dao.WithTimeout(timeout))
 }
 
-func InitEmbed() (err error) {
+func InitEmbed(name,dir,addr,client,peer,state,metrics string,peers []string) (err error) {
 	Device = embedder.NewEmbed()
 	return Device.Init(context.Background(),
-		embedder.WithName(config.Cfg.Name),
-		embedder.WithDir(config.Cfg.Dir),
-		embedder.WithIP(config.Cfg.Addr),
-		embedder.WithClientPort(config.Cfg.Client),
-		embedder.WithPeerPort(config.Cfg.Peer),
-		embedder.WithCluster(config.Cfg.Peers),
-		embedder.WithClusterState(config.Cfg.State))
+		embedder.WithName(name),
+		embedder.WithDir(dir),
+		embedder.WithIP(addr),
+		embedder.WithClientPort(client),
+		embedder.WithPeerPort(peer),
+		embedder.WithCluster(peers),
+		embedder.WithClusterState(state),
+		embedder.WithMetrics(metrics,"b"))
+
 }

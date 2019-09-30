@@ -2,8 +2,8 @@ package logic
 
 import (
 	"encoding/json"
-	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/log"
+	"github.com/offer365/odin/node"
 	"go.etcd.io/etcd/clientv3"
 	"strings"
 )
@@ -19,8 +19,8 @@ func GetConfig(key string) (val string, err error) {
 	)
 
 	key = clientConfigKeyPrefix + key
-	if resp, err = store.Get(key); err != nil {
-		log.Sugar.Errorf("get %s config failed. error: %s", key, err.Error())
+	if resp, err = store.Get(key, true); err != nil {
+		log.Sugar.Errorf("get %s config failed. error: %s", key, err)
 		return
 	}
 	if len(resp.Kvs) > 0 {
@@ -34,8 +34,8 @@ func GetAllConfig() (infos map[string]string, err error) {
 	var (
 		getResp *clientv3.GetResponse
 	)
-	if getResp, err = store.GetAll(clientConfigKeyPrefix); err != nil {
-		log.Sugar.Error("get all config failed. error: ", err.Error())
+	if getResp, err = store.GetAll(clientConfigKeyPrefix, true); err != nil {
+		log.Sugar.Error("get all config failed. error: ", err)
 		return
 	}
 	infos = make(map[string]string, 0)
@@ -50,8 +50,8 @@ func GetAllConfig() (infos map[string]string, err error) {
 // 写入配置
 func PutConfig(key, info string) (err error) {
 	key = clientConfigKeyPrefix + key
-	if _, err = store.Put(key, info); err != nil {
-		log.Sugar.Error("put config failed. error: ", err.Error())
+	if _, err = store.Put(key, info, true); err != nil {
+		log.Sugar.Error("put config failed. error: ", err)
 	}
 	return
 }
@@ -63,14 +63,14 @@ func DelConfig(key string) (err error) {
 		return
 	}
 	key = clientConfigKeyPrefix + key
-	if _, err = store.Del(key); err != nil {
-		log.Sugar.Error("del config failed. error: ", err.Error())
+	if _, err = store.Del(key, true); err != nil {
+		log.Sugar.Error("del config failed. error: ", err)
 	}
 	return
 }
 
 // 节点成员列表
-func MemberConf() {
+func MemberConf(web string) {
 	var (
 		mbs string
 		err error
@@ -94,10 +94,10 @@ func MemberConf() {
 		}
 	}
 	ips = make(map[string]string, 0)
-	nodes := GetAllNodes()
+	nodes := node.GetAllNodes(Self.Rpc, Self.Peers)
 	for _, n := range nodes {
 		if n.IP == Self.IP {
-			ips[n.IP] = config.Cfg.Web
+			ips[n.IP] = web
 		} else {
 			ips[n.IP] = members[n.IP]
 		}

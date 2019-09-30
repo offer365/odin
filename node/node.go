@@ -1,19 +1,15 @@
 package node
 
 import (
-	"context"
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"github.com/offer365/odin/log"
 	"github.com/zcalusic/sysinfo"
-	"net"
-	"net/rpc"
 	"time"
 )
 
-func NewNode(name, ip string) (n *Node) {
+func NewNode(name, ip, rpc string, peers []string) (n *Node) {
 	n = new(Node)
 	n.Hardware = new(Hardware)
 	n.Hardware.Networks = make([]*Network, 0)
@@ -28,12 +24,21 @@ func NewNode(name, ip string) (n *Node) {
 	n.Attr.Name = name
 	n.Attr.IP = ip
 	n.Attr.Start = time.Now().Unix()
+	n.Conf = new(Conf)
+	n.Conf.Rpc = rpc
+	n.Conf.Peers = peers
 	return
 }
 
 type Node struct {
+	*Conf
 	*Attr
 	*Hardware
+}
+
+type Conf struct {
+	Rpc   string   `bson:"rpc" json:"rpc"`
+	Peers []string `bson:"peers" json:"peers"`
 }
 
 type Attr struct {
@@ -192,57 +197,4 @@ func (n *Node) Status(args Args, node *Node) (err error) {
 		return
 	}
 	return errors.New("ip address error.")
-}
-
-func RunRpcServer(port string, register interface{}) {
-	// 注册一个带方法的类型
-	if err := rpc.Register(register); err != nil {
-		log.Sugar.Error("rpc register failed. error: ", err)
-	}
-	tcpAddr, err := net.ResolveTCPAddr("tcp", ":"+port)
-	if err != nil {
-		log.Sugar.Error("net resolve addr failed. error: ", err)
-	}
-	listener, err := net.ListenTCP("tcp", tcpAddr)
-	if err != nil {
-		log.Sugar.Error("net listen tcp failed. error: ", err)
-	}
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			continue
-		}
-		//go rpc.ServeConn(conn) // 并发
-		rpc.ServeConn(conn)
-	}
-}
-
-func GetRemoteNode(ctx context.Context, name, ip, port string) (node *Node, err error) {
-	var cli *rpc.Client
-	dial := func() (ch chan struct{}) {
-		ch = make(chan struct{}, 1)
-		if cli, err = rpc.Dial("tcp", ip+":"+port); err != nil {
-			return
-		}
-		node = NewNode(name, ip)
-		if err = cli.Call("Node.Status", Args{name, ip}, node); err != nil {
-			return
-		}
-		ch <- struct{}{}
-		if err = cli.Close(); err != nil {
-			return
-		}
-		return
-	}
-	select {
-	case <-ctx.Done():
-		log.Sugar.Errorf("call rpc server %s %s:%s timeout. error: %s", name, ip, port, err.Error())
-		return
-	case <-dial():
-		if err != nil {
-			log.Sugar.Errorf("call rpc server %s %s:%s failed. error: %s", name, ip, port, err.Error())
-			return
-		}
-		return
-	}
 }

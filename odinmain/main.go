@@ -1,6 +1,7 @@
 package odinmain
 
 import (
+	"flag"
 	"fmt"
 	"github.com/gorhill/cronexpr"
 	"github.com/offer365/odin/asset"
@@ -9,6 +10,8 @@ import (
 	"github.com/offer365/odin/logic"
 	"github.com/offer365/odin/model"
 	"github.com/offer365/odin/node"
+	"strings"
+
 	//"github.com/offer365/odin/ntpd"
 	"os"
 	"path/filepath"
@@ -33,7 +36,13 @@ var (
 	AssetPath string
 	User      = "admin"
 	debug     bool
+	cfp string
 )
+
+func args() {
+	flag.StringVar(&cfp, "f", "odin.yaml", "Config file path.")
+	flag.Parse()
+}
 
 // 释放静态资源
 func RestoreAsset() {
@@ -48,7 +57,7 @@ func RestoreAsset() {
 	dirs := []string{"html", "static"}
 	for _, dir := range dirs {
 		if err := asset.RestoreAssets(AssetPath, dir); err != nil {
-			log.Sugar.Error("restore assets failed. error: ", err.Error())
+			log.Sugar.Error("restore assets failed. error: ", err)
 			_ = os.RemoveAll(filepath.Join(AssetPath, dir))
 			continue
 		}
@@ -58,7 +67,18 @@ func RestoreAsset() {
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	fmt.Println(logo)
+	args()
 	RestoreAsset()
+	switch  {
+	case strings.HasSuffix(cfp,".json"):
+		config.Cfg.LoadJson(cfp)
+	case strings.HasSuffix(cfp,".yaml"):
+		config.Cfg.LoadYaml(cfp)
+	default:
+		log.Sugar.Fatal("config file path error")
+		return
+	}
+	//debug = true
 }
 
 func Main() {
@@ -66,15 +86,25 @@ func Main() {
 		err   error
 		ready chan struct{} = make(chan struct{})
 	)
+	logic.InitNode(config.Cfg.Name,config.Cfg.Addr,config.Cfg.Rpc,config.Cfg.Peers)
 	go node.RunRpcServer(config.Cfg.Rpc, logic.Self)
 
-	if err = logic.InitEmbed(); err != nil {
-		log.Sugar.Error("init embed server failed. error: ", err.Error())
+	if err = logic.InitEmbed(
+		config.Cfg.Name,
+		config.Cfg.Dir,
+		config.Cfg.Addr,
+		config.Cfg.Client,
+		config.Cfg.Peer,
+		config.Cfg.State,
+		config.Cfg.Metrics,
+		config.Cfg.Peers,
+		); err != nil {
+		log.Sugar.Error("init embed server failed. error: ", err)
 	}
 
 	go func() { // 运行etcd
 		if err = logic.Device.Run(ready); err != nil {
-			log.Sugar.Error("run embed server error. ", err.Error())
+			log.Sugar.Error("run embed server error. ", err)
 			return
 		}
 	}()
@@ -82,7 +112,7 @@ func Main() {
 	case <-ready: // 待etcd Ready 运行其他服务
 		err = logic.Device.SetAuth(Username, Password)
 		if err != nil {
-			log.Sugar.Fatal("set auth embed server failed. error: ", err.Error())
+			log.Sugar.Fatal("set auth embed server failed. error: ", err)
 		}
 		Server()
 	}
@@ -94,15 +124,15 @@ func Server() {
 	)
 	// 客户端连接
 	if err = logic.InitStore(config.Cfg.Addr, config.Cfg.Client, Username, Password, time.Second*3); err != nil {
-		log.Sugar.Error("init store failed. error: ", err.Error())
+		log.Sugar.Error("init store failed. error: ", err)
 	}
 
 	// 从etcd加载license
 	if err := loadLic(); err != nil {
-		log.Sugar.Error("init license failed. error: ", err.Error())
+		log.Sugar.Error("init license failed. error: ", err)
 	}
 	logic.DefaultConf()
-	logic.MemberConf()
+	logic.MemberConf(config.Cfg.Web)
 
 	// 间隔1分钟更新授权
 	go func() {
@@ -110,7 +140,7 @@ func Server() {
 		expr := cronexpr.MustParse("* * * * *")
 		for range ticker {
 			// 成员列表
-			logic.MemberConf()
+			logic.MemberConf(config.Cfg.Web)
 			now := time.Now()
 			next := expr.Next(now)
 			time.AfterFunc(next.Sub(now), func() {
@@ -118,7 +148,7 @@ func Server() {
 				if logic.Device.IsLeader() {
 					log.Sugar.Infof("%s is Leader. ip:%s", logic.Self.Name, logic.Self.IP)
 					if err := logic.ResetLicense(); err != nil {
-						log.Sugar.Error("reset license failed. error: ", err.Error())
+						log.Sugar.Error("reset license failed. error: ", err)
 					}
 				}
 			})
@@ -126,21 +156,7 @@ func Server() {
 	}()
 	// 监听授权变化
 	go logic.WatchLicense()
-	// 监听客户端
-	//go func() {
-	//	if err := EH.WatchClient(); err != nil {
-	//		log.Error("watch CollectionCli error. error: ", err.Error())
-	//	}
-	//}()
-	// web
 	go RunWebWithHttps(config.Cfg.Web)
-
-	//time.Sleep(3*time.Second)
-
-	// 向etcd注册本节点
-	//if err := initNodeStatus(); err != nil {
-	//	log.Error("initialization self node failed. error: ", err.Error())
-	//}
 
 	// 时间同步服务
 	//if config.Cfg.Ntp {
@@ -161,7 +177,7 @@ func loadLic() (err error) {
 		lic    *model.License
 	)
 	if cipher, err = logic.GetLicense(); err != nil {
-		log.Sugar.Error("get license failed. error: ", err.Error())
+		log.Sugar.Error("get license failed. error: ", err)
 	}
 
 	if cipher == "" {
