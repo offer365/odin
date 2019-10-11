@@ -266,13 +266,13 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"html/index.html": htmlIndexHtml,
-	"static/css/bootstrap.min.css": staticCssBootstrapMinCss,
+	"html/index.html":                  htmlIndexHtml,
+	"static/css/bootstrap.min.css":     staticCssBootstrapMinCss,
 	"static/css/bootstrap.min.css.map": staticCssBootstrapMinCssMap,
-	"static/favicon.ico": staticFaviconIco,
-	"static/js/bootstrap.min.js": staticJsBootstrapMinJs,
-	"static/js/jquery-3.3.1.min.js": staticJsJquery331MinJs,
-	"static/js/jquery.cookie.js": staticJsJqueryCookieJs,
+	"static/favicon.ico":               staticFaviconIco,
+	"static/js/bootstrap.min.js":       staticJsBootstrapMinJs,
+	"static/js/jquery-3.3.1.min.js":    staticJsJquery331MinJs,
+	"static/js/jquery.cookie.js":       staticJsJqueryCookieJs,
 }
 
 // AssetDir returns the file names below a certain
@@ -314,20 +314,21 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
 	"html": &bintree{nil, map[string]*bintree{
 		"index.html": &bintree{htmlIndexHtml, map[string]*bintree{}},
 	}},
 	"static": &bintree{nil, map[string]*bintree{
 		"css": &bintree{nil, map[string]*bintree{
-			"bootstrap.min.css": &bintree{staticCssBootstrapMinCss, map[string]*bintree{}},
+			"bootstrap.min.css":     &bintree{staticCssBootstrapMinCss, map[string]*bintree{}},
 			"bootstrap.min.css.map": &bintree{staticCssBootstrapMinCssMap, map[string]*bintree{}},
 		}},
 		"favicon.ico": &bintree{staticFaviconIco, map[string]*bintree{}},
 		"js": &bintree{nil, map[string]*bintree{
-			"bootstrap.min.js": &bintree{staticJsBootstrapMinJs, map[string]*bintree{}},
+			"bootstrap.min.js":    &bintree{staticJsBootstrapMinJs, map[string]*bintree{}},
 			"jquery-3.3.1.min.js": &bintree{staticJsJquery331MinJs, map[string]*bintree{}},
-			"jquery.cookie.js": &bintree{staticJsJqueryCookieJs, map[string]*bintree{}},
+			"jquery.cookie.js":    &bintree{staticJsJqueryCookieJs, map[string]*bintree{}},
 		}},
 	}},
 }}
@@ -378,4 +379,3 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-

@@ -33,27 +33,26 @@ func init() {
 	store = dao.NewStore()
 	Serial = new(model.SerialNum)
 
-
 }
 
-func InitNode(name,addr,rpc string,peers []string)  {
-	Self = node.NewNode(name,addr,rpc,peers)
+func InitNode(addr, group, rpc string, peers []string) {
+	Self = node.NewNode(addr, group, rpc, peers)
 }
 
 func InitStore(ip, port, user, pwd string, timeout time.Duration) (err error) {
 	return store.Init(context.Background(), dao.WithHost(ip), dao.WithPort(port), dao.WithUsername(user), dao.WithPassword(pwd), dao.WithTimeout(timeout))
 }
 
-func InitEmbed(name,dir,addr,client,peer,state,metrics string,peers []string) (err error) {
+func InitEmbed(group, dir, addr, client, peer, state, metrics string, peers []string) (err error) {
 	Device = embedder.NewEmbed()
 	return Device.Init(context.Background(),
-		embedder.WithName(name),
+		embedder.WithGroup(group),
 		embedder.WithDir(dir),
 		embedder.WithIP(addr),
 		embedder.WithClientPort(client),
 		embedder.WithPeerPort(peer),
 		embedder.WithCluster(peers),
 		embedder.WithClusterState(state),
-		embedder.WithMetrics(metrics,"b"))
+		embedder.WithMetrics(metrics, "b"))
 
 }

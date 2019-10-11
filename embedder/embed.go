@@ -7,6 +7,7 @@ import (
 
 type Options struct {
 	name         string
+	group        string
 	dir          string
 	ip           string
 	clientPort   string
@@ -19,9 +20,24 @@ type Options struct {
 
 type Option func(opts *Options)
 
-func WithName(name string) Option {
+func DefaultOpts() *Options {
+	return &Options{
+		name:         "",
+		group:        "default",
+		dir:          "disk/default",
+		ip:           "127.0.0.1",
+		clientPort:   "12379",
+		peerPort:     "12380",
+		cluster:      []string{"127.0.0.1"},
+		clusterState: "new",
+		metrics:      "",
+		metricsUrl:   "",
+	}
+}
+
+func WithGroup(group string) Option {
 	return func(opts *Options) {
-		opts.name = name
+		opts.group = group
 	}
 }
 
@@ -77,7 +93,7 @@ func WithMetrics(addr string, mode string) Option {
 			opts.metrics = "base"
 		}
 		if addr != "" && !strings.HasPrefix(addr, "http://") {
-			opts.metricsUrl = "http://" +opts.ip+":"+ addr
+			opts.metricsUrl = "http://" + opts.ip + ":" + addr
 			return
 		}
 		opts.metricsUrl = addr

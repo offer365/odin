@@ -9,18 +9,18 @@ import (
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/clientv3/concurrency"
 	"go.etcd.io/etcd/mvcc/mvccpb"
-	"sync"
 	"time"
 )
 
 // etcd 客户端
 type etcdStore struct {
-	options  *Options
-	config   clientv3.Config
-	client   *clientv3.Client
-	kv       clientv3.KV
-	leaseMap sync.Map
-	timeout  time.Duration
+	options *Options
+	config  clientv3.Config
+	client  *clientv3.Client
+	kv      clientv3.KV
+	lease   clientv3.Lease
+	watcher clientv3.Watcher
+	timeout time.Duration
 }
 
 func (es *etcdStore) Init(ctx context.Context, opts ...Option) (err error) {
@@ -41,11 +41,8 @@ func (es *etcdStore) Init(ctx context.Context, opts ...Option) (err error) {
 		return
 	}
 	es.kv = clientv3.NewKV(es.client)
-	//es.leaseMap = make(map[string]clientv3.Lease, 0)
-	//es.CliM = CliManger{
-	//	M: make(map[string]*Cli, 0),
-	//	L: sync.RWMutex{},
-	//}
+	es.lease = clientv3.NewLease(es.client)
+	es.watcher = clientv3.NewWatcher(es.client)
 	return
 }
 
@@ -89,25 +86,6 @@ func (es *etcdStore) Put(key, val string, lock bool) (resp *clientv3.PutResponse
 	return es.kv.Put(ctx, key, val)
 }
 
-func (es *etcdStore) Lease(key string, ttl int64) (resp *clientv3.LeaseGrantResponse, err error) {
-	lease := clientv3.NewLease(es.client)
-	es.leaseMap.Store(key, lease)
-	if resp, err = lease.Grant(context.Background(), ttl); err != nil {
-		return
-	}
-	return
-}
-
-func (es *etcdStore) PutWithLease(key, val string, id clientv3.LeaseID, lock bool) (resp *clientv3.PutResponse, err error) {
-	var unlock func()
-	if lock {
-		unlock, err = es.lock(es.md5(key))
-		defer unlock()
-	}
-	ctx2, _ := context.WithTimeout(context.Background(), es.timeout)
-	return es.kv.Put(ctx2, key, val, clientv3.WithLease(id))
-}
-
 func (es *etcdStore) Del(key string, lock bool) (resp *clientv3.DeleteResponse, err error) {
 	var unlock func()
 	if lock {
@@ -118,62 +96,57 @@ func (es *etcdStore) Del(key string, lock bool) (resp *clientv3.DeleteResponse, 
 	return es.kv.Delete(ctx, key)
 }
 
-//func (es *etcdStore) DelAll(prefix string, lock bool) (resp *clientv3.DeleteResponse, err error) {
-//	var unlock func()
-//	if lock {
-//		unlock, err = es.lock(es.md5(prefix))
-//		defer unlock()
-//	}
-//	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
-//	return es.kv.Delete(ctx, prefix,clientv3.WithPrefix())
-//}
+func (es *etcdStore) DelAll(prefix string, lock bool) (resp *clientv3.DeleteResponse, err error) {
+	var unlock func()
+	if lock {
+		unlock, err = es.lock(es.md5(prefix))
+		defer unlock()
+	}
+	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
+	return es.kv.Delete(ctx, prefix, clientv3.WithPrefix())
+}
 
-func (es *etcdStore) DelWithLease(key string, leaseId int64, lock bool) (resp *clientv3.DeleteResponse, err error) {
+func (es *etcdStore) Lease(key string, ttl int64) (resp *clientv3.LeaseGrantResponse, err error) {
+	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
+	if resp, err = es.lease.Grant(ctx, ttl); err != nil {
+		return
+	}
+	return
+}
+
+func (es *etcdStore) PutWithLease(key, val string, leaseId clientv3.LeaseID, lock bool) (resp *clientv3.PutResponse, err error) {
 	var unlock func()
 	if lock {
 		unlock, err = es.lock(es.md5(key))
 		defer unlock()
 	}
-	val, exist := es.leaseMap.Load(key)
-	lease, ok := val.(clientv3.Lease)
-	if exist && ok {
-		if _, err := lease.Revoke(context.TODO(), clientv3.LeaseID(leaseId)); err != nil {
-			log.Sugar.Error("cancel lease failed. error: ", err)
-		}
+	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
+	return es.kv.Put(ctx, key, val, clientv3.WithLease(leaseId))
+}
+
+func (es *etcdStore) DelWithLease(key string, leaseId clientv3.LeaseID, lock bool) (resp *clientv3.DeleteResponse, err error) {
+	var unlock func()
+	if lock {
+		unlock, err = es.lock(es.md5(key))
+		defer unlock()
+	}
+	if _, err := es.lease.Revoke(context.TODO(), leaseId); err != nil {
+		log.Sugar.Error("cancel lease failed. error: ", err)
 	}
 	return es.kv.Delete(context.TODO(), key)
 }
 
-func (es *etcdStore) KeepOnce(key string, leaseId int64) (resp *clientv3.LeaseKeepAliveResponse, err error) {
-	val, exist := es.leaseMap.Load(key)
-	lease, ok := val.(clientv3.Lease)
-	if !exist || !ok {
-		err = errors.New("not found this lease id")
-		return
-	}
-	return lease.KeepAliveOnce(context.TODO(), clientv3.LeaseID(leaseId))
+func (es *etcdStore) KeepOnce(leaseId clientv3.LeaseID) (resp *clientv3.LeaseKeepAliveResponse, err error) {
+	return es.lease.KeepAliveOnce(context.TODO(), leaseId)
 }
 
-func (es *etcdStore) KeepAlive(key, val string) (err error) {
+func (es *etcdStore) KeepAlive(ctx context.Context, leaseId clientv3.LeaseID) (err error) {
 	var (
-		lease          clientv3.Lease
-		leaseGrantResp *clientv3.LeaseGrantResponse
-		keepResp       *clientv3.LeaseKeepAliveResponse
-		keepRespChan   <-chan *clientv3.LeaseKeepAliveResponse
+		keepResp     *clientv3.LeaseKeepAliveResponse
+		keepRespChan <-chan *clientv3.LeaseKeepAliveResponse
 	)
-	// 申请一个租约
-	lease = clientv3.NewLease(es.client)
-	// 申请5秒租约
-	if leaseGrantResp, err = lease.Grant(context.Background(), 5); err != nil {
-		return
-	}
-	leaseID := leaseGrantResp.ID
 	// 自动续租
-	if keepRespChan, err = lease.KeepAlive(context.Background(), leaseID); err != nil {
-		return
-	}
-	ctx, _ := context.WithTimeout(context.Background(), es.timeout)
-	if _, err = es.kv.Put(ctx, key, val, clientv3.WithLease(leaseID)); err != nil {
+	if keepRespChan, err = es.lease.KeepAlive(ctx, leaseId); err != nil {
 		return
 	}
 
@@ -186,25 +159,23 @@ func (es *etcdStore) KeepAlive(key, val string) (err error) {
 					err = errors.New("stop renewed")
 					return
 				}
-				log.Sugar.Infof("successful renewal,lease id: %d.", leaseID)
+				log.Sugar.Infof("successful renewal,lease id: %d.", leaseId)
 			}
 		}
 	}()
 	return
 }
 
-func (es *etcdStore) Watch(key string, putFunc EventFunc, delFunc EventFunc) {
+func (es *etcdStore) Watch(ctx context.Context, key string, putFunc EventFunc, delFunc EventFunc) {
 	var (
-		watcher         clientv3.Watcher
 		watcherRespChan <-chan clientv3.WatchResponse
 		watcherResp     clientv3.WatchResponse
 		event           *clientv3.Event
 		err             error
 	)
-	// 创建一个watcher
-	watcher = clientv3.NewWatcher(es.client)
+
 	//这里不能用 context.WithTimeout 超时会导致watch退出。
-	watcherRespChan = watcher.Watch(context.Background(), key)
+	watcherRespChan = es.watcher.Watch(ctx, key)
 	// 处理kv变化事件
 	for watcherResp = range watcherRespChan {
 		for _, event = range watcherResp.Events {

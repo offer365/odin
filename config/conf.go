@@ -14,24 +14,25 @@ var (
 )
 
 type Config struct {
-	Name   string
+	Name  string
+	Group string
 	Nodes
 	Ports
-	Dir   string   `json:"dir"`
-	State string   `json:"state"`
-	Pwd   string   `json:"pwd"`
+	Dir   string `json:"dir"`
+	State string `json:"state"`
+	Pwd   string `json:"pwd"`
 }
 
 type Nodes struct {
-	Addr   string `json:"addr"`
+	Addr  string   `json:"addr"`
 	Peers []string `json:"peers"`
 }
 
 type Ports struct {
-	Peer   string `json:"peer"`
-	Client string `json:"client"`
-	Web    string `json:"web"`
-	Rpc    string `json:"rpc"`
+	Peer    string `json:"peer"`
+	Client  string `json:"client"`
+	Web     string `json:"web"`
+	Rpc     string `json:"rpc"`
 	Metrics string `json:"metrics"`
 }
 
@@ -51,13 +52,13 @@ func (cfg *Config) LoadJson(filename string) {
 
 	for id, ip := range cfg.Peers {
 		if ip == cfg.Addr {
-			cfg.Name = "odin" + strconv.Itoa(id)
+			cfg.Name = cfg.Group + strconv.Itoa(id)
 		}
 	}
 	return
 }
 
-func (cfg *Config) LoadYaml(filename string)  {
+func (cfg *Config) LoadYaml(filename string) {
 	var (
 		content []byte
 		err     error
@@ -73,10 +74,8 @@ func (cfg *Config) LoadYaml(filename string)  {
 
 	for id, ip := range cfg.Peers {
 		if ip == cfg.Addr {
-			cfg.Name = "odin" + strconv.Itoa(id)
+			cfg.Name = cfg.Group + strconv.Itoa(id)
 		}
 	}
 	return
 }
-
-

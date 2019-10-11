@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/offer365/endecrypt"
 	"github.com/offer365/endecrypt/endeaesrsa"
@@ -154,7 +155,8 @@ func WatchLicense() {
 		return nil
 	}
 
-	store.Watch(licenseKey, putFunc, delFunc)
+	ctx,_:=context.WithCancel(context.Background())
+	store.Watch(ctx,licenseKey, putFunc, delFunc)
 }
 
 // 检查授权码是否合法
@@ -168,7 +170,8 @@ func ChkLicense(cipher string) (lic *model.License, ok bool, msg string) {
 		return
 	}
 	// 当前机器是否在授权中
-	nodes := node.GetAllNodes(Self.Rpc,Self.Peers)
+	ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*500)
+	nodes := node.GetAllNodes(ctx, Self.Group, Self.Rpc, Self.Peers)
 	if len(nodes) != len(lic.Devices) {
 		msg = "节点数量不一致。"
 		return

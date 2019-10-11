@@ -24,11 +24,16 @@ type etcdEmbed struct {
 }
 
 func (e *etcdEmbed) Init(ctx context.Context, opts ...Option) (err error) {
-	e.options = new(Options)
+	e.options = DefaultOpts()
 	for _, opt := range opts {
 		opt(e.options)
 	}
 	e.conf = embed.NewConfig()
+	// initialCluster 通过 options.cluster 与 options.ip 得出 options.name的值
+	e.conf.InitialCluster = e.initialCluster()
+	if e.options.name == "" {
+		panic("options cluster or ip or name error.")
+	}
 	e.conf.Name = e.options.name
 	e.conf.Dir = e.options.dir
 	e.conf.InitialClusterToken = "odin-token"
@@ -44,7 +49,6 @@ func (e *etcdEmbed) Init(ctx context.Context, opts ...Option) (err error) {
 
 	e.conf.HostWhitelist = e.hostWhitelist(e.options.cluster)
 	e.conf.CORS = e.hostWhitelist(e.options.cluster)
-	e.conf.InitialCluster = e.initialCluster(e.options.peerPort, e.options.cluster)
 
 	// metrics 监控
 	if e.options.metricsUrl != "" {
@@ -163,9 +167,12 @@ func (e *etcdEmbed) IsLeader() bool {
 	return e.ee.Server.Leader().String() == e.ee.Server.ID().String()
 }
 
-func (e *etcdEmbed) initialCluster(port string, cluster []string) (str string) {
-	for i, ip := range cluster {
-		str += fmt.Sprintf(",%s=http://%s:%s", "odin"+strconv.Itoa(i), ip, port)
+func (e *etcdEmbed) initialCluster() (str string) {
+	for i, ip := range e.options.cluster {
+		if e.options.ip == ip {
+			e.options.name = e.options.group + strconv.Itoa(i)
+		}
+		str += fmt.Sprintf(",%s=http://%s:%s", e.options.group+strconv.Itoa(i), ip, e.options.peerPort)
 	}
 	return str[1:]
 }

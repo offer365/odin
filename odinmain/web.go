@@ -3,7 +3,6 @@ package odinmain
 import (
 	"crypto/rand"
 	"crypto/tls"
-	"github.com/DeanThompson/ginpprof"
 	"github.com/gin-gonic/gin"
 	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/controller"
@@ -161,6 +160,5 @@ func route() (r *gin.Engine) {
 	})
 
 	r.StaticFile("/favicon.ico", AssetPath+"static/favicon.ico")
-	ginpprof.Wrap(r)
 	return
 }

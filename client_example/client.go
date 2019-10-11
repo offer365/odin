@@ -75,7 +75,7 @@ tNBT2he8EJWiBzyZ31nGwTt/pQ==
 `
 )
 
-var member []string = []string{"10.0.0.200", "10.0.0.201", "10.0.0.202"}
+var member []string = []string{"10.0.0.200",/* "10.0.0.201", "10.0.0.202"*/}
 var format = "https://%s:8888/odin/api/v1/client/auth/"
 var app string
 

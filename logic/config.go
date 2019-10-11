@@ -1,11 +1,13 @@
 package logic
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/offer365/odin/log"
 	"github.com/offer365/odin/node"
 	"go.etcd.io/etcd/clientv3"
 	"strings"
+	"time"
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +96,8 @@ func MemberConf(web string) {
 		}
 	}
 	ips = make(map[string]string, 0)
-	nodes := node.GetAllNodes(Self.Rpc, Self.Peers)
+	ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*500)
+	nodes := node.GetAllNodes(ctx, Self.Group, Self.Rpc, Self.Peers)
 	for _, n := range nodes {
 		if n.IP == Self.IP {
 			ips[n.IP] = web

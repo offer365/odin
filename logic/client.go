@@ -89,13 +89,13 @@ func PutClient(key string, cli *model.Cli) (lease int64, err error) {
 // 删除Client
 func DelClient(key string, leaseId int64) (err error) {
 	key = clientKeyPrefix + key
-	_, err = store.DelWithLease(key, leaseId, false)
+	_, err = store.DelWithLease(key, clientv3.LeaseID(leaseId), false)
 	return
 }
 
 // 续租
 func KeepAliveClient(key string, leaseId int64) (err error) {
 	key = clientKeyPrefix + key
-	_, err = store.KeepOnce(key, leaseId)
+	_, err = store.KeepOnce(clientv3.LeaseID(leaseId))
 	return
 }

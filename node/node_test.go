@@ -9,7 +9,7 @@ import (
 )
 
 func TestRunRpcServer(t *testing.T) {
-	node := NewNode("odin0", "127.0.0.1")
+	node := NewNode("127.0.0.1", "odin", "1122", []string{"127.0.0.1"})
 	go RunRpcServer("1111", node)
 
 	time.Sleep(1 * time.Second)

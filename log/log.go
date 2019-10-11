@@ -11,7 +11,7 @@ func init() {
 	lg, _ := zap.NewProduction()
 	defer lg.Sync()
 	cfg := logutil.DefaultZapLoggerConfig
-	cfg.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+	cfg.Level = zap.NewAtomicLevelAt(zap.WarnLevel)
 	lg, _ = cfg.Build()
 	Sugar = lg.Sugar()
 }

@@ -1,4 +1,6 @@
 nodes:
+  # 组名 根据 addr 在 peers 中的顺序确定该节点的名字，比如 odin0.
+  group: "odin"
   # 本节点IP地址
   addr: "10.0.0.200"
   # 各节点IP地址，顺序必须一样
@@ -13,13 +15,13 @@ ports:
   client: "12380"
   web: "9527"
   rpc: "9528"
-  # 监控端口,留空则不开启
+  # 监控端口,留空则不开启,建议留空
   metrics: ""
 
 # 前端 web 页面访问密码，BasicAuth 密码
 pwd: "123"
 dir: "disk/default"
-# new or exist
+# 节点状态  new or exist
 state: "new"
 
 

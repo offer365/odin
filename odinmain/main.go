@@ -12,7 +12,6 @@ import (
 	"github.com/offer365/odin/node"
 	"strings"
 
-	//"github.com/offer365/odin/ntpd"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -36,7 +35,7 @@ var (
 	AssetPath string
 	User      = "admin"
 	debug     bool
-	cfp string
+	cfp       string
 )
 
 func args() {
@@ -69,10 +68,10 @@ func init() {
 	fmt.Println(logo)
 	args()
 	RestoreAsset()
-	switch  {
-	case strings.HasSuffix(cfp,".json"):
+	switch {
+	case strings.HasSuffix(cfp, ".json"):
 		config.Cfg.LoadJson(cfp)
-	case strings.HasSuffix(cfp,".yaml"):
+	case strings.HasSuffix(cfp, ".yaml"):
 		config.Cfg.LoadYaml(cfp)
 	default:
 		log.Sugar.Fatal("config file path error")
@@ -86,11 +85,11 @@ func Main() {
 		err   error
 		ready chan struct{} = make(chan struct{})
 	)
-	logic.InitNode(config.Cfg.Name,config.Cfg.Addr,config.Cfg.Rpc,config.Cfg.Peers)
-	go node.RunRpcServer(config.Cfg.Rpc, logic.Self)
+	logic.InitNode(config.Cfg.Addr, config.Cfg.Group, config.Cfg.Rpc, config.Cfg.Peers)
+	go node.RunRpcServer(config.Cfg.Addr+":"+config.Cfg.Rpc, logic.Self)
 
 	if err = logic.InitEmbed(
-		config.Cfg.Name,
+		config.Cfg.Group,
 		config.Cfg.Dir,
 		config.Cfg.Addr,
 		config.Cfg.Client,
@@ -98,7 +97,7 @@ func Main() {
 		config.Cfg.State,
 		config.Cfg.Metrics,
 		config.Cfg.Peers,
-		); err != nil {
+	); err != nil {
 		log.Sugar.Error("init embed server failed. error: ", err)
 	}
 

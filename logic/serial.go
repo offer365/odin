@@ -1,9 +1,11 @@
 package logic
 
 import (
+	"context"
 	"github.com/offer365/odin/log"
 	"github.com/offer365/odin/node"
 	"go.etcd.io/etcd/clientv3"
+	"time"
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +36,8 @@ func PutSerialNum(val string) (err error) {
 }
 
 func ResetSerialNum() (code string, err error) {
-	nodes:=node.GetAllNodes(Self.Rpc,Self.Peers)
+	ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*500)
+	nodes := node.GetAllNodes(ctx, Self.Group, Self.Rpc, Self.Peers)
 	code, err = Serial.GenSerialNum(nodes)
 	if err != nil {
 		goto ERR
@@ -49,6 +52,6 @@ ERR:
 }
 
 func GetAllNode() map[string]*node.Node {
-	return node.GetAllNodes(Self.Rpc,Self.Peers)
+	ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*500)
+	return node.GetAllNodes(ctx, Self.Group, Self.Rpc, Self.Peers)
 }
-

@@ -6,10 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/zcalusic/sysinfo"
+	"strconv"
 	"time"
 )
 
-func NewNode(name, ip, rpc string, peers []string) (n *Node) {
+func NewNode(ip, group, rpc string, peers []string) (n *Node) {
 	n = new(Node)
 	n.Hardware = new(Hardware)
 	n.Hardware.Networks = make([]*Network, 0)
@@ -21,8 +22,14 @@ func NewNode(name, ip, rpc string, peers []string) (n *Node) {
 	n.Hardware.Board = new(Board)
 	n.Hardware.Product = new(Product)
 	n.Attr = new(Attr)
-	n.Attr.Name = name
 	n.Attr.IP = ip
+	n.Attr.Group = group
+	//n.Attr.Name = name
+	for id, ip := range peers {
+		if n.Attr.IP == ip {
+			n.Attr.Name = n.Group + strconv.Itoa(id)
+		}
+	}
 	n.Attr.Start = time.Now().Unix()
 	n.Conf = new(Conf)
 	n.Conf.Rpc = rpc
@@ -44,6 +51,7 @@ type Conf struct {
 type Attr struct {
 	Name  string `bson:"name" json:"name"`
 	IP    string `bson:"ip" json:"ip"`
+	Group string `bson:"group" json:"group"`
 	Start int64  `bson:"start" json:"start"` // 启动时间
 	HwMd5 string `bson:"md5" json:"md5"`
 	Now   int64  `bson:"now" json:"now"`
