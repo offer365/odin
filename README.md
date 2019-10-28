@@ -38,7 +38,7 @@ sh install.sh
 >
 > appctl.sh 封装了linux下的一些常用api操作。
 >
-> 客户端的测试，请参考 client_example.
+> 客户端的测试，请参考 app_example.
 >
 > 建议使用三个节点提供服务。
 

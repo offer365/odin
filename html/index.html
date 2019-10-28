@@ -56,6 +56,8 @@
                                            onClick="GetConfList()">配置管理</a></li>
                 <li role="presentation"><a href="#online" aria-controls="online" role="tab" data-toggle="tab"
                                            onClick="GetOnline()">在线信息</a></li>
+                <li role="presentation"><a href="#untied" aria-controls="untied" role="tab" data-toggle="tab"
+                                           onClick="UntiedApp()">解绑应用</a></li>
                 <li role="presentation"><a href="#node_status" aria-controls="node_status" role="tab" data-toggle="tab"
                                            onClick="NodeStatus()">节点状态</a></li>
                 <li role="presentation"><a href="#delete_license" aria-controls="delete_license" role="tab"
@@ -234,7 +236,6 @@
                                     <h5 class="panel-title">在线信息</h5>
                                 </div>
                                 <div class="panel-body">
-
                                     <ul class="list-group" id="client-online-list">
                                         <li class="list-group-item">
                                             <h4>在线数</h4>
@@ -246,6 +247,35 @@
                         </div>
                     </div>
                 </div><!--在线信息-->
+                <!--解绑应用-->
+                <div role="tabpanel" class="tab-pane" id="untied">
+                    <div class="row container-fluid" style="margin-top: 1%">
+                        <div class="col-md-11">
+                            <div class="panel panel-default middle-center file">
+                                <div class="panel-heading">
+                                    <h5 class="panel-title">解绑应用</h5>
+                                </div>
+                                <div class="panel-body">
+                                    <h4>解绑</h4>
+                                    <div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="untied-id"
+                                                   placeholder="app/id eg:nlp/app01">
+                                        </div>
+                                        <div class="form-group">
+                                            <textarea name="" cols="40" rows="5" placeholder="解绑码"
+                                                      maxlength="4096" class="form-control" required
+                                                      id="untied-code"></textarea>
+                                            <span class="help-block"></span>
+                                        </div>
+                                        <a class="btn btn-primary" href="javascript:void(0)"
+                                           onClick="UntiedApp()">提交</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!--解绑应用-->
                 <!--节点状态-->
                 <div role="tabpanel" class="tab-pane" id="node_status">
                     <div class="row container-fluid" style="margin-top: 1%">
@@ -499,6 +529,20 @@
             $("#clear-modal").modal("show")
         }
 
+        // 解绑应用
+        function UntiedApp() {
+            $.ajax({
+                url: base_url + "/server/untied/"+$("#untied-id").val(),
+                type: "POST",
+                username: $("#username").val(),
+                password: $("#password").val(),
+                dataType: "json",
+                data: {code: $("#untied-code").val()},
+                success: function (resp) {
+                    alert(resp.msg)
+                }
+            });
+        }
         // 清空授权
         function clearLicense() {
             $.ajax({
@@ -663,8 +707,8 @@
                 dataType: "json",
                 success: function (data) {
                     $("#help-msg").empty();
-                    for (i = 0; i < data.msg.length; i++) {
-                        let p = $("<p></p>").text(data.msg[i]);
+                    for (i = 0; i < data.length; i++) {
+                        let p = $("<p></p>").text(data[i]);
                         $("#help-msg").append(p)
                     }
                     $("#help-modal").modal("show")
@@ -687,13 +731,10 @@
                     // $.cookie(cookie_key,value,{ expires: 1, path: "/" })
                     $("#login-modal").modal("hide"); //关闭模态框
                     window.location.reload();
-                    // GetLicense()
                 },
                 error: function (XHR) {
+                    window.location.reload();
                     $("#login-modal").modal("show");
-                    if (XHR.status == 401) {
-                        $("#login-modal").modal("show")
-                    }
                 }
             })
         }
@@ -723,7 +764,6 @@
             });
             // 编辑任务
             $("#conf-list").on("click", ".edit-conf", function () {
-                // 取当前conf的信息，赋值给模态框的input
                 $("#edit-name").attr("disabled", "disabled");
                 $("#edit-name").val($(this).parents("li").children(".conf-name").text());
                 $("#edit-text").val($(this).parents("li").children(".conf-text").text());

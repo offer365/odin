@@ -1,22 +1,41 @@
+## 0.9.2
+### 2019-10-25
+1. 功能更新
+    - 支持grpc
+    - 支持app端绑定与解绑，详见README.md。
+    - 支持grpc与resuful 两种调用方式与app端交互。
+    - 仅支持https访问,不再支持 http。
+
+2. 优化更新
+    - 重构config模块，去除json格式的支持，配置文件更加易读。
+    - 将rpc端口与http端口合并，减少端口占用。
+    - 功能下沉，embed 与 dao层 分离到 offer365/example/etcd。
+    - 优化加密解密，统一调用方式。
+    - 合并model与logic代码，合并node与proto代码。
+    - 优化退出时的资源回收。
+    - 优化部分代码。
 
 ## 0.9.1
 ### 2019-09-26
-1. 增加默认配置key: default; value: default 该key无法删除，只能编辑。
-2. 增加默认配置key: members; value: {ip:port} 表示所有可用节点的列表，该key无法删除，外部无法编辑。
-3. logic 增加编辑白名单，删除白名单，白名单里面的值无法执行对应操作。
-4. 优化 所有的返回结果的data为有序。
-5. 优化 client_example 代码。
-6. 更改默认配置文件为 yaml。
-7. 增加部分测试用例。
-8. 优化部分代码。
+1. 功能更新
+    - 增加默认配置key: default; value: default 该key无法删除，只能编辑。
+    - 更改默认配置文件为 yaml
+2. 优化更新
+    - 优化 所有的返回结果的data为有序。
+    - 优化 client_example 代码。
+    - 增加部分测试用例。
+    - 优化部分代码。
+
 
 ## 0.9
 ### 2019-09-20
-1. 日志更新为zap实现。
-2. 统一api 返回的数据结构。
-3. 优化并发操作内存中的license。
-4. 解决部分bug。优化代码。
-5. 解决 has already been bootstrapped 的错误。
+1. 功能更新
+    - 日志更新为zap实现。
+    - 解决 has already been bootstrapped 的错误。
+2. 优化更新
+    - 统一api 返回的数据结构。
+    - 优化并发操作内存中的license。
+    - 解决部分bug。优化代码。
 
 ## 0.8
 ### 2019-09-09
