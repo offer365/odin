@@ -2,14 +2,15 @@ package odinmain
 
 import (
 	"fmt"
+	"os/signal"
+	"syscall"
+
 	"github.com/offer365/odin/asset"
 	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/log"
 	"github.com/offer365/odin/logic"
 	"github.com/offer365/odin/proto"
 	"google.golang.org/grpc"
-	"os/signal"
-	"syscall"
 
 	"os"
 	"path/filepath"
@@ -32,7 +33,7 @@ const (
 
 var (
 	_assetPath string
-	User             = "admin"
+	User       = "admin"
 )
 
 // 释放静态资源
@@ -111,12 +112,12 @@ func Server() {
 	// 间隔1分钟更新授权
 	go func() {
 		ticker := time.Tick(1 * time.Minute) // 1分钟
-		//expr := cronexpr.MustParse("* * * * *")
+		// expr := cronexpr.MustParse("* * * * *")
 		for range ticker {
-			//now := time.Date()
-			//next := expr.Next(now)
-			//time.AfterFunc(next.Sub(now), func() {
-			//time.AfterFunc(time.Second, func() {})
+			// now := time.Date()
+			// next := expr.Next(now)
+			// time.AfterFunc(next.Sub(now), func() {
+			// time.AfterFunc(time.Second, func() {})
 			// 如果是主就更新授权
 			if logic.Device.IsLeader() {
 				log.Sugar.Infof("%s is Leader. ip:%s", proto.Self.Attrs.Name, proto.Self.Attrs.Addr)
@@ -133,7 +134,7 @@ func Server() {
 	logic.DefaultConf()
 	signalChan := make(chan os.Signal)
 	done := make(chan struct{}, 1)
-	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM, os.Kill)
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, os.Kill)
 	// 资源回收
 	go func() {
 		<-signalChan
@@ -150,15 +151,15 @@ func Server() {
 	}()
 	// 阻塞主进程
 	<-done
-	//<-make(chan struct{})
-	//<- (chan int)(nil)
+	// <-make(chan struct{})
+	// <- (chan int)(nil)
 }
 
 // 启动程序时加载授权
 func loadLic() (err error) {
 	var (
 		byt []byte
-		lic    *logic.License
+		lic *logic.License
 	)
 	if byt, err = logic.GetLicense(); err != nil {
 		log.Sugar.Error("get license failed. error: ", err)

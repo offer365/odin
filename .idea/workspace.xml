@@ -2,65 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa8a0eed-f415-4285-8944-9e75331cac68" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/demo/.idea/app_demo.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/demo/grpc/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/demo/proto/auth.pb.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/demo/proto/auth.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/demo/proto/cert.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logic/authorize.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logic/client.model.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logic/license.clear.model.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logic/license.model.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logic/serial.model.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logic/token.dao.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/odinmain/server.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/proto/node.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/proto/node.pb.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/proto/node.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/bindata.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/ssl.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/odin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/odin.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API.md" beforeDir="false" afterPath="$PROJECT_DIR$/API.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TODO.md" beforeDir="false" afterPath="$PROJECT_DIR$/TODO.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appctl.sh" beforeDir="false" afterPath="$PROJECT_DIR$/appctl.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/asset/asset.go" beforeDir="false" afterPath="$PROJECT_DIR$/asset/asset.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_example/client.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/conf.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/conf.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controller/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/dao_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/etcd.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dao/store.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedder/embed.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedder/embed_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedder/etcd.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/html/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/html/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/clearLicense.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/license.clear.dao.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/client.dao.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/config.dao.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/init.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/init.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/license.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/license.dao.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/serial.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/serial.dao.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/cli.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/example.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/hw_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/license.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/serial.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/node/node.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/node/node_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/node/rpc.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/odin.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/odin.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/odin.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/odinmain/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/odinmain/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/odinmain/web.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/odinmain/web_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/qrcode/qrcode.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/tools/tools.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/bindata.sh" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -137,7 +80,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.go build github.com/offer365/odin/demo/restful">
+  <component name="RunManager" selected="Go Test.TestConfig_LoadYaml in github.com/offer365/odin/config">
     <configuration name="go build github.com/offer365/odin" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="odin" />
       <working_directory value="$PROJECT_DIR$/" />
@@ -153,15 +96,6 @@
       <kind value="PACKAGE" />
       <filePath value="$PROJECT_DIR$/app_demo/grpc/main.go" />
       <package value="github.com/offer365/odin/app_demo/grpc" />
-      <directory value="$PROJECT_DIR$/" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build github.com/offer365/odin/app_demo/restful" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="odin" />
-      <working_directory value="$PROJECT_DIR$/" />
-      <kind value="PACKAGE" />
-      <filePath value="$PROJECT_DIR$/app_demo/restful/main.go" />
-      <package value="github.com/offer365/odin/app_demo/restful" />
       <directory value="$PROJECT_DIR$/" />
       <method v="2" />
     </configuration>
@@ -183,13 +117,24 @@
       <directory value="$PROJECT_DIR$/" />
       <method v="2" />
     </configuration>
+    <configuration name="TestConfig_LoadYaml in github.com/offer365/odin/config" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="odin" />
+      <working_directory value="$PROJECT_DIR$/config" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/offer365/odin/config" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestConfig_LoadYaml$" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestConfig_LoadYaml in github.com/offer365/odin/config" />
         <item itemvalue="Go Build.go build github.com/offer365/odin/demo/restful" />
         <item itemvalue="Go Build.go build github.com/offer365/odin/demo/grpc" />
         <item itemvalue="Go Build.go build github.com/offer365/odin/app_demo/grpc" />
         <item itemvalue="Go Build.go build github.com/offer365/odin" />
-        <item itemvalue="Go Build.go build github.com/offer365/odin/app_demo/restful" />
       </list>
     </recent_temporary>
   </component>
