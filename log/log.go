@@ -1,12 +1,27 @@
 package log
 
 import (
-	"github.com/offer365/example/loger"
+	"go.etcd.io/etcd/pkg/logutil"
 	"go.uber.org/zap"
 )
 
 var Sugar *zap.SugaredLogger
 
+
 func init() {
-	Sugar, _ = loger.SugaredLog("ODIN_RUN_MODE", loger.ReleaseMode)
+	var (
+		lg  *zap.Logger
+		err error
+	)
+	if lg, err = zap.NewProduction(); err != nil {
+		return
+	}
+	defer lg.Sync()
+	cfg := logutil.DefaultZapLoggerConfig
+	cfg.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+	if lg, err = cfg.Build(); err != nil {
+		return
+	}
+	Sugar = lg.Sugar()
 }
+
