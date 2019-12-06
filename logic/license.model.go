@@ -13,7 +13,7 @@ func init() {
 }
 
 type fLicense struct {
-	UpdateTime string  `json:"update_time" title:"更新时间"` //当前时间 最后一次授权更新时间
+	UpdateTime string  `json:"update_time" title:"更新时间"` // 当前时间 最后一次授权更新时间
 	LifeCycle  int64   `json:"life_cycle" title:"生存周期"`  // 当前生存周期
 	Apps       []*fApp `json:"apps"`
 }
@@ -30,21 +30,21 @@ type item struct {
 
 // 授权码
 type License struct {
-	Lid       string            `json:"lid"`                     // 授权码唯一uuid,用来甄别是否重复授权。
-	Sid       string            `json:"sid"`                     // 机器码的id, lid与sid 一一对应
-	Devices   map[string]string `json:"devices"`                 // 节点id与 硬件信息md5
-	Generate  int64             `json:"generate"`                // 授权生成时间
-	Update    int64             `json:"update" title:"更新时间"`     //当前时间 最后一次授权更新时间
+	Lid       string            `json:"lid"`                    // 授权码唯一uuid,用来甄别是否重复授权。
+	Sid       string            `json:"sid"`                    // 机器码的id, lid与sid 一一对应
+	Devices   map[string]string `json:"devices"`                // 节点id与 硬件信息md5
+	Generate  int64             `json:"generate"`               // 授权生成时间
+	Update    int64             `json:"update" title:"更新时间"`    // 当前时间 最后一次授权更新时间
 	LifeCycle int64             `json:"lifeCycle" title:"生存周期"` // 当前生存周期
-	Apps      map[string]*App   `json:"apps"  title:"产品"`        //map[key]*App key=App.key
+	Apps      map[string]*App   `json:"apps"  title:"产品"`       // map[key]*App key=App.key
 }
 
 type App struct {
 	Key          string  `json:"key"`
 	Name         string  `json:"name" title:"服务"`
-	Attrs        []*Attr `json:"attrs"`                         // 自定义内容
-	Instance     int64   `json:"instance" title:"最大实例"`         // 实例
-	Expire       int64   `json:"expire" title:"到期时间"`           // 授权到期的时间戳
+	Attrs        []*Attr `json:"attrs"`                       // 自定义内容
+	Instance     int64   `json:"instance" title:"最大实例"`       // 实例
+	Expire       int64   `json:"expire" title:"到期时间"`         // 授权到期的时间戳
 	MaxLifeCycle int64   `json:"maxLifeCycle" title:"最大生存周期"` // 最大生存周期 (授权到期时间-生成授权时间)/周期时间60s
 	rv           reflect.Value
 	rt           reflect.Type
@@ -66,7 +66,7 @@ func (lic *License) CheckTime(application string) bool {
 	return false
 }
 
-func (lic *License) ChkInstance(application string,num int64) bool {
+func (lic *License) ChkInstance(application string, num int64) bool {
 	app, ok := lic.Apps[application]
 	if ok {
 		return app.Instance > num
@@ -77,14 +77,14 @@ func (lic *License) ChkInstance(application string,num int64) bool {
 func (lic *License) Format() *fLicense {
 	fml.UpdateTime = time.Unix(lic.Update, 0).Format("2006-01-02 15:04:05")
 	fml.LifeCycle = lic.LifeCycle
-	fml.Apps = make([]*fApp, 0) //清空数组
+	fml.Apps = make([]*fApp, 0) // 清空数组
 
 	for _, app := range lic.Apps {
 		app.reflect()
 		fapp := new(fApp)
 		fapp.Title = app.Name
 		fapp.Data = make([]item, 0)
-		//fapp.Data = append(fapp.Data, App.fieldName())
+		// fapp.Data = append(fapp.Data, App.fieldName())
 		for _, i := range app.fieldAttrs() {
 			fapp.Data = append(fapp.Data, i)
 		}
@@ -158,7 +158,7 @@ func (a *App) fieldExpireTime() item {
 	}
 	return item{
 		Title: title,
-		Value: time.Unix(value,0).Format("2006-01-02 15:04:05"),
+		Value: time.Unix(value, 0).Format("2006-01-02 15:04:05"),
 	}
 }
 

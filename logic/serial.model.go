@@ -3,10 +3,11 @@ package logic
 import (
 	"encoding/base64"
 	"encoding/json"
+	"time"
+
 	"github.com/offer365/endecrypt"
 	pb "github.com/offer365/odin/proto"
 	uuid "github.com/satori/go.uuid"
-	"time"
 )
 
 var (
@@ -24,7 +25,7 @@ type SerialNum struct {
 	Date  int64               `json:"date"`  // 生成 序列号的时间。
 }
 
-//生成序列号
+// 生成序列号
 func (sn *SerialNum) Generate(nodes map[string]*pb.Node) (code string, err error) {
 	var byt []byte
 	sn.Nodes = nodes

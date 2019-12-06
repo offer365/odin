@@ -2,10 +2,11 @@ package config
 
 import (
 	"flag"
-	"github.com/offer365/odin/log"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"strings"
+
+	"github.com/offer365/odin/log"
+	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -42,10 +43,10 @@ func (c *config) LoadYaml(filename string) {
 	var (
 		content []byte
 		err     error
-		//name    string
+		// name    string
 	)
 	c.Peers = make(map[string]Node)
-	//读取配置文件
+	// 读取配置文件
 	if content, err = ioutil.ReadFile(filename); err != nil {
 		log.Sugar.Fatal("failed to read configuration file. error: ", err)
 	}

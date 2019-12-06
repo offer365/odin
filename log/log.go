@@ -7,7 +7,6 @@ import (
 
 var Sugar *zap.SugaredLogger
 
-
 func init() {
 	var (
 		lg  *zap.Logger
@@ -24,4 +23,3 @@ func init() {
 	}
 	Sugar = lg.Sugar()
 }
-

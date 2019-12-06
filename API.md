@@ -3,7 +3,7 @@
 
 # *序列号*
 ### 获取序列号
-`curl-k -s -X GET --user admin:123 https://10.0.0.200:9527/odin/api/v1/server/code`
+`curl -k -s -X GET --user admin:123 https://10.0.0.200:9527/odin/api/v1/server/code`
 ###### 返回示例:
 `{
      "code": 200,

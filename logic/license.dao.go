@@ -5,12 +5,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"sync/atomic"
+	"time"
+
 	"github.com/offer365/endecrypt"
 	"github.com/offer365/odin/log"
 	pb "github.com/offer365/odin/proto"
 	"go.etcd.io/etcd/clientv3"
-	"sync/atomic"
-	"time"
 )
 
 var atomicLic atomic.Value
@@ -88,15 +89,15 @@ func lic2Str(lic interface{}) (cipher string, err error) {
 		log.Sugar.Error("encrypt failed. error: ", err)
 		return
 	}
-	return base64.StdEncoding.EncodeToString(byt),err
+	return base64.StdEncoding.EncodeToString(byt), err
 }
 
 // 重置license
 func ResetLicense() (err error) {
 	var (
-		byt []byte
+		byt    []byte
 		cipher string
-		lic *License
+		lic    *License
 	)
 	if byt, err = GetLicense(); err != nil {
 		log.Sugar.Error("get lic failed. error: ", err)
@@ -121,19 +122,19 @@ func ResetLicense() (err error) {
 	num := (now - lic.Generate) / 60
 	// 这里限制了 LifeCycle 只能不断的增大
 	if num > lic.LifeCycle {
-		//atomic.StoreInt64(&(lic.LifeCycle),num)
+		// atomic.StoreInt64(&(lic.LifeCycle),num)
 		lic.LifeCycle = num
 	} else {
-		//atomic.AddInt64(&(lic.LifeCycle),1)
+		// atomic.AddInt64(&(lic.LifeCycle),1)
 		lic.LifeCycle += 1
 	}
 
 	// 这里限制了 UpdateTime 只能不断的增大
 	if now > lic.Update {
-		//atomic.StoreInt64(&(lic.Update),now)
+		// atomic.StoreInt64(&(lic.Update),now)
 		lic.Update = now
 	} else {
-		//atomic.AddInt64(&(lic.Update), 60)
+		// atomic.AddInt64(&(lic.Update), 60)
 		lic.Update += 60
 	}
 	if cipher, err = lic2Str(lic); err != nil {

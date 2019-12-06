@@ -1,11 +1,10 @@
 package logic
 
 import (
-	"go.etcd.io/etcd/clientv3"
 	"time"
+
+	"go.etcd.io/etcd/clientv3"
 )
-
-
 
 // 生成注销码
 func GenClearLicense() (text string, err error) {
@@ -19,7 +18,7 @@ func GenClearLicense() (text string, err error) {
 	lic := LoadLic()
 	lic.Apps = make(map[string]*App, 0)
 	StoreLic(lic)
-	obj:=&Clear{
+	obj := &Clear{
 		Lic:    lic,
 		Cipher: string(byt),
 		Date:   time.Now().Unix(),

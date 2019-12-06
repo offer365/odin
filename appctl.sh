@@ -3,7 +3,7 @@
 # 最后更新时间: 2019-08-04
 pwd=123
 ip=127.0.0.1
-port=8888
+port=9527
 address="http://${ip}:${port}/odin/api/v1"
 
 

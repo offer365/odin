@@ -5,12 +5,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"github.com/offer365/endecrypt"
-	"github.com/offer365/example/tools"
-	"github.com/offer365/odin/proto"
-	uuid "github.com/satori/go.uuid"
 	"sync"
 	"time"
+
+	"github.com/offer365/endecrypt"
+	"github.com/offer365/odin/proto"
+	"github.com/offer365/odin/utils"
+	uuid "github.com/satori/go.uuid"
 )
 
 var Author = &Authorize{}
@@ -70,7 +71,7 @@ func (a *Authorize) Auth(ctx context.Context, req *proto.Request) (resp *proto.R
 		return
 	}
 	// 检查请求是否合法
-	if valid.App != valid.App || valid.ID != req.Id || valid.Date != req.Date || tools.Abs(time.Now().Unix()-valid.Date) > 600 {
+	if valid.App != valid.App || valid.ID != req.Id || valid.Date != req.Date || utils.Abs(time.Now().Unix()-valid.Date) > 600 {
 		resp = &proto.Response{Code: statusValidatorErr, Msg: "verification failed"}
 		err = errors.New("verification failed")
 		return
@@ -85,7 +86,7 @@ func (a *Authorize) Auth(ctx context.Context, req *proto.Request) (resp *proto.R
 	// 1,token 不存在 不可注册 -----退出
 	// 2,token 存在  -----下一步
 	// 3,token 不存在 可注册 --- 下一步
-	if !exist && !register  {
+	if !exist && !register {
 		resp = &proto.Response{Code: statusCheckErr, Msg: "auth failed or token error"}
 		return
 	}
@@ -100,7 +101,7 @@ func (a *Authorize) Auth(ctx context.Context, req *proto.Request) (resp *proto.R
 		resp = &proto.Response{Code: statusCountErr, Msg: "get the number of App instances"}
 		return
 	}
-	if !LoadLic().ChkInstance(app,num) {
+	if !LoadLic().ChkInstance(app, num) {
 		resp = &proto.Response{Code: statusInsufficientErr, Msg: "app has insufficient remaining instances"}
 		return
 	}
@@ -178,7 +179,7 @@ func (a *Authorize) KeepLine(ctx context.Context, req *proto.Request) (resp *pro
 		resp = &proto.Response{Code: statusGetClientErr, Msg: "the client does not exist or get error"}
 		return
 	}
-	if tools.Md5sum([]byte(cli.Uuid), nil) != req.Umd5 || cli.Lease != req.Lease {
+	if utils.Md5sum([]byte(cli.Uuid), nil) != req.Umd5 || cli.Lease != req.Lease {
 		resp = &proto.Response{Code: statusUmd5Err, Msg: "uuid md5sum error"}
 		return
 	}
@@ -210,7 +211,7 @@ func (a *Authorize) OffLine(ctx context.Context, req *proto.Request) (resp *prot
 		resp = &proto.Response{Code: statusGetClientErr, Msg: "the client does not exist"}
 		return
 	}
-	if tools.Md5sum([]byte(cli.Uuid), nil) != req.Umd5 || cli.Lease != req.Lease {
+	if utils.Md5sum([]byte(cli.Uuid), nil) != req.Umd5 || cli.Lease != req.Lease {
 		resp = &proto.Response{Code: statusUmd5Err, Msg: "uuid md5sum error"}
 		return
 	}

@@ -19,9 +19,10 @@ import (
 )
 
 const (
-	Username = "root"
-	Password = "613f#8d164df4ACPF49@93a510df49!66f98b*d6"
-	logo     = `
+	Username     = "root"
+	Password     = "613f#8d164df4ACPF49@93a510df49!66f98b*d6"
+	clusterToken = "odin-665c34c924f8d1f259df81557d266dec"
+	logo         = `
 	             _   _        
 	            | | (_)       
 	  ___     __| |  _   _ __  
@@ -73,6 +74,7 @@ func Main() {
 		config.Cfg.Dir,
 		config.Cfg.LocalClientAddr(),
 		config.Cfg.LocalPeerAddr(),
+		clusterToken,
 		config.Cfg.State,
 		config.Cfg.AllPeerAddr(),
 	); err != nil {

@@ -126,8 +126,7 @@ gahmAgIzeyFCjb2txOo65VtLM0DfzzkIX2PrLz7CyiXP40m8uBMtCDG+IZS0arQ=
 `
 )
 
-
 var (
-	Addr = "10.0.0.200:9527"
-	Member = []string{fmt.Sprintf("https://%s/odin/api/v1/client/auth",Addr)}
+	Addr   = "10.0.0.200:9527"
+	Member = []string{fmt.Sprintf("https://%s/odin/api/v1/client/auth", Addr)}
 )

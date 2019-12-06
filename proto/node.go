@@ -3,19 +3,21 @@ package proto
 import (
 	"context"
 	"encoding/json"
+	"sync"
+
 	corec "github.com/offer365/example/grpc/core/client"
 	cores "github.com/offer365/example/grpc/core/server"
-	"github.com/offer365/example/tools"
 	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/log"
+	"github.com/offer365/odin/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"sync"
+
+	"time"
 
 	"github.com/zcalusic/sysinfo"
-	"time"
 )
 
 const (
@@ -146,16 +148,15 @@ var (
 	Self          *Node
 	auth          *Authentication
 	ClientConns   *CliConns
-	StaterClients  *StaterClis
+	StaterClients *StaterClis
 	_username     = "C205v406x68f5IM7"
 	_password     = "c9bJ3v7FQ11681EP"
 )
 
-
 func init() {
 	Self = NewNode(config.Cfg.Name, config.Cfg.LocalGRpcAddr())
-	ClientConns   =new(CliConns)
-	StaterClients  =new(StaterClis)
+	ClientConns = new(CliConns)
+	StaterClients = new(StaterClis)
 	auth = &Authentication{
 		User:     _username,
 		Password: _password,
@@ -226,7 +227,7 @@ func (n *Node) md5() {
 		if err != nil {
 			return
 		}
-		n.Attrs.Hwmd5 = tools.Md5sum(byt, nil)
+		n.Attrs.Hwmd5 = utils.Md5sum(byt, nil)
 	}
 }
 
@@ -234,21 +235,21 @@ func (n *Node) Status(ctx context.Context, args *Args) (*Node, error) {
 	n.Hardware.hw()
 	n.md5()
 	n.Attrs.Now = time.Now().Unix()
-	return n,nil
+	return n, nil
 }
 
 func GetAllNodes(ctx context.Context) (nodes map[string]*Node) {
 	var lock sync.Mutex
 	var wait sync.WaitGroup
-	//var  value atomic.Value
+	// var  value atomic.Value
 	nodes = make(map[string]*Node, 0)
-	//value.Store(nodes)
-	peers:=config.Cfg.AllGRpcAddr()
+	// value.Store(nodes)
+	peers := config.Cfg.AllGRpcAddr()
 	wait.Add(len(peers))
 	for remoteName, remoteAddr := range peers {
 		go func(remoteN string, remoteA string) {
 			defer wait.Done()
-			if  remoteN == Self.Attrs.Name || remoteA == Self.Attrs.Addr{
+			if remoteN == Self.Attrs.Name || remoteA == Self.Attrs.Addr {
 				Self.Attrs.Now = time.Now().Unix()
 				// 重新获取硬件信息
 				Self.Hardware.hw()
@@ -259,7 +260,7 @@ func GetAllNodes(ctx context.Context) (nodes map[string]*Node) {
 			if ok && cli != nil {
 				n, err := cli.Status(ctx, &Args{Name: Self.Attrs.Name, Addr: Self.Attrs.Addr}, grpc.WaitForReady(true))
 				if err != nil {
-					if conn,ok:=ClientConns.Get(remoteN); conn!=nil && ok{
+					if conn, ok := ClientConns.Get(remoteN); conn != nil && ok {
 						conn.Close()
 						ClientConns.Del(remoteN)
 						StaterClients.Del(remoteN)
@@ -278,9 +279,9 @@ func GetAllNodes(ctx context.Context) (nodes map[string]*Node) {
 	}
 	wait.Wait()
 	nodes[config.Cfg.Name] = Self
-	//sort.Slice(nodes, func(i, j int) bool {
+	// sort.Slice(nodes, func(i, j int) bool {
 	//	return nodes[i].name < nodes[j].name
-	//})
+	// })
 	return
 }
 
@@ -311,8 +312,8 @@ func NodeGRpcClient(name, addr string) {
 		return
 	}
 
-	StaterClients.Put(name,NewStaterClient(Con))
-	ClientConns.Put(name,Con)
+	StaterClients.Put(name, NewStaterClient(Con))
+	ClientConns.Put(name, Con)
 	return
 }
 
@@ -375,25 +376,24 @@ func (a *Authentication) RequireTransportSecurity() bool {
 	return true
 }
 
-
 type CliConns struct {
 	sync.Map
 }
 
-func (cc *CliConns)Get(key string) (*grpc.ClientConn,bool) {
-	val,exist:=cc.Load(key)
+func (cc *CliConns) Get(key string) (*grpc.ClientConn, bool) {
+	val, exist := cc.Load(key)
 	if exist {
-		cli,ok:= val.(*grpc.ClientConn)
-		return cli,ok
+		cli, ok := val.(*grpc.ClientConn)
+		return cli, ok
 	}
-	return nil,exist
+	return nil, exist
 }
 
-func (cc *CliConns)Put(key string,val *grpc.ClientConn){
-	cc.Store(key,val)
+func (cc *CliConns) Put(key string, val *grpc.ClientConn) {
+	cc.Store(key, val)
 }
 
-func (cc *CliConns)Del(key string)  {
+func (cc *CliConns) Del(key string) {
 	cc.Delete(key)
 }
 
@@ -401,19 +401,19 @@ type StaterClis struct {
 	sync.Map
 }
 
-func (sc *StaterClis)Get(key string) (StaterClient,bool) {
-	val,exist:=sc.Load(key)
+func (sc *StaterClis) Get(key string) (StaterClient, bool) {
+	val, exist := sc.Load(key)
 	if exist {
-		cli,ok:= val.(StaterClient)
-		return cli,ok
+		cli, ok := val.(StaterClient)
+		return cli, ok
 	}
-	return nil,exist
+	return nil, exist
 }
 
-func (sc *StaterClis)Put(key string,val StaterClient){
-	sc.Store(key,val)
+func (sc *StaterClis) Put(key string, val StaterClient) {
+	sc.Store(key, val)
 }
 
-func (sc *StaterClis)Del(key string)  {
+func (sc *StaterClis) Del(key string) {
 	sc.Delete(key)
 }

@@ -6,12 +6,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/offer365/example/qrcode"
-	"github.com/offer365/example/tools"
 	"github.com/offer365/odin/log"
 	"github.com/offer365/odin/logic"
 	"github.com/offer365/odin/proto"
+	"github.com/offer365/odin/utils"
+
 	"io/ioutil"
 	"net/http"
 	"sort"
@@ -21,8 +23,8 @@ import (
 )
 
 const (
-	statusOk   int = 200
-	statusMethodErr int32 = 405
+	statusOk            int   = 200
+	statusMethodErr     int32 = 405
 	statusChkLicenseErr int32 = iota + 440
 	statusPutLicenseErr
 	statusClearLicenseErr
@@ -53,7 +55,7 @@ type conf struct {
 func SerialNumAPI(c *gin.Context) {
 	var (
 		code string
-		err error
+		err  error
 	)
 	user := c.MustGet(gin.AuthUserKey).(string)
 	code = "auth error"
@@ -94,7 +96,7 @@ func QrCodeAPI(c *gin.Context) {
 		log.Sugar.Error(code)
 	}
 
-	//c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", "qr-code.jpg"))  //对下载的文件重命名
+	// c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", "qr-code.jpg"))  //对下载的文件重命名
 	c.Writer.Header().Add("Content-Type", "application/octet-stream")
 	c.Writer.Header().Add("Content-Type", "image/jpeg") // 不能去掉
 	buf := bytes.NewBuffer(make([]byte, 0))
@@ -105,9 +107,9 @@ func QrCodeAPI(c *gin.Context) {
 	c.DataFromReader(http.StatusOK, int64(buf.Len()), "image/jpeg", buf, extraHeaders)
 
 	// 使用文件实现
-	//c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", "qr-code.jpg"))
-	//c.Writer.Header().Add("Content-Type", "application/octet-stream")
-	//c.File(AssetPath+"qr-code.jpg")
+	// c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", "qr-code.jpg"))
+	// c.Writer.Header().Add("Content-Type", "application/octet-stream")
+	// c.File(AssetPath+"qr-code.jpg")
 }
 
 // 注销二维码Api
@@ -126,7 +128,7 @@ func QrLicenseAPI(c *gin.Context) {
 		log.Sugar.Error(code)
 	}
 
-	//c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", "qr-code.jpg"))  //对下载的文件重命名
+	// c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", "qr-code.jpg"))  //对下载的文件重命名
 	c.Writer.Header().Add("Content-Type", "application/octet-stream")
 	c.Writer.Header().Add("Content-Type", "image/jpeg") // 不能去掉
 	buf := bytes.NewBuffer(make([]byte, 0))
@@ -140,9 +142,9 @@ func QrLicenseAPI(c *gin.Context) {
 	c.DataFromReader(http.StatusOK, int64(buf.Len()), "image/jpeg", buf, extraHeaders)
 
 	// 使用文件实现
-	//c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", "qr-code.jpg"))
-	//c.Writer.Header().Add("Content-Type", "application/octet-stream")
-	//c.File(AssetPath+"qr-code.jpg")
+	// c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", "qr-code.jpg"))
+	// c.Writer.Header().Add("Content-Type", "application/octet-stream")
+	// c.File(AssetPath+"qr-code.jpg")
 }
 
 // licenseApi
@@ -199,7 +201,7 @@ func NodeStatusAPI(c *gin.Context) {
 	if _, ok := secrets[user]; ok {
 		nodeM := logic.GetAllNode()
 		for _, n := range nodeM {
-			nodeL = append(nodeL, status{n.Attrs.Name, n.Attrs.Addr, tools.RunTime(n.Attrs.Now, n.Attrs.Start)})
+			nodeL = append(nodeL, status{n.Attrs.Name, n.Attrs.Addr, utils.RunTime(n.Attrs.Now, n.Attrs.Start)})
 		}
 		sort.Slice(nodeL, func(i, j int) bool {
 			return nodeL[i].ID < nodeL[j].ID
@@ -290,8 +292,8 @@ func ConfAPI(c *gin.Context) {
 func ClientAPI(c *gin.Context) {
 	user := c.MustGet(gin.AuthUserKey).(string)
 	if _, ok := secrets[user]; ok {
-		//app := c.Param("app")
-		//id := c.Param("id")
+		// app := c.Param("app")
+		// id := c.Param("id")
 		data, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
 			log.Sugar.Error("ready request body error: ", err)
@@ -306,7 +308,7 @@ func ClientAPI(c *gin.Context) {
 		case "POST": // 认证
 			resp, err := logic.Author.Auth(context.TODO(), req)
 			if err != nil {
-				log.Sugar.Error(resp,err)
+				log.Sugar.Error(resp, err)
 				return
 			}
 			c.JSON(statusOk, resp)
@@ -314,7 +316,7 @@ func ClientAPI(c *gin.Context) {
 		case "PUT": // 心跳
 			resp, err := logic.Author.KeepLine(context.TODO(), req)
 			if err != nil {
-				log.Sugar.Error(resp,err)
+				log.Sugar.Error(resp, err)
 				return
 			}
 			c.JSON(statusOk, resp)
@@ -322,7 +324,7 @@ func ClientAPI(c *gin.Context) {
 		case "DELETE": // 关闭
 			resp, err := logic.Author.OffLine(context.TODO(), req)
 			if err != nil {
-				log.Sugar.Error(resp,err)
+				log.Sugar.Error(resp, err)
 				return
 			}
 			c.JSON(statusOk, resp)
@@ -347,7 +349,7 @@ func CliOnlineAPI(c *gin.Context) {
 			for id, status := range cliMap {
 				cli := new(logic.Cli)
 				if err := json.Unmarshal([]byte(status), cli); err == nil {
-					tmp[id] = fmt.Sprintf("节点:%s %s %s", cli.ID, cli.App, tools.RunTime(time.Now().Unix(), cli.Start))
+					tmp[id] = fmt.Sprintf("节点:%s %s %s", cli.ID, cli.App, utils.RunTime(time.Now().Unix(), cli.Start))
 				}
 			}
 			for id, info := range tmp {

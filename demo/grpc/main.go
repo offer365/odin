@@ -6,13 +6,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/offer365/endecrypt"
-	corec "github.com/offer365/example/grpc/core/client"
-	"github.com/offer365/example/tools"
-	pb "github.com/offer365/odin/demo/proto"
-	"google.golang.org/grpc"
 	"strconv"
 	"time"
+
+	"github.com/offer365/endecrypt"
+	corec "github.com/offer365/example/grpc/core/client"
+	pb "github.com/offer365/odin/demo/proto"
+	"github.com/offer365/odin/utils"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -49,7 +50,7 @@ func ManyApp(ins int) {
 	apps := make([]*Application, 0)
 	for i := 0; i < ins; i++ {
 		token := "app" + strconv.Itoa(i)
-		app := NewApp("nlp", "app"+strconv.Itoa(i), token, []string{"10.0.0.200:9527"},[]byte(pb.Client_crt), []byte(pb.Client_key), []byte(pb.Ca_crt))
+		app := NewApp("nlp", "app"+strconv.Itoa(i), token, []string{"10.0.0.200:9527"}, []byte(pb.Client_crt), []byte(pb.Client_key), []byte(pb.Ca_crt))
 		apps = append(apps, app)
 	}
 	for _, ap := range apps {
@@ -63,7 +64,7 @@ func ManyApp(ins int) {
 }
 
 func SingleAPP() {
-	app := NewApp("hotword", "app"+strconv.Itoa(99), "app"+strconv.Itoa(99), pb.Member,[]byte(pb.Client_crt), []byte(pb.Client_key), []byte(pb.Ca_crt) )
+	app := NewApp("hotword", "app"+strconv.Itoa(99), "app"+strconv.Itoa(99), pb.Member, []byte(pb.Client_crt), []byte(pb.Client_key), []byte(pb.Ca_crt))
 	app.Active()
 	app.KeepLine()
 	app.OffLine()
@@ -154,15 +155,15 @@ func (app *Application) KeepLine() {
 		Id:     app.ID,
 		Date:   time.Now().Unix(),
 		Verify: "",
-		Umd5:   tools.Md5sum([]byte(app.Uuid), nil),
+		Umd5:   utils.Md5sum([]byte(app.Uuid), nil),
 		Lease:  app.Lease,
 	}
-	for range time.Tick(time.Second*6){
+	for range time.Tick(time.Second * 6) {
 		resp, err := app.cli.KeepLine(context.TODO(), req)
-		if err!=nil{
-			fmt.Println( err)
+		if err != nil {
+			fmt.Println(err)
 		}
-		fmt.Println(resp.Code,resp.Msg)
+		fmt.Println(resp.Code, resp.Msg)
 	}
 }
 
@@ -172,7 +173,7 @@ func (app *Application) OffLine() {
 		Id:     app.ID,
 		Date:   time.Now().Unix(),
 		Verify: "",
-		Umd5:   tools.Md5sum([]byte(app.Uuid), nil),
+		Umd5:   utils.Md5sum([]byte(app.Uuid), nil),
 		Lease:  app.Lease,
 	}
 	resp, err := app.cli.OffLine(context.TODO(), req)

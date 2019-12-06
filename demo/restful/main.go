@@ -1,4 +1,4 @@
-[package main
+package main
 
 import (
 	"crypto/rand"
@@ -7,10 +7,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+
 	"github.com/astaxie/beego/httplib"
 	"github.com/offer365/endecrypt"
-	"github.com/offer365/example/tools"
 	pb "github.com/offer365/odin/demo/proto"
+	"github.com/offer365/odin/utils"
+
 	"strconv"
 	"time"
 )
@@ -181,7 +183,7 @@ func Tls(crt, key, ca []byte) *tls.Config {
 	certPool := x509.NewCertPool()
 
 	if ok := certPool.AppendCertsFromPEM(ca); !ok {
-		//err = errors.New("failed to append ca certs")
+		// err = errors.New("failed to append ca certs")
 		return nil
 	}
 	return &tls.Config{
@@ -191,7 +193,7 @@ func Tls(crt, key, ca []byte) *tls.Config {
 		InsecureSkipVerify: true,
 		Rand:               rand.Reader,
 		Time:               time.Now,
-		//NextProtos:         []string{"http/1.1", http2.NextProtoTLS},
+		// NextProtos:         []string{"http/1.1", http2.NextProtoTLS},
 	}
 
 }
@@ -219,7 +221,7 @@ func (app *Application) Active() {
 		Date:   time.Now().Unix(),
 		Verify: base64.StdEncoding.EncodeToString(byt),
 	}
-	byt,_=json.Marshal(req)
+	byt, _ = json.Marshal(req)
 	fmt.Println(string(byt))
 	result, err := httplib.Post(app.Servers[0]).SetTimeout(2*time.Second, 3*time.Second).Debug(true).SetBasicAuth("admin", "123").SetTLSClientConfig(tlsConifg).Header("Content-Type", "application/json; charset=utf-8").JSONBody(req)
 	if err != nil {
@@ -243,12 +245,12 @@ func (app *Application) KeepLine() {
 		Id:     app.ID,
 		Date:   time.Now().Unix(),
 		Verify: "",
-		Umd5:   tools.Md5sum([]byte(app.Uuid), nil),
+		Umd5:   utils.Md5sum([]byte(app.Uuid), nil),
 		Lease:  app.Lease,
 	}
 
 	for range time.Tick(time.Second * 6) {
-		byt,_:=json.Marshal(req)
+		byt, _ := json.Marshal(req)
 		fmt.Println(string(byt))
 		result, _ := httplib.Put(app.Servers[0]).SetTimeout(2*time.Second, 3*time.Second).Debug(true).SetBasicAuth("admin", "123").SetTLSClientConfig(tlsConifg).Header("Content-Type", "application/json; charset=utf-8").JSONBody(req)
 		resp := &pb.Response{}
@@ -264,7 +266,7 @@ func (app *Application) OffLine() {
 		Id:     app.ID,
 		Date:   time.Now().Unix(),
 		Verify: "",
-		Umd5:   tools.Md5sum([]byte(app.Uuid), nil),
+		Umd5:   utils.Md5sum([]byte(app.Uuid), nil),
 		Lease:  app.Lease,
 	}
 
@@ -276,7 +278,7 @@ func (app *Application) OffLine() {
 }
 
 func main() {
-	//ManyApp(1000)
+	// ManyApp(1000)
 	SingleAPP()
 	select {}
 

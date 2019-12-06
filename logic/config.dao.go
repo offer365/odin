@@ -1,13 +1,13 @@
 package logic
 
 import (
+	"strings"
+
 	"github.com/offer365/odin/log"
 	"go.etcd.io/etcd/clientv3"
-	"strings"
 )
 
 // 配置管理
-
 
 // 获取配置
 func GetConfig(key string) (val string, err error) {

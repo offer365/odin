@@ -2,10 +2,11 @@ package logic
 
 import (
 	"context"
+	"time"
+
 	"github.com/offer365/odin/log"
 	pb "github.com/offer365/odin/proto"
 	"go.etcd.io/etcd/clientv3"
-	"time"
 )
 
 // 序列号
@@ -32,6 +33,7 @@ func PutSerialNum(val string) (err error) {
 	}
 	return nil
 }
+
 // 重置序列号
 func ResetSerialNum() (code string, err error) {
 	ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*500)

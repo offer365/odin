@@ -5,6 +5,11 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
+	"net"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/controller"
@@ -13,10 +18,6 @@ import (
 	pb "github.com/offer365/odin/proto"
 	"golang.org/x/net/http2"
 	"google.golang.org/grpc"
-	"net"
-	"net/http"
-	"strings"
-	"time"
 )
 
 var gs *grpc.Server
@@ -39,7 +40,7 @@ func Run(addr string) {
 		}
 		return
 	})
-	listener, err := NewTlsListen([]byte(pb.Server_crt), []byte(pb.Server_key), []byte(pb.Ca_crt),addr)
+	listener, err := NewTlsListen([]byte(pb.Server_crt), []byte(pb.Server_key), []byte(pb.Ca_crt), addr)
 	if err != nil {
 		log.Sugar.Fatal(err)
 		return
@@ -80,10 +81,10 @@ func NewTlsListen(crt, key, ca []byte, addr string) (net.Listener, error) {
 func ginServer() http.Handler {
 	gin.SetMode(gin.ReleaseMode) // 生产模式
 	r := gin.New()
-	r.Use(gin.Recovery()) //Recovery 中间件从任何 panic 恢复，如果出现 panic，它会写一个 500 错误。
-	//store := cookie.NewStore([]byte("secret"))
-	//store.Options(sessions.Options{MaxAge:0})
-	//r.Use(sessions.Sessions("odin",store))
+	r.Use(gin.Recovery()) // Recovery 中间件从任何 panic 恢复，如果出现 panic，它会写一个 500 错误。
+	// store := cookie.NewStore([]byte("secret"))
+	// store.Options(sessions.Options{MaxAge:0})
+	// r.Use(sessions.Sessions("odin",store))
 	r.LoadHTMLGlob(_assetPath + "html/*")
 	r.Static("/static", _assetPath+"static")
 	r.StaticFile("/favicon.ico", _assetPath+"static/favicon.ico")
@@ -103,7 +104,7 @@ func ginServer() http.Handler {
 	// 节点状态
 	api.GET("/server/nodes", controller.NodeStatusAPI)
 	// 解绑接口
-	api.POST("/server/untied/:app/:id",controller.UntiedAppApi)
+	api.POST("/server/untied/:app/:id", controller.UntiedAppApi)
 	// 配置接口 kv 存储
 	api.Any("/client/conf/*name", controller.ConfAPI)
 	// 客户端接口
@@ -113,8 +114,7 @@ func ginServer() http.Handler {
 	// web 交互
 	api.POST("/web/login", controller.LoginAPI)
 	// 帮助
-	api.GET("/server/help",controller.HelpAPI)
-
+	api.GET("/server/help", controller.HelpAPI)
 
 	r.Any("", func(c *gin.Context) {
 		c.Request.URL.Path = "/index"
