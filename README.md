@@ -2,16 +2,65 @@
 
 ----
 
-## what this? ##
-- 应用在局域网中或互联网中的分布式授权服务。
+## what this?
+- 应用在局域网中或互联网中的==分布式==授权服务。
 - odin 是一个 license server  用于给多种应用的多个客户端提供授权服务。
-- 可以通过绑定应用的硬件信息鉴权。
-- 通过内嵌 etcd 来存储数据。
 - 目前只能运行在 linux 系统中。
 - 这个应用需要与[edda](https://github.com/offer365/edda) 配合使用。
 - 在 [edda](https://github.com/offer365/edda) 中生成授权码，在odin中激活。多个客户端或应用从odin 获取授权信息。
-- 被授权的应用可以通过 restful 或 grpc 与 odin 交互。
-- demo 里面有go语言的restful 和 grpc 实现demo，可以参考。
+- 被授权的应用可以通过 restful 或 gRPC 与 odin 交互。
+
+
+
+## 特点
+- 分布式。
+- 可以通过绑定应用的==硬件信息鉴权==。
+- 支持 ==https 加密==通信。
+- 部署简单，无依赖。
+
+#### odin & apes
+> 区别apes 只能限制产品安装的数量，不能限制产品安装的位置。\
+> odin 可以根据 客户端提供的token 限制产品安装的位置。
+
+#### edda & idst
+> edda 不提供授权管理，审批流程，客户关系等功能\
+> 只实现了授权相关四个核心功能。
+
+**gRpc接口**
+
+```
+service Authorization {
+    rpc Resolved (Cipher) returns (SerialNum); // 解析序列号
+    rpc Authorized (AuthReq) returns (AuthResp); // 授权
+    rpc Untied (UntiedReq) returns (Cipher); // 解绑
+    rpc Cleared (Cipher) returns (Clear);  // 清除
+}
+```
+
+
+## 技术栈
+- 使用 GoLang 语言开发。
+- 使用 gin web 框架。
+- 嵌入etcd。
+- 支持 RestFul 和 ==GRPC== 传输数据。
+- 前后端分离 bootstrap + jquery + ajax 。
+
+## 安全
+- RestFul 和 gRPC 都使用 https 传输数据。
+- 序列号和授权码使用 aes32+rsa2048加密。Auth步骤可以采用多种加密方式。
+- 通过 ==到期时间== 与 ==生存周期== 相互印证防止时间篡改。
+- odin 不会存储明文，存储加密过或hash后的值。
+- N个节点(奇数)部署时，可以允许 (N-1)/2 个节点挂掉，且数据不会丢失。
+- 内嵌 etcd 支持 用户认证。
+
+## 性能
+- CPU:Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz * 2
+- MEM: 2G
+
+> 单节点下1000个客户端同时访问。cpu:27%  mem:5%\
+> 三节点下1000个客户端同时访问。cpu:33%  mem:7%
+
+
 
 ## 应用交互流程
 在demo/proto/auth.proto 包里定义了request 和 reponse 消息体
@@ -143,7 +192,16 @@ sh install.sh
 > app端的测试，请参考 demo。\
 > 建议使用三个节点提供服务。
 
+## Demo
+- 目前仅实现了go语言的restful 和 grpc demo。在demo 目录下。
 
+## TODO
+* 序列号/授权码采用 椭圆曲线ECC加密算法 ？？？
+* 支持 圣天诺Sentinel Time时钟芯片加密锁 ？？？
+* 前端交互支持 session，不再使用 BasicAtuh。Linux下，curl访问时 根据 UserAgent区分 使用 BasicAtuh 认证。？？？
+* 提高测试代码覆盖率。
+* 内嵌 etcd 支持https。
+* 支持 windows。实现获取硬件信息接口。
 
 ## 使用介绍 ##
 1. 先安装odin 并运行。访问web端口，默认账号密码：admin:123 可在配置文件odin.yaml 中修改。
