@@ -220,8 +220,7 @@
 ### 关闭
 `curl -k -s -X PUT --user admin:123 -d '{"app":"hotword","id":"app99","date":1572257373,"umd5":"wkQR9xdxuTvg56FkwGQfnA==","lease":2859906785733287407}' https://10.0.0.200:9527/odin/api/v1/client/auth`
 ###### 返回示例:
-`{"code":200,"data":{"lease":2859906785733287504},"msg":"success"}`
-
+`{"code":200,"data":{"lease":2859906785733287504},"msg":"success"}
 ---
 
 # *Client在线信息接口*
@@ -235,7 +234,8 @@
          {
              "id": "hotword/app99",
              "info": "节点:app99 hotword 00天00小时00分钟39秒."
-         }
+         }`
+
      ],
      "msg": "success"
  }`

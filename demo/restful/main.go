@@ -278,8 +278,8 @@ func (app *Application) OffLine() {
 }
 
 func main() {
-	// ManyApp(1000)
-	SingleAPP()
+	ManyApp(1000)
+	// SingleAPP()
 	select {}
 
 }

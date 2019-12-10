@@ -2,7 +2,7 @@
 # appctl.sh
 # 最后更新时间: 2019-08-04
 pwd=123
-ip=127.0.0.1
+ip=10.0.0.200
 port=9527
 address="http://${ip}:${port}/odin/api/v1"
 
