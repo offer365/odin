@@ -9,7 +9,7 @@
 - 这个应用需要与[edda](https://github.com/offer365/edda) 配合使用。
 - 在 [edda](https://github.com/offer365/edda) 中生成授权码，在odin中激活。多个客户端或应用从odin 获取授权信息。
 - 被授权的应用可以通过 restful 或 gRPC 与 odin 交互。
-- 更多内容请阅读 [MORE.md](https://github.com/offer365/odin/MORE.md)
+- 更多内容请阅读 [MORE.md](https://github.com/offer365/odin/blob/master/MORE.md)
 
 
 
