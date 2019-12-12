@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/offer365/endecrypt"
+	"github.com/offer365/example/endecrypt"
 	pb "github.com/offer365/odin/proto"
 	uuid "github.com/satori/go.uuid"
 )

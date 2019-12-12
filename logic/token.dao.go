@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/offer365/endecrypt"
+	"github.com/offer365/example/endecrypt"
 	"github.com/offer365/odin/log"
 	"github.com/offer365/odin/utils"
 	"go.etcd.io/etcd/clientv3"
 )
 
-var salt = []byte("build857484914")
+var salt = []byte(hashSalt)
 
 // 下面的函数并不会直接存储App发送的token,而是对app,ID,val 分别进行md5或sha256 hash 后,再进行存储或取出。上层函数以同样的算法计算后，操作和比对。
 

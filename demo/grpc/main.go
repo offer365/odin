@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/offer365/endecrypt"
+	"github.com/offer365/example/endecrypt"
 	corec "github.com/offer365/example/grpc/core/client"
 	pb "github.com/offer365/odin/demo/proto"
 	"github.com/offer365/odin/utils"

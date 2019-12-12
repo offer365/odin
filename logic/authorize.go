@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/offer365/endecrypt"
+	"github.com/offer365/example/endecrypt"
 	"github.com/offer365/odin/proto"
 	"github.com/offer365/odin/utils"
 	uuid "github.com/satori/go.uuid"

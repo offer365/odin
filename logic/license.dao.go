@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/offer365/endecrypt"
+	"github.com/offer365/example/endecrypt"
 	"github.com/offer365/odin/log"
 	pb "github.com/offer365/odin/proto"
 	"go.etcd.io/etcd/clientv3"
