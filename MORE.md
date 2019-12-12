@@ -1,7 +1,7 @@
 ## 逻辑
 ![架构](https://github.com/offer365/odin/blob/master/OdinProcess.png)
 
-[Odin&App交互](https://github.com/offer365/odin/blob/master/Odin&App.png)
+![Odin&App交互](https://github.com/offer365/odin/blob/master/Odin&App.png)
 ## 序列号的生成
 
 > 序列号的结构体
