@@ -4,7 +4,7 @@
 pwd=123
 ip=10.0.0.200
 port=9527
-address="http://${ip}:${port}/odin/api/v1"
+address="https://${ip}:${port}/odin/api/v1"
 
 
 function usage() {

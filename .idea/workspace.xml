@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="aa8a0eed-f415-4285-8944-9e75331cac68" name="默认更改列表" comment="" />
+    <list default="true" id="aa8a0eed-f415-4285-8944-9e75331cac68" name="默认更改列表" comment="">
+      <change beforePath="$PROJECT_DIR$/appctl.sh" beforeDir="false" afterPath="$PROJECT_DIR$/appctl.sh" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
