@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 Restart=always
-ExecStart=PATH/odin -f PATH/odin.json
+ExecStart=PATH/odin -f PATH/odin.yaml
 WorkingDirectory=PATH
 ExecStop=kill -9 $MAINPID
 
