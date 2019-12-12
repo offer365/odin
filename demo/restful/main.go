@@ -198,6 +198,7 @@ func Tls(crt, key, ca []byte) *tls.Config {
 
 }
 
+// auth
 func (app *Application) Active() {
 	verify := make(map[string]interface{})
 	verify["app"] = app.Name
@@ -231,9 +232,9 @@ func (app *Application) Active() {
 	resp := &pb.Response{}
 	fmt.Println(result.ToJSON(resp))
 	fmt.Println(resp.Code, resp.Msg)
-	byt, err = endecrypt.Decrypt(endecrypt.Pub2Rsa1024, resp.Data.Cipher)
+	byt, err = endecrypt.Decrypt(endecrypt.Pub2Rsa1024, resp.Data.Cipher) // uuid
 	app.Uuid = string(byt)
-	byt, err = endecrypt.Decrypt(endecrypt.Pub2Rsa2048, resp.Data.Auth)
+	byt, err = endecrypt.Decrypt(endecrypt.Pub2Rsa2048, resp.Data.Auth) // {"attrs":[{"Name":"热词","Key":"hotword","Value":1000},{"Name":"类热词","Key":"classword","Value":1000}],"time":1571909203232224000}
 	app.AuthInfo = string(byt) // eg: {"attrs":[{"Name":"热词","Key":"hotword","Value":1000},{"Name":"类热词","Key":"classword","Value":1000}],"time":1571909203232224000}
 	fmt.Println(string(byt), err)
 	app.Lease = resp.Data.Lease

@@ -17,7 +17,7 @@ func init() {
 	}
 	defer lg.Sync()
 	cfg := logutil.DefaultZapLoggerConfig
-	cfg.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+	cfg.Level = zap.NewAtomicLevelAt(zap.WarnLevel)
 	if lg, err = cfg.Build(); err != nil {
 		return
 	}

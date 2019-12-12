@@ -31,7 +31,7 @@ type item struct {
 // 授权码
 type License struct {
 	Lid       string            `json:"lid"`                    // 授权码唯一uuid,用来甄别是否重复授权。
-	Sid       string            `json:"sid"`                    // 机器码的id, lid与sid 一一对应
+	Sid       string            `json:"sid"`                    // 序列号的id, lid与sid 一一对应
 	Devices   map[string]string `json:"devices"`                // 节点id与 硬件信息md5
 	Generate  int64             `json:"generate"`               // 授权生成时间
 	Update    int64             `json:"update" title:"更新时间"`    // 当前时间 最后一次授权更新时间

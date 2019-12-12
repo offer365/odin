@@ -6,6 +6,7 @@ import (
 
 	"github.com/offer365/example/etcd/dao"
 	"github.com/offer365/example/etcd/embedder"
+	"github.com/offer365/odin/log"
 )
 
 const (
@@ -44,6 +45,7 @@ func InitEmbed(name, dir, client, peer, token, state string, cluster map[string]
 		embedder.WithClusterToken(token),
 		embedder.WithClusterState(state),
 		embedder.WithCluster(cluster),
+		embedder.WithLogger(log.Sugar),
 	)
 }
 

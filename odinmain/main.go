@@ -78,12 +78,12 @@ func Main() {
 		config.Cfg.State,
 		config.Cfg.AllPeerAddr(),
 	); err != nil {
-		log.Sugar.Error("init embed server failed. error: ", err)
+		log.Sugar.Fatal("init embed server failed. error: ", err)
 	}
 
 	go func() { // 运行etcd
 		if err = logic.Device.Run(ready); err != nil {
-			log.Sugar.Error("run embed server error. ", err)
+			log.Sugar.Fatal("run embed server error. ", err)
 			return
 		}
 	}()
@@ -103,7 +103,7 @@ func Server() {
 	)
 	// 客户端连接
 	if err = logic.InitStore(config.Cfg.LocalClientAddr(), Username, Password, time.Second*3); err != nil {
-		log.Sugar.Error("init store failed. error: ", err)
+		log.Sugar.Fatal("init store failed. error: ", err)
 	}
 
 	// 从etcd加载license
@@ -171,6 +171,7 @@ func loadLic() (err error) {
 		lic = new(logic.License)
 	} else {
 		lic, err = logic.Str2lic(string(byt))
+		// TODO 启动时检查授权时间合法性。？？？
 	}
 	logic.StoreLic(lic)
 	return

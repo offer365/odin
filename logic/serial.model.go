@@ -21,7 +21,7 @@ func init() {
 // 序列号
 type SerialNum struct {
 	Sid   string              `json:"sid"`   // 序列号唯一uuid，用来标识序列号，并与 授权码相互校验，一一对应。
-	Nodes map[string]*pb.Node `json:"nodes"` // 节点的具体硬件信息。这里不使用map的原因是map是无序的。无法保证每次生成的hws是一致的。
+	Nodes map[string]*pb.Node `json:"nodes"` // 节点的具体硬件信息。
 	Date  int64               `json:"date"`  // 生成 序列号的时间。
 }
 
