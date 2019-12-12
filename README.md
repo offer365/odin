@@ -177,6 +177,7 @@ eg: /NcJEs2UCgYEA/mh0SYJIGyadW/hash(app,salt)/hash(id,salt)    hash(token,salt)
 unzip odin-xxx-linux.amd64.zip
 cd odin
 sh install.sh
+# 请先修改odin.yaml,appctl.sh 中的IP地址为本机IP。
 ./appctl.sh resetcode 
 ./appctl.sh getcode
 ```
