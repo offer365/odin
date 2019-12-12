@@ -3,7 +3,7 @@
 ----
 
 ## what this?
-- 应用在局域网中或互联网中的==分布式==授权服务。
+- 应用在局域网中或互联网中的分布式授权服务。
 - odin 是一个 license server  用于给多种应用的多个客户端提供授权服务。
 - 目前只能运行在 linux 系统中。
 - 这个应用需要与[edda](https://github.com/offer365/edda) 配合使用。
@@ -14,8 +14,8 @@
 
 ## 特点
 - 分布式。
-- 可以通过绑定应用的==硬件信息鉴权==。
-- 支持 ==https 加密==通信。
+- 可以通过绑定应用的硬件信息鉴权。
+- 支持 https 加密通信。
 - 部署简单，无依赖。
 
 #### odin
@@ -41,7 +41,7 @@ service Authorization {
 - 使用 GoLang 语言开发。
 - 使用 gin web 框架。
 - 嵌入etcd。
-- 支持 RestFul 和 ==GRPC== 传输数据。
+- 支持 RestFul 和 GRPC 传输数据。
 - 前后端分离 bootstrap + jquery + ajax 。
 
 ## 安全
