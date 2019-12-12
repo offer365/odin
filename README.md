@@ -195,12 +195,12 @@ sh install.sh
 - 目前仅实现了go语言的restful 和 grpc demo。在demo 目录下。
 
 ## TODO
-* 序列号/授权码采用 椭圆曲线ECC加密算法 ？？？
-* 支持 圣天诺Sentinel Time时钟芯片加密锁 ？？？
-* 前端交互支持 session，不再使用 BasicAtuh。Linux下，curl访问时 根据 UserAgent区分 使用 BasicAtuh 认证。？？？
+* 序列号/授权码采用 椭圆曲线ECC加密算法 (maybe)
+* 支持 圣天诺Sentinel Time时钟锁 (maybe)
+* 前端交互支持 session，不再使用 BasicAtuh。Linux下，curl访问时 根据 UserAgent区分 使用 BasicAtuh 认证。(maybe)
 * 提高测试代码覆盖率。
 * 内嵌 etcd 支持https。
-* 支持 windows。实现获取硬件信息接口。
+* 支持 windows。实现获取硬件信息接口。(maybe)
 
 ## 使用介绍 ##
 1. 先安装odin 并运行。访问web端口，默认账号密码：admin:123 可在配置文件odin.yaml 中修改。

@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa8a0eed-f415-4285-8944-9e75331cac68" name="默认更改列表" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Odin&amp;App.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OdinProcess.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/restful/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/demo/restful/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/license.model.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/license.model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/serial.model.go" beforeDir="false" afterPath="$PROJECT_DIR$/logic/serial.model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/odinmain/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/odinmain/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -35,7 +35,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="C:\Go" />
+  <component name="GOROOT" path="D:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
