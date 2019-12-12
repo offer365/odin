@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="aa8a0eed-f415-4285-8944-9e75331cac68" name="默认更改列表" comment="" />
+    <list default="true" id="aa8a0eed-f415-4285-8944-9e75331cac68" name="默认更改列表" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,19 +52,19 @@
     <property name="settings.editor.selected.configurable" value="go.sdk" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\demo\proto" />
-      <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\logic" />
-      <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\model" />
-      <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\dao" />
-      <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\scripts" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin" />
       <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\proto" />
       <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\scripts" />
       <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\utils" />
       <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\logic" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin" />
+      <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\demo\proto" />
+      <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\logic" />
+      <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\model" />
+      <recent name="C:\Users\Administrator\go\src\github.com\offer365\odin\dao" />
     </key>
   </component>
   <component name="RunDashboard">
