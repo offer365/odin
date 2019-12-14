@@ -1,6 +1,7 @@
-## 逻辑
+## Odin运行逻辑
 ![架构](https://github.com/offer365/odin/blob/master/OdinProcess.png)
 
+## Odin与App交互
 ![Odin&App交互](https://github.com/offer365/odin/blob/master/Odin&App.png)
 ## 序列号的生成
 
