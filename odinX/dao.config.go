@@ -1,4 +1,4 @@
-package logic
+package odinX
 
 import (
 	"strings"
@@ -15,7 +15,7 @@ func GetConfig(key string) (val string, err error) {
 		resp *clientv3.GetResponse
 	)
 
-	key = clientConfigKeyPrefix + key
+	key = Cfg.StoreClientConfigKeyPrefix + key
 	if resp, err = store.Get(key, true); err != nil {
 		log.Sugar.Errorf("get %s config failed. error: %s", key, err)
 		return
@@ -31,14 +31,14 @@ func GetAllConfig() (infos map[string]string, err error) {
 	var (
 		getResp *clientv3.GetResponse
 	)
-	if getResp, err = store.GetAll(clientConfigKeyPrefix, true); err != nil {
+	if getResp, err = store.GetAll(Cfg.StoreClientConfigKeyPrefix, true); err != nil {
 		log.Sugar.Error("get all config failed. error: ", err)
 		return
 	}
 	infos = make(map[string]string, 0)
 	for _, i := range getResp.Kvs {
 		// TODO 是否字符串切分
-		key := strings.Split(string(i.Key), clientConfigKeyPrefix)[1]
+		key := strings.Split(string(i.Key), Cfg.StoreClientConfigKeyPrefix)[1]
 		infos[key] = string(i.Value)
 	}
 	return
@@ -46,7 +46,7 @@ func GetAllConfig() (infos map[string]string, err error) {
 
 // 写入配置
 func PutConfig(key, info string) (err error) {
-	key = clientConfigKeyPrefix + key
+	key = Cfg.StoreClientConfigKeyPrefix + key
 	if _, err = store.Put(key, info, true); err != nil {
 		log.Sugar.Error("put config failed. error: ", err)
 	}
@@ -59,7 +59,7 @@ func DelConfig(key string) (err error) {
 	if ok {
 		return
 	}
-	key = clientConfigKeyPrefix + key
+	key = Cfg.StoreClientConfigKeyPrefix + key
 	if _, err = store.Del(key, true); err != nil {
 		log.Sugar.Error("del config failed. error: ", err)
 	}

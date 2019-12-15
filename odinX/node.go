@@ -1,4 +1,4 @@
-package proto
+package odinX
 
 import (
 	"context"
@@ -7,17 +7,14 @@ import (
 
 	corec "github.com/offer365/example/grpc/core/client"
 	cores "github.com/offer365/example/grpc/core/server"
-	"github.com/offer365/odin/config"
-	"github.com/offer365/odin/log"
 	"github.com/offer365/odin/utils"
+	"github.com/offer365/odin/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	"time"
-
-	"github.com/zcalusic/sysinfo"
 )
 
 var (
@@ -28,12 +25,12 @@ var (
 )
 
 func init() {
-	Self = NewNode(config.Cfg.Name, config.Cfg.LocalGRpcAddr())
+	Self = NewNode(Cfg.NodeName, Cfg.NodeAddr)
 	ClientConns = new(CliConns)
 	StaterClients = new(StaterClis)
 	auth = &Authentication{
-		User:     _username,
-		Password: _password,
+		User:     Cfg.GRpcUser,
+		Password: Cfg.GRpcPwd,
 	}
 }
 
@@ -56,43 +53,27 @@ func NewNode(name, addr string) (n *Node) {
 }
 
 func (hd *Hardware) hw() {
-	var si sysinfo.SysInfo
-	si.GetSysInfo()
+	Cfg.NodeHardware.GetSysInfo()
+	hd.Host.Machineid, hd.Host.Architecture, hd.Host.Hypervisor = Cfg.NodeHardware.HostInfo()
 
-	hd.Host.Machineid = si.Node.MachineID
-	hd.Host.Architecture = si.OS.Architecture
-	hd.Host.Hypervisor = si.Node.Hypervisor
+	hd.Product.Name, hd.Product.Serial, hd.Product.Vendor = Cfg.NodeHardware.ProductInfo()
 
-	hd.Product.Name = si.Product.Name
-	hd.Product.Serial = si.Product.Serial
-	hd.Product.Vendor = si.Product.Vendor
+	hd.Board.Name, hd.Board.Serial, hd.Board.Vendor = Cfg.NodeHardware.BoardInfo()
 
-	hd.Board.Name = si.Board.Name
-	hd.Board.Vendor = si.Board.Vendor
-	hd.Board.Serial = si.Board.Serial
+	hd.Bios.Vendor = Cfg.NodeHardware.BiosInfo()
 
-	hd.Bios.Vendor = si.BIOS.Vendor
+	hd.Cpu.Vendor, hd.Cpu.Model, hd.Cpu.Threads, hd.Cpu.Cache, hd.Cpu.Cores, hd.Cpu.Cpus, hd.Cpu.Speed = Cfg.NodeHardware.CpuInfo()
 
-	hd.Cpu.Vendor = si.CPU.Vendor
-	hd.Cpu.Threads = uint32(si.CPU.Threads)
-	hd.Cpu.Model = si.CPU.Model
-	hd.Cpu.Cache = uint32(si.CPU.Cache)
-	hd.Cpu.Cores = uint32(si.CPU.Cores)
-	hd.Cpu.Cpus = uint32(si.CPU.Cpus)
-	hd.Cpu.Speed = uint32(si.CPU.Speed)
-
-	hd.Mem.Speed = uint32(si.Memory.Speed)
-	hd.Mem.Type = si.Memory.Type
+	hd.Mem.Speed, hd.Mem.Type = Cfg.NodeHardware.MemInfo()
 
 	hd.Networks = make([]*Network, 0)
-	for _, val := range si.Network {
+	for _, val := range Cfg.NodeHardware.NetworksInfo() {
 		nw := new(Network)
-		nw.Speed = uint32(val.Speed)
-		nw.Macaddress = val.MACAddress
+		nw.Speed = val.Speed
+		nw.Macaddress = val.Macaddress
 		nw.Driver = val.Driver
 		hd.Networks = append(hd.Networks, nw)
 	}
-
 }
 
 func (n *Node) md5() {
@@ -118,7 +99,7 @@ func GetAllNodes(ctx context.Context) (nodes map[string]*Node) {
 	// var  value atomic.Value
 	nodes = make(map[string]*Node, 0)
 	// value.Store(nodes)
-	peers := config.Cfg.AllGRpcAddr()
+	peers := Cfg.GRpcAllNode
 	wait.Add(len(peers))
 	for remoteName, remoteAddr := range peers {
 		go func(remoteN string, remoteA string) {
@@ -152,7 +133,7 @@ func GetAllNodes(ctx context.Context) (nodes map[string]*Node) {
 		}(remoteName, remoteAddr)
 	}
 	wait.Wait()
-	nodes[config.Cfg.Name] = Self
+	nodes[Cfg.NodeName] = Self
 	// sort.Slice(nodes, func(i, j int) bool {
 	//	return nodes[i].name < nodes[j].name
 	// })
@@ -176,10 +157,10 @@ func NodeGRpcClient(name, addr string) {
 	Con, err = corec.NewRpcClient(
 		corec.WithAddr(addr),
 		corec.WithDialOption(grpc.WithPerRPCCredentials(auth)),
-		corec.WithServerName(rpcServerName),
-		corec.WithCert([]byte(Client_crt)),
-		corec.WithKey([]byte(Client_key)),
-		corec.WithCa([]byte(Ca_crt)),
+		corec.WithServerName(Cfg.GRpcServerName),
+		corec.WithCert([]byte(Cfg.GRpcClientCrt)),
+		corec.WithKey([]byte(Cfg.GRpcClientKey)),
+		corec.WithCa([]byte(Cfg.GRpcCaCrt)),
 	)
 	if err != nil {
 		log.Sugar.Error(err)
@@ -209,7 +190,7 @@ func NodeGRpcServer() (*grpc.Server, error) {
 			pwd = val[0]
 		}
 
-		if user != _username || pwd != _password {
+		if user != Cfg.GRpcUser || pwd != Cfg.GRpcPwd {
 			return status.Errorf(codes.Unauthenticated, "invalid token")
 		}
 
@@ -230,9 +211,9 @@ func NodeGRpcServer() (*grpc.Server, error) {
 	// 实例化grpc Server
 	return cores.NewRpcServer(
 		cores.WithServerOption(grpc.UnaryInterceptor(interceptor)),
-		cores.WithCert([]byte(Server_crt)),
-		cores.WithKey([]byte(Server_key)),
-		cores.WithCa([]byte(Ca_crt)),
+		cores.WithCert([]byte( Cfg.GRpcServerCrt)),
+		cores.WithKey([]byte( Cfg.GRpcServerKey)),
+		cores.WithCa([]byte( Cfg.GRpcCaCrt)),
 	)
 }
 

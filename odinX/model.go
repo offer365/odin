@@ -1,15 +1,50 @@
-package logic
+package odinX
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"reflect"
 	"strconv"
 	"time"
+
+	uuid "github.com/satori/go.uuid"
 )
 
-var fml *fLicense
+var (
+	Serial *SerialNum
+	fml    *fLicense
+)
 
 func init() {
+	Serial = new(SerialNum)
 	fml = new(fLicense)
+}
+
+// 序列号
+type SerialNum struct {
+	Sid   string           `json:"sid"`   // 序列号唯一uuid，用来标识序列号，并与 授权码相互校验，一一对应。
+	Nodes map[string]*Node `json:"nodes"` // 节点的具体硬件信息。
+	Date  int64            `json:"date"`  // 生成 序列号的时间。
+}
+
+// 生成序列号
+func (sn *SerialNum) Generate(nodes map[string]*Node) (code string, err error) {
+	var byt []byte
+	sn.Nodes = nodes
+	sn.Sid = uuid.Must(uuid.NewV4()).String()
+	// 生成序列号的时间
+	sn.Date = time.Now().Unix()
+	// 序列化 实例
+	if byt, err = json.Marshal(sn); err != nil {
+		return
+	}
+	// 公钥加密 生成序列号
+	byt, err = Cfg.SerialEncrypt(byt)
+	if err != nil {
+		return
+	}
+	code = base64.StdEncoding.EncodeToString(byt)
+	return
 }
 
 type fLicense struct {
@@ -176,4 +211,19 @@ func (a *App) fieldMaxLifeCycle() item {
 		Title: title,
 		Value: strconv.Itoa(int(value)),
 	}
+}
+
+type Clear struct {
+	Lic    *License `json:"lic"`
+	Cipher string   `json:"cipher"`
+	Date   int64    `json:"date"`
+}
+
+// 客户端
+type Cli struct {
+	ID    string `json:"ID"`   // 客户端 ID
+	App   string `json:"App"`  // 产品
+	Uuid  string `json:"uuid"` // 客户端 随机token
+	Start int64  `json:"start"`
+	Lease int64  `json:"lease"`
 }

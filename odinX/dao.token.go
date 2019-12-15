@@ -1,25 +1,22 @@
-package logic
+package odinX
 
 import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 
-	"github.com/offer365/example/endecrypt"
 	"github.com/offer365/odin/log"
 	"github.com/offer365/odin/utils"
 	"go.etcd.io/etcd/clientv3"
 )
 
-var salt = []byte(hashSalt)
 
 // 下面的函数并不会直接存储App发送的token,而是对app,ID,val 分别进行md5或sha256 hash 后,再进行存储或取出。上层函数以同样的算法计算后，操作和比对。
 
 func PutToken(app, id, val string) (err error) {
-	key := tokenKey + utils.Sha256sum([]byte(app), salt) + "/" + utils.Sha256sum([]byte(id), salt)
-	val = utils.Sha256sum([]byte(val), salt)
+	key := Cfg.StoreTokenKey + Cfg.TokenHash([]byte(app)) + "/" + Cfg.TokenHash([]byte(id))
+	val = Cfg.TokenHash([]byte(val))
 	if _, err = store.Put(key, val, true); err != nil {
 		log.Sugar.Error("put Token failed. error: ", err)
 		return
@@ -28,7 +25,7 @@ func PutToken(app, id, val string) (err error) {
 }
 
 func GetToken(app, id string) (token string, err error) {
-	key := tokenKey + utils.Sha256sum([]byte(app), salt) + "/" + utils.Sha256sum([]byte(id), salt)
+	key := Cfg.StoreTokenKey + Cfg.TokenHash([]byte(app)) + "/" + Cfg.TokenHash([]byte(id))
 	resp, err := store.Get(key, false)
 	if err != nil {
 		log.Sugar.Error("get client failed. error: ", err)
@@ -42,7 +39,7 @@ func GetToken(app, id string) (token string, err error) {
 
 // 删除Client
 func DelToken(app, id string) (err error) {
-	key := tokenKey + utils.Sha256sum([]byte(app), salt) + "/" + utils.Sha256sum([]byte(id), salt)
+	key := Cfg.StoreTokenKey + Cfg.TokenHash([]byte(app)) + "/" + Cfg.TokenHash([]byte(id))
 	_, err = store.Del(key, true)
 	return
 }
@@ -51,7 +48,7 @@ func CountTokenWithApp(app string) (count int64, err error) {
 	var (
 		resp *clientv3.GetResponse
 	)
-	key := tokenKey + utils.Sha256sum([]byte(app), salt) + "/"
+	key := Cfg.StoreTokenKey + Cfg.TokenHash([]byte(app)) + "/"
 	if resp, err = store.Count(key, true); err != nil {
 		log.Sugar.Error("get count Token failed. error: ", err)
 		return
@@ -63,7 +60,7 @@ func CountTokenWithID(app, id string) (count int64, err error) {
 	var (
 		resp *clientv3.GetResponse
 	)
-	key := tokenKey + utils.Sha256sum([]byte(app), salt) + "/" + utils.Sha256sum([]byte(id), salt)
+	key := Cfg.StoreTokenKey + Cfg.TokenHash([]byte(app)) + "/" + Cfg.TokenHash([]byte(id))
 	if resp, err = store.Count(key, true); err != nil {
 		log.Sugar.Error("get count Token failed. error: ", err)
 		return
@@ -87,7 +84,7 @@ func GetTokenAndChk(app, id, token string) (exist, register bool) {
 	}
 
 	// 如果 一致 直接返回 存在
-	if result == utils.Sha256sum([]byte(token), salt) {
+	if result == Cfg.TokenHash([]byte(token)) {
 		exist = true
 		return
 	}
@@ -112,8 +109,8 @@ func Untied(app, id, code string) (err error) {
 		return
 	}
 
-	// 解密 解密后的内容是 一个map k,v经过sha256计算
-	if byt, err = endecrypt.Decrypt(endecrypt.Pub1AesRsa2048, byt); err != nil {
+	// 解密 解密后的内容是 一个map k,v经过Cfg.TokenHash计算
+	if byt, err = Cfg.UntiedDecrypt(byt); err != nil {
 		return
 	}
 	untie := new(UntiedCode)
@@ -121,10 +118,9 @@ func Untied(app, id, code string) (err error) {
 		return
 	}
 	// 计算 比对 解密后的值
-	sha256Key := utils.Sha256sum([]byte(app), salt)
-	sha256Val := utils.Sha256sum([]byte(id), salt)
+	sha256Key := Cfg.TokenHash([]byte(app))
+	sha256Val := Cfg.TokenHash([]byte(id))
 
-	fmt.Println(*untie)
 	if untie.Key != sha256Key || untie.Value != sha256Val || utils.Abs(time.Now().Unix()-untie.Date) > 3600*6 {
 		err = errors.New("app or id or date error ")
 		return

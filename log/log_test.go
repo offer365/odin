@@ -3,6 +3,6 @@ package log
 import "testing"
 
 func TestLog(t *testing.T) {
-	Sugar.Info("test")
-	Sugar.Warn(map[string]string{"a": "b"})
+	log.Sugar.Info("test")
+	log.Sugar.Warn(map[string]string{"a": "b"})
 }

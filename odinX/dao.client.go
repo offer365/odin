@@ -1,4 +1,4 @@
-package logic
+package odinX
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ func GetClient(key string) (cli *Cli, ok bool) {
 	var (
 		resp *clientv3.GetResponse
 	)
-	key = clientKeyPrefix + key
+	key = Cfg.StoreClientKeyPrefix + key
 	resp, err := store.Get(key, false)
 	if err != nil {
 		log.Sugar.Error("get client failed. error: ", err)
@@ -35,7 +35,7 @@ func GetAllClient(app string) (all map[string]string, err error) {
 	var (
 		getResp *clientv3.GetResponse
 	)
-	key := clientKeyPrefix + app
+	key := Cfg.StoreClientKeyPrefix + app
 	if getResp, err = store.GetAll(key, false); err != nil {
 		log.Sugar.Error("get all client failed. error: ", err)
 		return
@@ -43,7 +43,7 @@ func GetAllClient(app string) (all map[string]string, err error) {
 	all = make(map[string]string, 0)
 	for _, i := range getResp.Kvs {
 		// TODO 是否字符串切分
-		key := strings.Split(string(i.Key), clientKeyPrefix)[1]
+		key := strings.Split(string(i.Key), Cfg.StoreClientKeyPrefix)[1]
 		all[key] = string(i.Value)
 	}
 	return
@@ -54,7 +54,7 @@ func CountClient(app string) (count int64, err error) {
 	var (
 		resp *clientv3.GetResponse
 	)
-	key := clientKeyPrefix + app
+	key := Cfg.StoreClientKeyPrefix + app
 	if resp, err = store.Count(key, true); err != nil {
 		log.Sugar.Error("get all client failed. error: ", err)
 		return
@@ -64,7 +64,7 @@ func CountClient(app string) (count int64, err error) {
 
 // 写入Client
 func PutClient(key string, cli *Cli) (lease int64, err error) {
-	key = clientKeyPrefix + key
+	key = Cfg.StoreClientKeyPrefix + key
 	// 10秒租期
 	lg, err := store.Lease(key, 10)
 	if err != nil {
@@ -84,14 +84,14 @@ func PutClient(key string, cli *Cli) (lease int64, err error) {
 
 // 删除Client
 func DelClient(key string, leaseId int64) (err error) {
-	key = clientKeyPrefix + key
+	key = Cfg.StoreClientKeyPrefix + key
 	_, err = store.DelWithLease(key, clientv3.LeaseID(leaseId), false)
 	return
 }
 
 // 续租
 func KeepAliveClient(key string, leaseId int64) (err error) {
-	key = clientKeyPrefix + key
+	key = Cfg.StoreClientKeyPrefix + key
 	_, err = store.KeepOnce(clientv3.LeaseID(leaseId))
 	return
 }

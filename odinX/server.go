@@ -1,28 +1,44 @@
-package controller
+package odinX
 
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/gin-gonic/gin"
-	"github.com/offer365/example/qrcode"
-	"github.com/offer365/odin/log"
-	"github.com/offer365/odin/logic"
-	"github.com/offer365/odin/proto"
-	"github.com/offer365/odin/utils"
-
 	"io/ioutil"
+	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/offer365/example/etcd/dao"
+	"github.com/offer365/example/etcd/embedder"
+	"github.com/offer365/example/qrcode"
+	"github.com/offer365/odin/asset"
+	"github.com/offer365/odin/log"
+	"github.com/offer365/odin/utils"
+
+	"golang.org/x/net/http2"
+	"google.golang.org/grpc"
 )
 
 const (
+	username                  = "root"
+	restfulUser               = "admin"
+	defaultKey                = "default"
 	statusOk            int   = 200
 	statusMethodErr     int32 = 405
 	statusChkLicenseErr int32 = iota + 440
@@ -32,15 +48,272 @@ const (
 	statusGetLicenseErr
 )
 
-var secrets = gin.H{"admin": nil}
-var Lock sync.Mutex
+var (
+	store         dao.Store
+	device        embedder.Embed
+	confWhiteList = map[string]string{"default": "", "members": ""} // 在白名单的配置无法删除
+	_assetPath    string
+	secrets       = gin.H{"admin": nil}
+	Lock          sync.Mutex
+)
+
+// 释放静态资源
+func RestoreAsset() {
+	// 解压 静态文件的位置
+	if runtime.GOOS == "linux" {
+		_assetPath = "/usr/share/.asset/.temp/"
+	} else {
+		_assetPath = "./"
+	}
+	// go get -u github.com/jteeuwen/go-bindata/...
+	// 重新生成静态资源在项目的根目录下 go-bindata -o=asset/asset.go -pkg=asset html/... static/...
+	dirs := []string{"html", "static"}
+	for _, dir := range dirs {
+		if err := asset.RestoreAssets(_assetPath, dir); err != nil {
+			log.Sugar.Error("restore assets failed. error: ", err)
+			_ = os.RemoveAll(filepath.Join(_assetPath, dir))
+			continue
+		}
+	}
+}
+
+func Main() {
+	var (
+		err   error
+		ready = make(chan struct{})
+	)
+	device = embedder.NewEmbed()
+	if err = device.Init(Cfg.EmbedCtx,
+		embedder.WithName(Cfg.EmbedName),
+		embedder.WithDir(Cfg.EmbedDir),
+		embedder.WithClientAddr(Cfg.EmbedClientAddr),
+		embedder.WithPeerAddr(Cfg.EmbedPeerAddr),
+		embedder.WithClusterToken(Cfg.EmbedClusterToken),
+		embedder.WithClusterState(Cfg.EmbedClusterState),
+		embedder.WithCluster(Cfg.EmbedCluster),
+		embedder.WithLogger(log.Sugar),
+	); err != nil {
+		log.Sugar.Fatal("init embed server failed. error: ", err)
+	}
+
+	go func() { // 运行etcd
+		if err = device.Run(ready); err != nil {
+			log.Sugar.Fatal("run embed server error. ", err)
+			return
+		}
+	}()
+	select {
+	case <-ready: // 待etcd Ready 运行其他服务
+		err = device.SetAuth(username, Cfg.EmbedAuthPwd)
+		if err != nil {
+			log.Sugar.Fatal("set auth embed server failed. error: ", err)
+		}
+		Server()
+	}
+}
+
+func Server() {
+	var (
+		err error
+	)
+	// 客户端连接
+	store = dao.NewStore()
+	if err = store.Init(Cfg.EtcdCliCtx,
+		dao.WithAddr(Cfg.EtcdCliAddr),
+		dao.WithUsername(username),
+		dao.WithPassword(Cfg.EmbedAuthPwd),
+		dao.WithTimeout(Cfg.EtcdCliTimeout),
+	); err != nil {
+		log.Sugar.Fatal("init store failed. error: ", err)
+	}
+
+	// 从etcd加载license
+	if err := loadLic(); err != nil {
+		log.Sugar.Error("init license failed. error: ", err)
+	}
+
+	// 间隔1分钟更新授权
+	go func() {
+		ticker := time.Tick(1 * time.Minute) // 1分钟
+		// expr := cronexpr.MustParse("* * * * *")
+		for range ticker {
+			// now := time.Date()
+			// next := expr.Next(now)
+			// time.AfterFunc(next.Sub(now), func() {
+			// time.AfterFunc(time.Second, func() {})
+			// 如果是主就更新授权
+			if device.IsLeader() {
+				log.Sugar.Infof("%s is Leader. ip:%s", Self.Attrs.Name, Self.Attrs.Addr)
+				if err := ResetLicense(); err != nil {
+					log.Sugar.Error("reset license failed. error: ", err)
+				}
+			}
+		}
+	}()
+	// 监听授权变化
+	go WatchLicense()
+	go RunRpc(Cfg.GRpcListen)
+	AllNodeGRpcClient(Cfg.GRpcAllNode)
+	DefaultConf()
+	signalChan := make(chan os.Signal)
+	done := make(chan struct{}, 1)
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, os.Kill)
+	// 资源回收
+	go func() {
+		<-signalChan
+		ClientConns.Range(func(key, value interface{}) bool {
+			cli, ok := value.(*grpc.ClientConn)
+			if ok {
+				cli.Close()
+			}
+			return true
+		})
+		gs.Stop()
+		device.Close()
+		store.Close()
+		done <- struct{}{}
+	}()
+	// 阻塞主进程
+	<-done
+	// <-make(chan struct{})
+	// <- (chan int)(nil)
+}
+
+// 启动程序时加载授权
+func loadLic() (err error) {
+	var (
+		byt []byte
+		lic *License
+	)
+	if byt, err = GetLicense(); err != nil {
+		log.Sugar.Error("get license failed. error: ", err)
+	}
+
+	if byt == nil || len(byt) == 0 {
+		lic = new(License)
+	} else {
+		lic, err = Str2lic(string(byt))
+		// TODO 启动时检查授权时间合法性。？？？
+	}
+	StoreLic(lic)
+	return
+}
+
+var gs *grpc.Server
+
+func RunRpc(addr string) {
+	var err error
+	gs, err = NodeGRpcServer()
+	if err != nil {
+		log.Sugar.Fatal(err)
+		return
+	}
+	RegisterStaterServer(gs, Self)
+	RegisterAuthorizeServer(gs, Author)
+	ws := ginServer()
+	handle := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
+			gs.ServeHTTP(w, r) // grpc server
+		} else {
+			ws.ServeHTTP(w, r) // gin web server
+		}
+		return
+	})
+	listener, err := NewTlsListen([]byte(Cfg.GRpcServerCrt), []byte(Cfg.GRpcServerKey), []byte(Cfg.GRpcCaCrt), addr)
+	if err != nil {
+		log.Sugar.Fatal(err)
+		return
+	}
+	err = http.Serve(listener, handle)
+	if err != nil {
+		log.Sugar.Fatal(err)
+		return
+	}
+}
+
+func NewTlsListen(crt, key, ca []byte, addr string) (net.Listener, error) {
+	certificate, err := tls.X509KeyPair(crt, key)
+	if err != nil {
+		log.Sugar.Fatal(err)
+		return nil, err
+	}
+	certPool := x509.NewCertPool()
+
+	if ok := certPool.AppendCertsFromPEM(ca); !ok {
+		err = errors.New("failed to append ca certs")
+		log.Sugar.Fatal(err)
+		return nil, err
+	}
+	tlsConfig := &tls.Config{
+		Certificates:       []tls.Certificate{certificate},
+		ClientAuth:         tls.NoClientCert, // NOTE: 这是可选的!
+		ClientCAs:          certPool,
+		InsecureSkipVerify: true,
+		Rand:               rand.Reader,
+		Time:               time.Now,
+		NextProtos:         []string{"http/1.1", http2.NextProtoTLS},
+	}
+	return tls.Listen("tcp", addr, tlsConfig)
+}
+
+// gin 路由
+func ginServer() http.Handler {
+	gin.SetMode(gin.ReleaseMode) // 生产模式
+	r := gin.New()
+	r.Use(gin.Recovery()) // Recovery 中间件从任何 panic 恢复，如果出现 panic，它会写一个 500 错误。
+	// store := cookie.NewStore([]byte("secret"))
+	// store.Options(sessions.Options{MaxAge:0})
+	// r.Use(sessions.Sessions("odin",store))
+	r.LoadHTMLGlob(_assetPath + "html/*")
+	r.Static("/static", _assetPath+"static")
+	r.StaticFile("/favicon.ico", _assetPath+"static/favicon.ico")
+	// api 路由组 basicauth 认证
+	api := r.Group("/odin/api/v1", gin.BasicAuth(gin.Accounts{
+		restfulUser: Cfg.RestfulPwd,
+	}))
+
+	// 序列号
+	api.Any("/server/code", SerialNumAPI)
+	// 序列号二维码
+	api.GET("/server/qr-code", QrCodeAPI)
+	// 授权码
+	api.Any("/server/license", LicenseAPI)
+	// 注销二维码
+	api.GET("/server/qr-license", QrLicenseAPI)
+	// 节点状态
+	api.GET("/server/nodes", NodeStatusAPI)
+	// 解绑接口
+	api.POST("/server/untied/:app/:id", UntiedAppApi)
+	// 配置接口 kv 存储
+	api.Any("/client/conf/*name", ConfAPI)
+	// 客户端接口
+	api.Any("/client/auth", ClientAPI)
+	// 客户端在线接口
+	api.GET("/client/online/*app", CliOnlineAPI)
+	// web 交互
+	api.POST("/web/login", LoginAPI)
+	// 帮助
+	api.GET("/server/help", HelpAPI)
+
+	r.Any("", func(c *gin.Context) {
+		c.Request.URL.Path = "/index"
+		r.HandleContext(c)
+	})
+	r.GET("/index", func(c *gin.Context) {
+		c.HTML(200, "index.html", gin.H{
+			"title": "首页",
+		})
+	})
+
+	return r
+}
 
 type online struct {
 	ID   string `json:"id"`
 	Info string `json:"info"`
 }
 
-type status struct {
+type stat struct {
 	ID     string `json:"id"`
 	Addr   string `json:"addr"`
 	Online string `json:"online"`
@@ -62,9 +335,9 @@ func SerialNumAPI(c *gin.Context) {
 	if _, ok := secrets[user]; ok {
 		switch c.Request.Method {
 		case "GET":
-			code, err = logic.GetSerialNum()
+			code, err = GetSerialNum()
 		case "POST":
-			code, err = logic.ResetSerialNum()
+			code, err = ResetSerialNum()
 		default:
 			code = "method error"
 		}
@@ -89,7 +362,7 @@ func QrCodeAPI(c *gin.Context) {
 	user := c.MustGet(gin.AuthUserKey).(string)
 	code = "auth error"
 	if _, ok := secrets[user]; ok {
-		code, err = logic.GetSerialNum()
+		code, err = GetSerialNum()
 	}
 	if err != nil {
 		code = err.Error()
@@ -121,7 +394,7 @@ func QrLicenseAPI(c *gin.Context) {
 	user := c.MustGet(gin.AuthUserKey).(string)
 	code = "auth error"
 	if _, ok := secrets[user]; ok {
-		code, err = logic.GetClearLicense()
+		code, err = GetClearLicense()
 	}
 	if err != nil {
 		code = err.Error()
@@ -161,26 +434,26 @@ func LicenseAPI(c *gin.Context) {
 		case "GET":
 			c.JSON(http.StatusOK, gin.H{
 				"code": statusOk,
-				"data": logic.LoadLic().Format(),
+				"data": LoadLic().Format(),
 				"msg":  "success",
 			})
 		// 导入授权
 		case "POST":
 			cipher = c.PostForm("key")
-			lic, ok, msg := logic.ChkLicense(cipher)
+			lic, ok, msg := ChkLicense(cipher)
 			if !ok {
 				c.JSON(statusOk, gin.H{"code": statusChkLicenseErr, "msg": msg, "data": ""})
 				return
 			}
-			err = logic.PutLicense(cipher)
+			err = PutLicense(cipher)
 			if err != nil {
 				c.JSON(statusOk, gin.H{"code": statusPutLicenseErr, "msg": err, "data": ""})
 				return
 			}
-			logic.StoreLic(lic)
+			StoreLic(lic)
 			c.JSON(statusOk, gin.H{"code": statusOk, "msg": msg, "data": ""})
 		case "DELETE":
-			code, err := logic.GenClearLicense()
+			code, err := GenClearLicense()
 			if err != nil {
 				c.JSON(statusOk, gin.H{"code": statusClearLicenseErr, "msg": err, "data": map[string]string{"key": code}})
 				return
@@ -195,13 +468,13 @@ func LicenseAPI(c *gin.Context) {
 // 运行状态Api
 func NodeStatusAPI(c *gin.Context) {
 	var (
-		nodeL = make([]status, 0)
+		nodeL = make([]stat, 0)
 	)
 	user := c.MustGet(gin.AuthUserKey).(string)
 	if _, ok := secrets[user]; ok {
-		nodeM := logic.GetAllNode()
+		nodeM := GetAllNode()
 		for _, n := range nodeM {
-			nodeL = append(nodeL, status{n.Attrs.Name, n.Attrs.Addr, utils.RunTime(n.Attrs.Now, n.Attrs.Start)})
+			nodeL = append(nodeL, stat{n.Attrs.Name, n.Attrs.Addr, utils.RunTime(n.Attrs.Now, n.Attrs.Start)})
 		}
 		sort.Slice(nodeL, func(i, j int) bool {
 			return nodeL[i].ID < nodeL[j].ID
@@ -221,7 +494,7 @@ func UntiedAppApi(c *gin.Context) {
 		app := c.Param("app")
 		id := c.Param("id")
 		code := c.PostForm("code")
-		if err = logic.Untied(app, id, code); err != nil {
+		if err = Untied(app, id, code); err != nil {
 			log.Sugar.Error(err)
 			c.JSON(http.StatusOK, gin.H{"code": statusUntiedAppErr, "data": "", "msg": "解绑失败"})
 			return
@@ -247,7 +520,7 @@ func ConfAPI(c *gin.Context) {
 		case "GET":
 			// 获取单个config
 			if name != "" {
-				text, err = logic.GetConfig(name)
+				text, err = GetConfig(name)
 				if err != nil {
 					c.JSON(statusOk, gin.H{"code": statusGetLicenseErr, "msg": "Code value error." + err.Error(), "data": ""})
 					return
@@ -257,7 +530,7 @@ func ConfAPI(c *gin.Context) {
 				return
 			}
 			// 获取多个config
-			if all, err = logic.GetAllConfig(); err != nil {
+			if all, err = GetAllConfig(); err != nil {
 				all = map[string]string{"default": err.Error()}
 			}
 			for name, text := range all {
@@ -269,7 +542,7 @@ func ConfAPI(c *gin.Context) {
 			c.JSON(statusOk, gin.H{"code": statusOk, "data": list, "msg": "success"})
 
 		case "DELETE":
-			if err = logic.DelConfig(name); err != nil {
+			if err = DelConfig(name); err != nil {
 				c.JSON(statusOk, gin.H{"code": statusOk, "msg": err, "data": ""})
 				return
 			}
@@ -277,7 +550,7 @@ func ConfAPI(c *gin.Context) {
 
 		case "POST", "PUT":
 			text = c.PostForm("text")
-			if err = logic.PutConfig(name, text); err != nil {
+			if err = PutConfig(name, text); err != nil {
 				c.JSON(statusOk, gin.H{"code": statusOk, "msg": err, "data": "",})
 				return
 			}
@@ -299,14 +572,14 @@ func ClientAPI(c *gin.Context) {
 			log.Sugar.Error("ready request body error: ", err)
 			return
 		}
-		req := new(proto.Request)
+		req := new(Request)
 		err = json.Unmarshal(data, req)
 		if err != nil {
 			return
 		}
 		switch c.Request.Method {
 		case "POST": // 认证
-			resp, err := logic.Author.Auth(context.TODO(), req)
+			resp, err := Author.Auth(context.TODO(), req)
 			if err != nil {
 				log.Sugar.Error(resp, err)
 				return
@@ -314,7 +587,7 @@ func ClientAPI(c *gin.Context) {
 			c.JSON(statusOk, resp)
 			return
 		case "PUT": // 心跳
-			resp, err := logic.Author.KeepLine(context.TODO(), req)
+			resp, err := Author.KeepLine(context.TODO(), req)
 			if err != nil {
 				log.Sugar.Error(resp, err)
 				return
@@ -322,7 +595,7 @@ func ClientAPI(c *gin.Context) {
 			c.JSON(statusOk, resp)
 			return
 		case "DELETE": // 关闭
-			resp, err := logic.Author.OffLine(context.TODO(), req)
+			resp, err := Author.OffLine(context.TODO(), req)
 			if err != nil {
 				log.Sugar.Error(resp, err)
 				return
@@ -330,7 +603,7 @@ func ClientAPI(c *gin.Context) {
 			c.JSON(statusOk, resp)
 			return
 		default:
-			c.JSON(statusOk, &proto.Response{Code: statusMethodErr, Data: nil, Msg: "method error",})
+			c.JSON(statusOk, &Response{Code: statusMethodErr, Data: nil, Msg: "method error",})
 		}
 	}
 }
@@ -345,9 +618,9 @@ func CliOnlineAPI(c *gin.Context) {
 		app := c.Param("app")
 		app = strings.Trim(app, "/")
 		tmp := make(map[string]string)
-		if cliMap, err := logic.GetAllClient(app); err == nil {
+		if cliMap, err := GetAllClient(app); err == nil {
 			for id, status := range cliMap {
-				cli := new(logic.Cli)
+				cli := new(Cli)
 				if err := json.Unmarshal([]byte(status), cli); err == nil {
 					tmp[id] = fmt.Sprintf("节点:%s %s %s", cli.ID, cli.App, utils.RunTime(time.Now().Unix(), cli.Start))
 				}

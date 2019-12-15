@@ -1,4 +1,4 @@
-package logic
+package odinX
 
 import (
 	"context"
@@ -8,9 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/offer365/example/endecrypt"
 	"github.com/offer365/odin/log"
-	pb "github.com/offer365/odin/proto"
 	"go.etcd.io/etcd/clientv3"
 )
 
@@ -24,7 +22,7 @@ func GetLicense() (byt []byte, err error) {
 		resp *clientv3.GetResponse
 	)
 
-	if resp, err = store.Get(licenseKey, true); err != nil {
+	if resp, err = store.Get(Cfg.StoreLicenseKey, true); err != nil {
 		log.Sugar.Error("get license failed. error: ", err)
 		return
 	}
@@ -36,7 +34,7 @@ func GetLicense() (byt []byte, err error) {
 
 // 刷新license
 func PutLicense(val string) (err error) {
-	if _, err = store.Put(licenseKey, val, true); err != nil {
+	if _, err = store.Put(Cfg.StoreLicenseKey, val, true); err != nil {
 		log.Sugar.Error("put license failed. error: ", err)
 		return
 	}
@@ -45,7 +43,7 @@ func PutLicense(val string) (err error) {
 
 // 删除license
 func DelLicense() (err error) {
-	if _, err = store.Del(licenseKey, true); err != nil {
+	if _, err = store.Del(Cfg.StoreLicenseKey, true); err != nil {
 		log.Sugar.Error("del license failed. error: ", err)
 		return
 	}
@@ -65,7 +63,7 @@ func Str2lic(cipher string) (lic *License, err error) {
 		return
 	}
 	lic = new(License)
-	if byt, err = endecrypt.Decrypt(endecrypt.Pub1AesRsa2048, byt); err != nil {
+	if byt, err = Cfg.LicenseDecrypt(byt); err != nil {
 		log.Sugar.Errorf("decrypt license failed. error: ", err)
 		return
 	}
@@ -85,7 +83,7 @@ func lic2Str(lic interface{}) (cipher string, err error) {
 		return
 	}
 
-	if byt, err = endecrypt.Encrypt(endecrypt.Pri1AesRsa2048, byt); err != nil {
+	if byt, err = Cfg.LicenseEncrypt(byt); err != nil {
 		log.Sugar.Error("encrypt failed. error: ", err)
 		return
 	}
@@ -151,7 +149,7 @@ func ResetLicense() (err error) {
 // 监听license
 func WatchLicense() {
 	putFunc := func(event *clientv3.Event) error {
-		if !Device.IsLeader() {
+		if !device.IsLeader() {
 			lic, err := Str2lic(string(event.Kv.Value))
 			if err == nil {
 				StoreLic(lic)
@@ -168,7 +166,7 @@ func WatchLicense() {
 	}
 
 	ctx, _ := context.WithCancel(context.Background())
-	store.Watch(ctx, licenseKey, putFunc, delFunc)
+	store.Watch(ctx, Cfg.StoreLicenseKey, putFunc, delFunc)
 }
 
 // 检查授权码是否合法
@@ -183,17 +181,17 @@ func ChkLicense(cipher string) (lic *License, ok bool, msg string) {
 	}
 	// 当前机器是否在授权中
 	ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*500)
-	nodes := pb.GetAllNodes(ctx)
+	nodes := GetAllNodes(ctx)
 	if len(nodes) != len(lic.Devices) {
 		msg = "节点数量不一致。"
 		return
 	}
-	hw, exist := lic.Devices[pb.Self.Attrs.Name]
+	hw, exist := lic.Devices[Self.Attrs.Name]
 	if !exist {
 		msg = "未在授权中找到本机id。"
 		return
 	}
-	if hw != pb.Self.Attrs.Hwmd5 {
+	if hw != Self.Attrs.Hwmd5 {
 		msg = "绑定硬件信息错误。"
 		return
 	}

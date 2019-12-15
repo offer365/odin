@@ -5,6 +5,8 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+
+	"golang.org/x/crypto/scrypt"
 )
 
 // 运行时间
@@ -25,7 +27,7 @@ func Abs(a int64) int64 {
 	return (a ^ a>>31) - a>>31
 }
 
-func Md5sum(byt []byte, salt []byte) string {
+func Md5sum(byt, salt []byte) string {
 	h := md5.New()
 	if salt != nil {
 		byt = append(byt, salt...)
@@ -34,11 +36,19 @@ func Md5sum(byt []byte, salt []byte) string {
 	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
-func Sha256sum(byt []byte, salt []byte) string {
+func Sha256sum(byt, salt []byte) string {
 	h := sha256.New()
 	if salt != nil {
 		byt = append(byt, salt...)
 	}
 	h.Write(byt)
 	return base64.StdEncoding.EncodeToString(h.Sum(nil))
+}
+
+func Scrypt(src, salt []byte) string {
+	byt,err:=scrypt.Key(src, salt, 1<<15, 8, 1, 32)
+	if err!=nil{
+		return ""
+	}
+	return base64.StdEncoding.EncodeToString(byt)
 }

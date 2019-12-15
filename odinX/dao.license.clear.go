@@ -1,4 +1,4 @@
-package logic
+package odinX
 
 import (
 	"time"
@@ -35,7 +35,7 @@ func GetClearLicense() (info string, err error) {
 	var (
 		getResp *clientv3.GetResponse
 	)
-	if getResp, err = store.Get(clearLicenseKey, true); err != nil {
+	if getResp, err = store.Get(Cfg.StoreClearLicenseKey, true); err != nil {
 		return
 	}
 	if len(getResp.Kvs) > 0 {
@@ -46,6 +46,6 @@ func GetClearLicense() (info string, err error) {
 
 // 写入注销码
 func PutClearLicense(info string) (err error) {
-	_, err = store.Put(clearLicenseKey, info, true)
+	_, err = store.Put(Cfg.StoreClearLicenseKey, info, true)
 	return
 }
