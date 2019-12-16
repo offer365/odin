@@ -183,7 +183,6 @@ func Start(cfg *Config)  {
 		return
 	}
 	Cfg = cfg
-	RestoreAsset()
 	Main()
 	return
 }

@@ -49,6 +49,8 @@ const (
 )
 
 var (
+	Self          *Node
+	// auth          *Authentication
 	store         dao.Store
 	device        embedder.Embed
 	confWhiteList = map[string]string{"default": "", "members": ""} // 在白名单的配置无法删除
@@ -82,6 +84,9 @@ func Main() {
 		err   error
 		ready = make(chan struct{})
 	)
+
+	Self = NewNode(Cfg.NodeName, Cfg.NodeAddr)
+	RestoreAsset()
 	device = embedder.NewEmbed()
 	if err = device.Init(Cfg.EmbedCtx,
 		embedder.WithName(Cfg.EmbedName),

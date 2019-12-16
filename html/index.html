@@ -532,7 +532,7 @@
         // 解绑应用
         function UntiedApp() {
             $.ajax({
-                url: base_url + "/server/untied/" + $("#untied-id").val(),
+                url: base_url + "/server/untied/"+$("#untied-id").val(),
                 type: "POST",
                 username: $("#username").val(),
                 password: $("#password").val(),
@@ -543,7 +543,6 @@
                 }
             });
         }
-
         // 清空授权
         function clearLicense() {
             $.ajax({

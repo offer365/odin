@@ -7,8 +7,8 @@ import (
 
 	corec "github.com/offer365/example/grpc/core/client"
 	cores "github.com/offer365/example/grpc/core/server"
-	"github.com/offer365/odin/utils"
 	"github.com/offer365/odin/log"
+	"github.com/offer365/odin/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -18,20 +18,14 @@ import (
 )
 
 var (
-	Self          *Node
-	auth          *Authentication
+
 	ClientConns   *CliConns
 	StaterClients *StaterClis
 )
 
 func init() {
-	Self = NewNode(Cfg.NodeName, Cfg.NodeAddr)
 	ClientConns = new(CliConns)
 	StaterClients = new(StaterClis)
-	auth = &Authentication{
-		User:     Cfg.GRpcUser,
-		Password: Cfg.GRpcPwd,
-	}
 }
 
 func NewNode(name, addr string) (n *Node) {
@@ -153,7 +147,10 @@ func NodeGRpcClient(name, addr string) {
 		Con *grpc.ClientConn
 		err error
 	)
-
+	auth := &Authentication{
+		User:     Cfg.GRpcUser,
+		Password: Cfg.GRpcPwd,
+	}
 	Con, err = corec.NewRpcClient(
 		corec.WithAddr(addr),
 		corec.WithDialOption(grpc.WithPerRPCCredentials(auth)),

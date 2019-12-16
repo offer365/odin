@@ -7,10 +7,10 @@ import (
 	"github.com/offer365/example/endecrypt/endeaes"
 	"github.com/offer365/example/endecrypt/endeaesrsa"
 	"github.com/offer365/example/endecrypt/endersa"
+	"github.com/offer365/example/winsysinfo"
 	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/odinX"
 	"github.com/offer365/odin/utils"
-	"github.com/zcalusic/sysinfo"
 )
 
 const (
@@ -450,9 +450,9 @@ func HashFunc(src []byte) string {
 
 type hardware struct {
 	// linux
-	sysinfo.SysInfo  // "github.com/zcalusic/sysinfo"
+	// sysinfo.SysInfo  // "github.com/zcalusic/sysinfo"
 	// windows
-	// winsysinfo.SysInfo  // "github.com/offer365/example/winsysinfo"
+	winsysinfo.SysInfo  // "github.com/offer365/example/winsysinfo"
 }
 
 func (h *hardware) HostInfo() (machineID, architecture, hypervisor string) {
