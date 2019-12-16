@@ -89,13 +89,13 @@ type Config struct {
 	SerialDecrypt  CryptFunc
 	UntiedEncrypt  CryptFunc // 解绑码 加解密
 	UntiedDecrypt  CryptFunc
+	TokenHash      HashFunc
 
 	// odin & client app
 	VerifyDecrypt CryptFunc // token 密文解密
 	CipherEncrypt CryptFunc // uuid 加密
 	AuthEncrypt   CryptFunc // auth 数据加密
 	UuidHash      HashFunc
-	TokenHash     HashFunc
 }
 
 func NewConfig() *Config {
@@ -145,11 +145,12 @@ func NewConfig() *Config {
 		SerialDecrypt:  nil,
 		UntiedEncrypt:  nil,
 		UntiedDecrypt:  nil,
+		TokenHash:      nil,
+
 		VerifyDecrypt:  nil,
 		CipherEncrypt:  nil,
 		AuthEncrypt:    nil,
 		UuidHash:       nil,
-		TokenHash:      nil,
 	}
 }
 
@@ -177,7 +178,7 @@ func (cfg Config) CheckValue() (err error) {
 	return
 }
 
-func Start(cfg *Config)  {
+func Start(cfg *Config) {
 	if err := cfg.CheckValue(); err != nil {
 		log.Sugar.Fatal(err)
 		return

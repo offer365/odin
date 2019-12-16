@@ -408,17 +408,21 @@ func main() {
 		NodeAddr:                   config.Cfg.LocalGRpcAddr(),
 		NodeHardware:               hw,
 
+		// odin & edda
 		LicenseEncrypt:             PriEncryptRsa2048Aes256,
 		LicenseDecrypt:             PubDecryptRsa2048Aes256,
 		SerialEncrypt:              PriEncryptRsa2048Aes256,
 		SerialDecrypt:              PubDecryptRsa2048Aes256,
 		UntiedEncrypt:              PriEncryptRsa2048Aes256,
 		UntiedDecrypt:              PubDecryptRsa2048Aes256,
+		TokenHash:                  HashFunc,
+
+		// odin & app
 		VerifyDecrypt:              PriDecryptRsa2048,
 		CipherEncrypt:              Aes256key1,
 		AuthEncrypt:                Aes256key2,
 		UuidHash:                   HashFunc,
-		TokenHash:                  HashFunc,
+
 	}
 	odinX.Start(cfg)
 }
