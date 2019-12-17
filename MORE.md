@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## 逻辑
 ![架构](https://github.com/offer365/odin/blob/master/OdinProcess.png)
 
