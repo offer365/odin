@@ -86,9 +86,11 @@ type Config struct {
 	LicenseEncrypt CryptFunc // license 加解密
 	LicenseDecrypt CryptFunc
 	SerialEncrypt  CryptFunc // 序列号 加解密
-	SerialDecrypt  CryptFunc
-	UntiedEncrypt  CryptFunc // 解绑码 加解密
+	// SerialDecrypt  CryptFunc
+	// UntiedEncrypt  CryptFunc // 解绑码 加解密
 	UntiedDecrypt  CryptFunc
+	// ClearEncrypt   CryptFunc // 注销码 加解密
+	// ClearDecrypt   CryptFunc
 	TokenHash      HashFunc
 
 	// odin & client app
@@ -142,8 +144,8 @@ func NewConfig() *Config {
 		LicenseEncrypt: nil,
 		LicenseDecrypt: nil,
 		SerialEncrypt:  nil,
-		SerialDecrypt:  nil,
-		UntiedEncrypt:  nil,
+		// SerialDecrypt:  nil,
+		// UntiedEncrypt:  nil,
 		UntiedDecrypt:  nil,
 		TokenHash:      nil,
 
