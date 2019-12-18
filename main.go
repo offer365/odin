@@ -14,42 +14,42 @@ import (
 	"github.com/offer365/odin/utils"
 )
 
-const  (
-	_eccpri1=`-----BEGIN ECC PRIVATE KEY -----
+const (
+	_eccpri1 = `-----BEGIN ECC PRIVATE KEY -----
 MHcCAQEEINTHYitegwLb6PkGhOl+LJonebOV4WtexUwx4d0QlLydoAoGCCqGSM49
 AwEHoUQDQgAEmXK9uogmGwqZPscCqsQIebwu8McR//a94nNjwOfGj6Elb17pU6Sa
 OhZAL6ze+8BSd4GpBFbinIfQvZJ9xTQEyQ==
 -----END ECC PRIVATE KEY -----
 `
-	_eccpub1=`-----BEGIN ECC PUBLIC KEY -----
+	_eccpub1 = `-----BEGIN ECC PUBLIC KEY -----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmXK9uogmGwqZPscCqsQIebwu8McR
 //a94nNjwOfGj6Elb17pU6SaOhZAL6ze+8BSd4GpBFbinIfQvZJ9xTQEyQ==
 -----END ECC PUBLIC KEY -----
 `
-	_eccpri2=`-----BEGIN ECC PRIVATE KEY -----
+	_eccpri2 = `-----BEGIN ECC PRIVATE KEY -----
 MHcCAQEEIOLl1KF0MC9OSobCnBeaBBh+431v+u5B7tV1su5fsHFgoAoGCCqGSM49
 AwEHoUQDQgAE/xUZFcgtaPOF3A/6rDcTyrOqXiy88ZKYzsDxmE5WYQZHZtf3gDH6
 L79v6/tWpACYuEGco3tmFuIi8AzECzzoBw==
 -----END ECC PRIVATE KEY -----
 `
-	_eccpub2=`-----BEGIN ECC PUBLIC KEY -----
+	_eccpub2 = `-----BEGIN ECC PUBLIC KEY -----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/xUZFcgtaPOF3A/6rDcTyrOqXiy8
 8ZKYzsDxmE5WYQZHZtf3gDH6L79v6/tWpACYuEGco3tmFuIi8AzECzzoBw==
 -----END ECC PUBLIC KEY -----
 `
-	_eccpri3=`-----BEGIN ECC PRIVATE KEY -----
+	_eccpri3 = `-----BEGIN ECC PRIVATE KEY -----
 MHcCAQEEIGN1uA4orUdqpePCWMOlnjtBw5tMZwN38skShPVYtyLvoAoGCCqGSM49
 AwEHoUQDQgAEou1sKgFO39v/zD3XjlD293W1/DIJKOCmbnau+H459sIm4jjghc0f
 n2j1k37ktks/02qI2a+WMJICWUBl139r3g==
 -----END ECC PRIVATE KEY -----
 `
-	_eccpub3=`-----BEGIN ECC PUBLIC KEY -----
+	_eccpub3 = `-----BEGIN ECC PUBLIC KEY -----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEou1sKgFO39v/zD3XjlD293W1/DIJ
 KOCmbnau+H459sIm4jjghc0fn2j1k37ktks/02qI2a+WMJICWUBl139r3g==
 -----END ECC PUBLIC KEY -----
 `
 
-	_rsa1024pri1=`-----BEGIN RSA PRIVATE KEY -----
+	_rsa1024pri1 = `-----BEGIN RSA PRIVATE KEY -----
 MIICXQIBAAKBgQCqj8sIrUV68NJZio2voxiJALe+7CpsJokjaO1dtsyKOic8RKFw
 t94ntggY/7gLnNpTywCsT/3O+XYCfzoT5p6n6nt5TGiXYvtSyx501O7N23hLRgbo
 R1ST/wrgAGrP1F6DEaQWDDgquAXacKFR1epOIpOh72JXcFtF+NE6ejBtZwIDAQAB
@@ -65,14 +65,14 @@ CdCcAJOURM4pCERNq9a5AkBILMp2uItb8oxmgVV+2+UfYuBrj3u+AfAEYkXMtgUf
 ED9g58w+pR87ZHhHn2uKqdjoeK/s2YNUVIGVIl+cwu5/
 -----END RSA PRIVATE KEY -----
 `
-	_rsa1024pub1=`-----BEGIN RSA PUBLIC KEY -----
+	_rsa1024pub1 = `-----BEGIN RSA PUBLIC KEY -----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqj8sIrUV68NJZio2voxiJALe+
 7CpsJokjaO1dtsyKOic8RKFwt94ntggY/7gLnNpTywCsT/3O+XYCfzoT5p6n6nt5
 TGiXYvtSyx501O7N23hLRgboR1ST/wrgAGrP1F6DEaQWDDgquAXacKFR1epOIpOh
 72JXcFtF+NE6ejBtZwIDAQAB
 -----END RSA PUBLIC KEY -----
 `
-	_rsa1024pri2=`-----BEGIN RSA PRIVATE KEY -----
+	_rsa1024pri2 = `-----BEGIN RSA PRIVATE KEY -----
 MIICXAIBAAKBgQC+W7M97N6IhJTYRawc0FAFb3tbkHUDV5APJQqQEIGNQ7Ge3AWB
 nL9MxQrALufg3cTfXlPuNox0d9efjQGRFnxQfpwRXfjOWZYa5OrsDvDMK1TFYwe2
 S0UrrpXKWp7FCPlee5aho20woaZY8XCB5DrmS8DPS1/IAfLkuEQNkb2lvQIDAQAB
@@ -88,14 +88,14 @@ M4M1uV4XNLc9RNeA79kCQAVqQW0hk4xTQmJvwQmlYWS8zBi8PsogB0lJJGmQywoL
 Haf3HFEnhIIZe/cjGtAddBnecHg6y5cMVr7xJxEPLqU=
 -----END RSA PRIVATE KEY -----
 `
-	_rsa1024pub2=`-----BEGIN RSA PUBLIC KEY -----
+	_rsa1024pub2 = `-----BEGIN RSA PUBLIC KEY -----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+W7M97N6IhJTYRawc0FAFb3tb
 kHUDV5APJQqQEIGNQ7Ge3AWBnL9MxQrALufg3cTfXlPuNox0d9efjQGRFnxQfpwR
 XfjOWZYa5OrsDvDMK1TFYwe2S0UrrpXKWp7FCPlee5aho20woaZY8XCB5DrmS8DP
 S1/IAfLkuEQNkb2lvQIDAQAB
 -----END RSA PUBLIC KEY -----
 `
-	_rsa1024pri3=`-----BEGIN RSA PRIVATE KEY -----
+	_rsa1024pri3 = `-----BEGIN RSA PRIVATE KEY -----
 MIICWwIBAAKBgQC4tf1DPByPeXirTkQxEzGz+iJoYDhlT5OHftFWhSYfZqQCKktr
 AqcxlkVEMBYFW73HAGmvyqY1x2TtBD8fzldWyJzUA6BWCb7eBbYC7m5QpNdBiI+k
 4t2+D5UBnvLuxMDpb76NVynEuaNykEo3FvtqrrVr+8MaNgQ/01tOp9YvRwIDAQAB
@@ -111,14 +111,14 @@ FWXHMXNsWI8n/A5y4QJAeCRee0qqwPTN7SUC/tjfSM0zatEJmCc42xkH5cRALEv2
 zVH/pRVXjreM1j9MQYGJlQW5SXORc5y4E0N3C4dK7Q==
 -----END RSA PRIVATE KEY -----
 `
-	_rsa1024pub3=`-----BEGIN RSA PUBLIC KEY -----
+	_rsa1024pub3 = `-----BEGIN RSA PUBLIC KEY -----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC4tf1DPByPeXirTkQxEzGz+iJo
 YDhlT5OHftFWhSYfZqQCKktrAqcxlkVEMBYFW73HAGmvyqY1x2TtBD8fzldWyJzU
 A6BWCb7eBbYC7m5QpNdBiI+k4t2+D5UBnvLuxMDpb76NVynEuaNykEo3FvtqrrVr
 +8MaNgQ/01tOp9YvRwIDAQAB
 -----END RSA PUBLIC KEY -----
 `
-	_rsa2048pri1=`-----BEGIN RSA PRIVATE KEY -----
+	_rsa2048pri1 = `-----BEGIN RSA PRIVATE KEY -----
 MIIEowIBAAKCAQEA9yMngj5ENROiunl4U3WjcR39ecXF8OOxXlPKGNo5LkxvHz/A
 gy7MiavfadHtpKhGSsrAFZ306SE0SvrO/CQdkW5g3pQzVAPUTFYVTr1f0ZumLVTW
 oG/u+QSuZRkARQpMhrIWrU65JpT62uGxo8ov2Z8f3bYYNdBZgJcQFDFryGckdNkZ
@@ -146,7 +146,7 @@ t0luGjTzOObZQSNReBzJBiQukcMpPG8NSwFwZVzfVeqzHTjtqeoxrNSB4/iS6pAX
 z1aRjqAy2+FL6lpD/mT7Qx+bfTfCpgrmDlxea42Z8UGYZAnYaKZI
 -----END RSA PRIVATE KEY -----
 `
-	_rsa2048pub1=`-----BEGIN RSA PUBLIC KEY -----
+	_rsa2048pub1 = `-----BEGIN RSA PUBLIC KEY -----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA9yMngj5ENROiunl4U3Wj
 cR39ecXF8OOxXlPKGNo5LkxvHz/Agy7MiavfadHtpKhGSsrAFZ306SE0SvrO/CQd
 kW5g3pQzVAPUTFYVTr1f0ZumLVTWoG/u+QSuZRkARQpMhrIWrU65JpT62uGxo8ov
@@ -156,7 +156,7 @@ HmowNRoO+kA95cnnRHM4Sz6LZ1kJJhqJXMrZ/DPUEX5qgpqyRFHf64lCi8jEDy7l
 KQIDAQAB
 -----END RSA PUBLIC KEY -----
 `
-	_rsa2048pri2=`-----BEGIN RSA PRIVATE KEY -----
+	_rsa2048pri2 = `-----BEGIN RSA PRIVATE KEY -----
 MIIEogIBAAKCAQEAvYFQllcFhWVIYwd+QUtLdplNLujQ8VO45WH6NK2BgUKpeQz1
 FnDJNmmRVsok/IZBFJwRb1ktA9gdEJvJjfg9SFK1VOtNLgHZfKSweHh/942X53ET
 xTu0iUeQjTHJdmNyu8PF9ZcBmz1J4yor8IX82Svfz9zFqsmUrRnZQi0bB2EyvBMP
@@ -184,7 +184,7 @@ yV+2X3/FtjUyqAsDcMbwMjMINCmnPcPpTSPe6M/ACKlsceghEcgU8pifh6lQfW1C
 2RY8YuctzLhGBtyC44BN4lnchvCalB8IdkwXbnj01iQ353kyZGk=
 -----END RSA PRIVATE KEY -----
 `
-	_rsa2048pub2=`-----BEGIN RSA PUBLIC KEY -----
+	_rsa2048pub2 = `-----BEGIN RSA PUBLIC KEY -----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvYFQllcFhWVIYwd+QUtL
 dplNLujQ8VO45WH6NK2BgUKpeQz1FnDJNmmRVsok/IZBFJwRb1ktA9gdEJvJjfg9
 SFK1VOtNLgHZfKSweHh/942X53ETxTu0iUeQjTHJdmNyu8PF9ZcBmz1J4yor8IX8
@@ -194,7 +194,7 @@ WjtfvdyiuMdFT8e5S+ocfga38BmFJgB+tHrG7q657/8ZUmj7jWMydxsYpPoSsqdd
 /wIDAQAB
 -----END RSA PUBLIC KEY -----
 `
-	_rsa2048pri3=`-----BEGIN RSA PRIVATE KEY -----
+	_rsa2048pri3 = `-----BEGIN RSA PRIVATE KEY -----
 MIIEpAIBAAKCAQEAxKheCDHJGf+NBpWjJ/uP0bA9v0zsML/GK4OoGMubNjLp5y1b
 au20+9J+lFAEJtr2qKeBwLOMjoys9F0F5qwK5ORctT8MITWpeots+HZenuN+GshR
 EeTBPBwUEGjTp7c2I7KTCgyRjyBDFV/u+hRTvLFYfcw4E9Nhamzb7465SHHq+pWi
@@ -222,7 +222,7 @@ LDS+vXWQMel0HWgJ83ZMNA6a3xzldg/ZQHEXKmWxnSvUswSX3+eWc77QcSS1yQN4
 fAN0LE8IV7Jayy3k+vpp5plp9048CZ4eFPBSNI5L+PmrpLrrjnusBg==
 -----END RSA PRIVATE KEY -----
 `
-	_rsa2048pub3=`-----BEGIN RSA PUBLIC KEY -----
+	_rsa2048pub3 = `-----BEGIN RSA PUBLIC KEY -----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxKheCDHJGf+NBpWjJ/uP
 0bA9v0zsML/GK4OoGMubNjLp5y1bau20+9J+lFAEJtr2qKeBwLOMjoys9F0F5qwK
 5ORctT8MITWpeots+HZenuN+GshREeTBPBwUEGjTp7c2I7KTCgyRjyBDFV/u+hRT
@@ -232,7 +232,7 @@ jgeD2hF7FFo3zxHM76torVJhgNTh8qAD24rdTcVytghlqWjLr0ASNbIxAtFSxQqu
 owIDAQAB
 -----END RSA PUBLIC KEY -----
 `
-	_rsa4096pri1=`-----BEGIN RSA PRIVATE KEY -----
+	_rsa4096pri1 = `-----BEGIN RSA PRIVATE KEY -----
 MIIJKAIBAAKCAgEAqT9kx0CTA9sHYRmAkHZ9lm1QtgffrO2G70eBl+agIT4W9JiE
 7eYeE1KqFWfnaDanOWWei9GV02fT+W7EJKHx+8lszhR55FIDVMSUitXeprJQC0uj
 HOujjBBAvDhRDXlYTX6Mm+gpp2YXdsbK0qlVMLnC31UipOzkdVGj0v0eZw0ZjGpX
@@ -284,7 +284,7 @@ HeNFnisS3RvVOYStBRx5ML87BKptLxTmWg1WcTh+h8ANk3niHAQa6TFyeuX4wmzi
 iFL0G9an11Za+J41hpUqtt2HUmiuSW6kAI/O8IZ/N9HbNAFGZ9sSIfJo3B8=
 -----END RSA PRIVATE KEY -----
 `
-	_rsa4096pub1=`-----BEGIN RSA PUBLIC KEY -----
+	_rsa4096pub1 = `-----BEGIN RSA PUBLIC KEY -----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAqT9kx0CTA9sHYRmAkHZ9
 lm1QtgffrO2G70eBl+agIT4W9JiE7eYeE1KqFWfnaDanOWWei9GV02fT+W7EJKHx
 +8lszhR55FIDVMSUitXeprJQC0ujHOujjBBAvDhRDXlYTX6Mm+gpp2YXdsbK0qlV
@@ -299,7 +299,7 @@ wUFdhw4Ma8Jc+8GS977oXkVe1V9ootkVraeeQq4r+o2noB/zhsf6qMTbXKvpxdwT
 z65MbXTx6D1ppJvlK6t28rcCAwEAAQ==
 -----END RSA PUBLIC KEY -----
 `
-	_rsa4096pri2=`-----BEGIN RSA PRIVATE KEY -----
+	_rsa4096pri2 = `-----BEGIN RSA PRIVATE KEY -----
 MIIJKQIBAAKCAgEA78VjLtA7aeUgRLiSX1/v25+VYX51uUpWtGyp9cvQ4qbvo9b2
 +YaUx0ODGxxrkFc/PrqTNyFH6LJW1macMxsTc0X3mmBVG0OvDX7/7JMB+bh2VOTl
 YJ26AKD1RPFqQiqfearAAlwV9h972Kf3iBxijoCDBig3NT5+EgjVtVfTUhG3+bew
@@ -351,7 +351,7 @@ KkHVQcFeqIaVET1SDc4GORV8tfSCQXzPKIa+MolhlWgyjYpFil9iqgmkt/JHpj7R
 dbaatolfjqVJWCJ2sDWQOky7xlPNVIVl0hWe29bFyGi/+khuLIsdeCmjoGPs
 -----END RSA PRIVATE KEY -----
 `
-	_rsa4096pub2=`-----BEGIN RSA PUBLIC KEY -----
+	_rsa4096pub2 = `-----BEGIN RSA PUBLIC KEY -----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA78VjLtA7aeUgRLiSX1/v
 25+VYX51uUpWtGyp9cvQ4qbvo9b2+YaUx0ODGxxrkFc/PrqTNyFH6LJW1macMxsT
 c0X3mmBVG0OvDX7/7JMB+bh2VOTlYJ26AKD1RPFqQiqfearAAlwV9h972Kf3iBxi
@@ -366,7 +366,7 @@ pndkhAQ2IfQ1GysgWZmSUbS89S9QMZpGoLqTOnYK8+dH1j+gxC6aG/yOKTzcF70D
 XvNPePtj+Rjl2vXib9Ej6f8CAwEAAQ==
 -----END RSA PUBLIC KEY -----
 `
-	_rsa4096pri3=`-----BEGIN RSA PRIVATE KEY -----
+	_rsa4096pri3 = `-----BEGIN RSA PRIVATE KEY -----
 MIIJKAIBAAKCAgEA1cSuz7Vr/KKNQ5dsbJfR1vyBWX8D5cfNfxycun/omR/+L9/O
 brPyFZHPihCDDVyTPvYZvphQ8ar8r4IXqqyWvi2e5F8G+vyPcIa/ugcSnTRPCdEN
 9KFAAFxdPuWVMpPw84aDQ/O8un3GqGIRf9FrpoGOsfYnpgEBVe4WDM82OcwKGY7o
@@ -418,7 +418,7 @@ raUD60IrL+cQJ4exaa1Pm6RIU7PBGw2qQ5XjxUPkSWIYHoxz/AQ2e/QR06A4VNBP
 nG+B+JfA4YBh69Q3OhqtF55SLUXuvYUv1AiKucYdl6El+vcFdCg2wXEN4WY=
 -----END RSA PRIVATE KEY -----
 `
-	_rsa4096pub3=`-----BEGIN RSA PUBLIC KEY -----
+	_rsa4096pub3 = `-----BEGIN RSA PUBLIC KEY -----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA1cSuz7Vr/KKNQ5dsbJfR
 1vyBWX8D5cfNfxycun/omR/+L9/ObrPyFZHPihCDDVyTPvYZvphQ8ar8r4IXqqyW
 vi2e5F8G+vyPcIa/ugcSnTRPCdEN9KFAAFxdPuWVMpPw84aDQ/O8un3GqGIRf9Fr
@@ -434,10 +434,10 @@ UUcV+sKUU02YkpE6kQ/x8icCAwEAAQ==
 -----END RSA PUBLIC KEY -----
 `
 
-	_aes256key1=`70o9Zg70lxF5360cnj9p94JqmuqNVu60`
-	_aes256key2=`P2sX1uVPlWX0F989yoF12Tmi1OpKy8lU`
-	_aes256key3=`43xfx12jPHhO2rAL23l9zMpx3OVutp9u`
-	_aes256key4=`ITN5KfuF36nyr9I5OrKGopnnu9HYrk8L`
+	_aes256key1 = `70o9Zg70lxF5360cnj9p94JqmuqNVu60`
+	_aes256key2 = `P2sX1uVPlWX0F989yoF12Tmi1OpKy8lU`
+	_aes256key3 = `43xfx12jPHhO2rAL23l9zMpx3OVutp9u`
+	_aes256key4 = `ITN5KfuF36nyr9I5OrKGopnnu9HYrk8L`
 )
 
 /* shell 生成随机sha256值
@@ -469,14 +469,14 @@ const (
 	clusterToken = "G81dau36S8HAI5J4jGs45T61B93d7t08YQ1CjN1Sv0shRrPE46C4sw0WwVCunxSi"
 	embedAuthPwd = "u1MMj4Cx4B1Jr2qpU3a9unmc2U97Pz3VLgsQ0hzFR90d16W5j94q3cQD5ShSu5Jt"
 
-	storeLicenseKey = "/9cefd7c79bd2f63358072f0316d5335ba693355b2ccd12696179017577def641/2269e226079a2296b8d2325209ba11051ac1c0b6123c6bcc95350706ae33c01a"
-	storeClearLicenseKey = "/3e08f087017dae140cce18ea86a5bd0e02679c76ff600bf33c209c08dc80566a/b1059ce383ed990ff66e85ef1f3bf44b318198ce24b05b7f3f5108e7fa7004f1"
+	storeLicenseKey            = "/9cefd7c79bd2f63358072f0316d5335ba693355b2ccd12696179017577def641/2269e226079a2296b8d2325209ba11051ac1c0b6123c6bcc95350706ae33c01a"
+	storeClearLicenseKey       = "/3e08f087017dae140cce18ea86a5bd0e02679c76ff600bf33c209c08dc80566a/b1059ce383ed990ff66e85ef1f3bf44b318198ce24b05b7f3f5108e7fa7004f1"
 	storeClientConfigKeyPrefix = "/cdc7e1dd02053480db18055c197ae7b20cd4c2b3801e60c9028ed325907659cb/1d5862de77f68559eeeb412165f9a562a81b79da26ebd446fd4e0ce858d8c018/"
-	storeClientKeyPrefix = "/0d5eed3e8dce0dbe888c6ab5cc4e691f2210934ad0be81222509d680620892bc/b50457636f53c7d8e5b6aa0d86ae3021079da50a970d256512b11bf4be4b72ff/"
-	storeTokenKey = "/9e98424a9f813823006565b767d1624c864286df7678abeae9208073bf1b047d/7d9db4a702218ee797b72ef65e2e2ec843e1992b780a7ab68c4632296fe97b83"
-	storeSerialNumKey = "/cb73f5c7ecf49137c9b90e030673d3b05f61da0d057e2917c203b6396c353a1b/5a9529ee9b61c3194dc8ebc29af8a80a4564a88bf4af39490a8a0bfcaeba285b"
-	storeHashSalt = "5a9529ee9b61c3194dc8ebc29af8a80a4564a88bf4af39490a8a0bfcaeba285b"
-	server_crt = `-----BEGIN CERTIFICATE-----
+	storeClientKeyPrefix       = "/0d5eed3e8dce0dbe888c6ab5cc4e691f2210934ad0be81222509d680620892bc/b50457636f53c7d8e5b6aa0d86ae3021079da50a970d256512b11bf4be4b72ff/"
+	storeTokenKey              = "/9e98424a9f813823006565b767d1624c864286df7678abeae9208073bf1b047d/7d9db4a702218ee797b72ef65e2e2ec843e1992b780a7ab68c4632296fe97b83"
+	storeSerialNumKey          = "/cb73f5c7ecf49137c9b90e030673d3b05f61da0d057e2917c203b6396c353a1b/5a9529ee9b61c3194dc8ebc29af8a80a4564a88bf4af39490a8a0bfcaeba285b"
+	storeHashSalt              = "5a9529ee9b61c3194dc8ebc29af8a80a4564a88bf4af39490a8a0bfcaeba285b"
+	server_crt                 = `-----BEGIN CERTIFICATE-----
 MIIDAzCCAesCCQDqO1aVDNi/IzANBgkqhkiG9w0BAQsFADBDMQswCQYDVQQGEwJH
 QjEOMAwGA1UEBwwFQ2hpbmExDzANBgNVBAoMBmdvYm9vazETMBEGA1UEAwwKZ2l0
 aHViLmNvbTAgFw0xOTEwMjAxMTAyMzhaGA8yMTE5MDkyNjExMDIzOFowQjELMAkG
@@ -597,29 +597,29 @@ IOS/jew/kfpPLavuvyPqoGAfc1xpe6QQXZUEGCtzTDU/rl/hQWMxCJg85E1S5Usx
 gahmAgIzeyFCjb2txOo65VtLM0DfzzkIX2PrLz7CyiXP40m8uBMtCDG+IZS0arQ=
 -----END CERTIFICATE-----
 `
-	grpcUser = `axjBj6l4l49k0EXD473HNuOXZbpZfku4`
-	grpcPwd = `tGH57Sz2ml5TT6StPIDeX1l911nPT9M9`
+	grpcUser      = `axjBj6l4l49k0EXD473HNuOXZbpZfku4`
+	grpcPwd       = `tGH57Sz2ml5TT6StPIDeX1l911nPT9M9`
 	grepSererName = "server.io"
 )
 
-var hw   =&hardware{}
+var hw = &hardware{}
 
 func main() {
-	cfg:=&odinX.Config{
-		EmbedCtx:                   context.TODO(),
-		EmbedName:                  config.Cfg.Name,
-		EmbedDir:                   config.Cfg.Dir,
-		EmbedClientAddr:            config.Cfg.LocalClientAddr(),
-		EmbedPeerAddr:              config.Cfg.LocalPeerAddr(),
-		EmbedClusterToken:          clusterToken,
-		EmbedClusterState:          config.Cfg.State,
-		EmbedCluster:               config.Cfg.AllPeerAddr(),
-		EmbedAuthPwd:               embedAuthPwd,
+	cfg := &odinX.Config{
+		EmbedCtx:          context.TODO(),
+		EmbedName:         config.Cfg.Name,
+		EmbedDir:          config.Cfg.Dir,
+		EmbedClientAddr:   config.Cfg.LocalClientAddr(),
+		EmbedPeerAddr:     config.Cfg.LocalPeerAddr(),
+		EmbedClusterToken: clusterToken,
+		EmbedClusterState: config.Cfg.State,
+		EmbedCluster:      config.Cfg.AllPeerAddr(),
+		EmbedAuthPwd:      embedAuthPwd,
 
 		EtcdCliCtx:                 context.TODO(),
-		EtcdCliAddr:                "127.0.0.1:"+config.Cfg.LocalClientPort(),
+		EtcdCliAddr:                "127.0.0.1:" + config.Cfg.LocalClientPort(),
 		EtcdCliUser:                "root",
-		EtcdCliTimeout:             3*time.Second,
+		EtcdCliTimeout:             3 * time.Second,
 		StoreLicenseKey:            storeLicenseKey,
 		StoreClearLicenseKey:       storeClearLicenseKey,
 		StoreClientConfigKeyPrefix: storeClientConfigKeyPrefix,
@@ -627,96 +627,99 @@ func main() {
 		StoreTokenKey:              storeTokenKey,
 		StoreSerialNumKey:          storeSerialNumKey,
 
-		GRpcServerCrt:              server_crt,
-		GRpcServerKey:              server_key,
-		GRpcClientCrt:              client_crt,
-		GRpcClientKey:              client_key,
-		GRpcCaCrt:                  ca_crt,
-		GRpcUser:                   grpcUser,
-		GRpcPwd:                    grpcPwd,
-		GRpcServerName:             grepSererName,
-		GRpcAllNode:                config.Cfg.AllGRpcAddr(),
-		GRpcListen:                 config.Cfg.LocalGRpcAddr(),
-		RestfulPwd:                 config.Cfg.Pwd,
+		GRpcServerCrt:  server_crt,
+		GRpcServerKey:  server_key,
+		GRpcClientCrt:  client_crt,
+		GRpcClientKey:  client_key,
+		GRpcCaCrt:      ca_crt,
+		GRpcUser:       grpcUser,
+		GRpcPwd:        grpcPwd,
+		GRpcServerName: grepSererName,
+		GRpcAllNode:    config.Cfg.AllGRpcAddr(),
+		GRpcListen:     config.Cfg.LocalGRpcAddr(),
 
-		NodeName:                   config.Cfg.LocalName(),
-		NodeAddr:                   config.Cfg.LocalGRpcAddr(),
-		NodeHardware:               hw,
+
+		// web config
+		WebPwd:    config.Cfg.Pwd,
+		WebListen: config.Cfg.Web,
+
+		NodeName:     config.Cfg.LocalName(),
+		NodeAddr:     config.Cfg.LocalGRpcAddr(),
+		NodeHardware: hw,
 
 		// odin & edda
-		LicenseEncrypt:             PubEncryptRsa2048Aes256,
-		LicenseDecrypt:             PriDecryptRsa2048Aes256,
-		SerialEncrypt:              PubEncryptRsa2048Aes256,
+		LicenseEncrypt: PubEncryptRsa2048Aes256,
+		LicenseDecrypt: PriDecryptRsa2048Aes256,
+		SerialEncrypt:  PubEncryptRsa2048Aes256,
 		// SerialDecrypt:              PubDecryptRsa2048Aes256,
 		// UntiedEncrypt:              PriEncryptRsa2048Aes256,
-		UntiedDecrypt:              PubDecryptRsa2048Aes256,
-		TokenHash:                  HashFunc,
+		UntiedDecrypt: PubDecryptRsa2048Aes256,
+		TokenHash:     HashFunc,
 
 		// odin & app
-		VerifyDecrypt:              PriDecryptRsa2048,
-		CipherEncrypt:              Aes256key1,
-		AuthEncrypt:                Aes256key2,
-		UuidHash:                   HashFunc,
-
+		VerifyDecrypt: PriDecryptRsa2048,
+		CipherEncrypt: Aes256key1,
+		AuthEncrypt:   Aes256key2,
+		UuidHash:      HashFunc,
 	}
 	odinX.Start(cfg)
 }
 
-func PubEncryptRsa2048Aes256(src []byte)([]byte,error)  {
+func PubEncryptRsa2048Aes256(src []byte) ([]byte, error) {
 	return endeaesrsa.PubEncrypt(src, []byte(_rsa2048pub1), []byte(_aes256key1))
 }
 
-func PriDecryptRsa2048Aes256(src []byte)([]byte,error)  {
+func PriDecryptRsa2048Aes256(src []byte) ([]byte, error) {
 	return endeaesrsa.PriDecrypt(src, []byte(_rsa2048pri1), []byte(_aes256key1))
 }
 
 // Ecc256 + Rsa2048 + Aes256
-func PubEncryptEcc256Rsa2048Aes256(src []byte)([]byte,error)   {
-	return endeaesrsaecc.PubEncrypt(src,[]byte(_eccpub2),[]byte(_rsa2048pub2),[]byte(_aes256key2))
+func PubEncryptEcc256Rsa2048Aes256(src []byte) ([]byte, error) {
+	return endeaesrsaecc.PubEncrypt(src, []byte(_eccpub2), []byte(_rsa2048pub2), []byte(_aes256key2))
 }
+
 // Ecc256 + Rsa2048 + Aes256
-func PriDecryptEcc256Rsa2048Aes256(src []byte)([]byte,error)   {
-	return endeaesrsaecc.PriDecrypt(src,[]byte(_eccpri2),[]byte(_rsa2048pri2),[]byte(_aes256key2))
+func PriDecryptEcc256Rsa2048Aes256(src []byte) ([]byte, error) {
+	return endeaesrsaecc.PriDecrypt(src, []byte(_eccpri2), []byte(_rsa2048pri2), []byte(_aes256key2))
 }
 
-func PubDecryptRsa2048Aes256(src []byte)([]byte,error)  {
-	return endeaesrsa.PubDecrypt(src, []byte(_rsa2048pub3),[]byte(_aes256key3))
+func PubDecryptRsa2048Aes256(src []byte) ([]byte, error) {
+	return endeaesrsa.PubDecrypt(src, []byte(_rsa2048pub3), []byte(_aes256key3))
 }
 
-func PriDecryptRsa2048(src []byte)([]byte,error) {
-	return endersa.PriDecrypt(src,[]byte(_rsa4096pri1))
+func PriDecryptRsa2048(src []byte) ([]byte, error) {
+	return endersa.PriDecrypt(src, []byte(_rsa4096pri1))
 }
 
-func Aes256key1(src []byte)([]byte,error)  {
+func Aes256key1(src []byte) ([]byte, error) {
 	return endeaes.AesCbcEncrypt(src, []byte(_aes256key4))
 }
 
-func Aes256key2(src []byte)([]byte,error)  {
+func Aes256key2(src []byte) ([]byte, error) {
 	return endeaes.AesCbcEncrypt(src, []byte(_aes256key4))
 }
 
 func HashFunc(src []byte) string {
-	return  utils.Sha256sum(src,[]byte(storeHashSalt))
+	return utils.Sha256sum(src, []byte(storeHashSalt))
 }
-
 
 type hardware struct {
 	// linux
 	// sysinfo.SysInfo  // "github.com/zcalusic/sysinfo"
 	// windows
-	winsysinfo.SysInfo  // "github.com/offer365/example/winsysinfo"
+	winsysinfo.SysInfo // "github.com/offer365/example/winsysinfo"
 }
 
 func (h *hardware) HostInfo() (machineID, architecture, hypervisor string) {
-	return h.Node.MachineID,h.OS.Architecture,h.Node.Hypervisor
+	return h.Node.MachineID, h.OS.Architecture, h.Node.Hypervisor
 }
 
 func (h *hardware) ProductInfo() (name, serial, vendor string) {
-	return h.Product.Name,h.Product.Serial,h.Product.Vendor
+	return h.Product.Name, h.Product.Serial, h.Product.Vendor
 }
 
 func (h *hardware) BoardInfo() (name, serial, vendor string) {
-	return h.Board.Name,h.Board.Serial,h.Board.Vendor
+	return h.Board.Name, h.Board.Serial, h.Board.Vendor
 }
 
 func (h *hardware) BiosInfo() (vendor string) {
@@ -724,13 +727,13 @@ func (h *hardware) BiosInfo() (vendor string) {
 }
 
 func (h *hardware) CpuInfo() (vendor, model string, threads, cache, cores, cpus, speed uint32) {
-	return h.CPU.Vendor,h.CPU.Model,uint32(h.CPU.Threads),
-		uint32(h.CPU.Cache),uint32(h.CPU.Cores),
-		uint32(h.CPU.Cpus),uint32(h.CPU.Speed)
+	return h.CPU.Vendor, h.CPU.Model, uint32(h.CPU.Threads),
+		uint32(h.CPU.Cache), uint32(h.CPU.Cores),
+		uint32(h.CPU.Cpus), uint32(h.CPU.Speed)
 }
 
 func (h *hardware) MemInfo() (speed uint32, tp string) {
-	return uint32(h.Memory.Speed),h.Memory.Type
+	return uint32(h.Memory.Speed), h.Memory.Type
 }
 
 func (h *hardware) NetworksInfo() (drivers []*odinX.NetDriver) {
@@ -739,7 +742,7 @@ func (h *hardware) NetworksInfo() (drivers []*odinX.NetDriver) {
 		nw.Speed = uint32(val.Speed)
 		nw.Macaddress = val.MACAddress
 		nw.Driver = val.Driver
-		drivers=append(drivers, nw)
+		drivers = append(drivers, nw)
 	}
 	return
 }

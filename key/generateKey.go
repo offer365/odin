@@ -88,7 +88,7 @@ func main() {
 		}
 	}
 
-	time.Sleep(time.Second*2)
+	time.Sleep(time.Second * 2)
 	str := temp
 	files, err := ioutil.ReadDir("./")
 	if err != nil {

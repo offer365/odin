@@ -11,7 +11,6 @@ import (
 	"go.etcd.io/etcd/clientv3"
 )
 
-
 // 下面的函数并不会直接存储App发送的token,而是对app,ID,val 分别进行md5或sha256 hash 后,再进行存储或取出。上层函数以同样的算法计算后，操作和比对。
 
 func PutToken(app, id, val string) (err error) {

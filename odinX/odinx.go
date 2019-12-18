@@ -74,7 +74,10 @@ type Config struct {
 	GRpcServerName string
 	GRpcAllNode    map[string]string
 	GRpcListen     string
-	RestfulPwd     string
+
+	// web config
+	WebPwd    string
+	WebListen string
 
 	// node config
 	NodeName     string
@@ -88,10 +91,10 @@ type Config struct {
 	SerialEncrypt  CryptFunc // 序列号 加解密
 	// SerialDecrypt  CryptFunc
 	// UntiedEncrypt  CryptFunc // 解绑码 加解密
-	UntiedDecrypt  CryptFunc
+	UntiedDecrypt CryptFunc
 	// ClearEncrypt   CryptFunc // 注销码 加解密
 	// ClearDecrypt   CryptFunc
-	TokenHash      HashFunc
+	TokenHash HashFunc
 
 	// odin & client app
 	VerifyDecrypt CryptFunc // token 密文解密
@@ -135,7 +138,7 @@ func NewConfig() *Config {
 		GRpcServerName: "",
 		GRpcAllNode:    nil,
 		GRpcListen:     "0.0.0.0:9527",
-		RestfulPwd:     "",
+		WebPwd:         "",
 
 		NodeName:     "",
 		NodeAddr:     "",
@@ -146,13 +149,13 @@ func NewConfig() *Config {
 		SerialEncrypt:  nil,
 		// SerialDecrypt:  nil,
 		// UntiedEncrypt:  nil,
-		UntiedDecrypt:  nil,
-		TokenHash:      nil,
+		UntiedDecrypt: nil,
+		TokenHash:     nil,
 
-		VerifyDecrypt:  nil,
-		CipherEncrypt:  nil,
-		AuthEncrypt:    nil,
-		UuidHash:       nil,
+		VerifyDecrypt: nil,
+		CipherEncrypt: nil,
+		AuthEncrypt:   nil,
+		UuidHash:      nil,
 	}
 }
 

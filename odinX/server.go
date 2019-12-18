@@ -49,7 +49,7 @@ const (
 )
 
 var (
-	Self          *Node
+	Self *Node
 	// auth          *Authentication
 	store         dao.Store
 	device        embedder.Embed
@@ -157,7 +157,8 @@ func Server() {
 	}()
 	// 监听授权变化
 	go WatchLicense()
-	go RunRpc(Cfg.GRpcListen)
+	go RunAPI(Cfg.GRpcListen)
+	go WebServer()
 	AllNodeGRpcClient(Cfg.GRpcAllNode)
 	DefaultConf()
 	signalChan := make(chan os.Signal)
@@ -206,7 +207,7 @@ func loadLic() (err error) {
 
 var gs *grpc.Server
 
-func RunRpc(addr string) {
+func RunAPI(addr string) {
 	var err error
 	gs, err = NodeGRpcServer()
 	if err != nil {
@@ -215,12 +216,12 @@ func RunRpc(addr string) {
 	}
 	RegisterStaterServer(gs, Self)
 	RegisterAuthorizeServer(gs, Author)
-	ws := ginServer()
+	ws := apiServer()
 	handle := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
 			gs.ServeHTTP(w, r) // grpc server
 		} else {
-			ws.ServeHTTP(w, r) // gin web server
+			ws.ServeHTTP(w, r) // gin api server
 		}
 		return
 	})
@@ -251,9 +252,9 @@ func NewTlsListen(crt, key, ca []byte, addr string) (net.Listener, error) {
 	}
 	tlsConfig := &tls.Config{
 		Certificates:       []tls.Certificate{certificate},
-		ClientAuth:         tls.NoClientCert, // NOTE: 这是可选的!
+		ClientAuth:         tls.RequireAndVerifyClientCert, // NOTE: 这是可选的!
 		ClientCAs:          certPool,
-		InsecureSkipVerify: true,
+		InsecureSkipVerify: false,
 		Rand:               rand.Reader,
 		Time:               time.Now,
 		NextProtos:         []string{"http/1.1", http2.NextProtoTLS},
@@ -262,7 +263,7 @@ func NewTlsListen(crt, key, ca []byte, addr string) (net.Listener, error) {
 }
 
 // gin 路由
-func ginServer() http.Handler {
+func WebServer() {
 	gin.SetMode(gin.ReleaseMode) // 生产模式
 	r := gin.New()
 	r.Use(gin.Recovery()) // Recovery 中间件从任何 panic 恢复，如果出现 panic，它会写一个 500 错误。
@@ -274,7 +275,7 @@ func ginServer() http.Handler {
 	r.StaticFile("/favicon.ico", _assetPath+"static/favicon.ico")
 	// api 路由组 basicauth 认证
 	api := r.Group("/odin/api/v1", gin.BasicAuth(gin.Accounts{
-		restfulUser: Cfg.RestfulPwd,
+		restfulUser: Cfg.WebPwd,
 	}))
 
 	// 序列号
@@ -291,8 +292,6 @@ func ginServer() http.Handler {
 	api.POST("/server/untied/:app/:id", UntiedAppApi)
 	// 配置接口 kv 存储
 	api.Any("/client/conf/*name", ConfAPI)
-	// 客户端接口
-	api.Any("/client/auth", ClientAPI)
 	// 客户端在线接口
 	api.GET("/client/online/*app", CliOnlineAPI)
 	// web 交互
@@ -309,7 +308,22 @@ func ginServer() http.Handler {
 			"title": "首页",
 		})
 	})
+	log.Sugar.Info(r.Run(Cfg.WebListen))
+}
 
+// gin 路由
+func apiServer() http.Handler {
+	gin.SetMode(gin.ReleaseMode) // 生产模式
+	r := gin.New()
+	r.Use(gin.Recovery()) // Recovery 中间件从任何 panic 恢复，如果出现 panic，它会写一个 500 错误。
+	// store := cookie.NewStore([]byte("secret"))
+	// store.Options(sessions.Options{MaxAge:0})
+	// r.Use(sessions.Sessions("odin",store))
+	api := r.Group("/odin/api/v1", gin.BasicAuth(gin.Accounts{
+		Cfg.GRpcUser: Cfg.GRpcPwd,
+	}))
+	// 客户端接口
+	api.Any("/client/auth", ClientAPI)
 	return r
 }
 

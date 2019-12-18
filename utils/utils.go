@@ -46,8 +46,8 @@ func Sha256sum(byt, salt []byte) string {
 }
 
 func Scrypt(src, salt []byte) string {
-	byt,err:=scrypt.Key(src, salt, 1<<15, 8, 1, 32)
-	if err!=nil{
+	byt, err := scrypt.Key(src, salt, 1<<15, 8, 1, 32)
+	if err != nil {
 		return ""
 	}
 	return base64.StdEncoding.EncodeToString(byt)

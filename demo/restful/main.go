@@ -235,7 +235,7 @@ func (app *Application) Active() {
 	byt, err = endecrypt.Decrypt(endecrypt.Pub2Rsa1024, resp.Data.Cipher) // uuid
 	app.Uuid = string(byt)
 	byt, err = endecrypt.Decrypt(endecrypt.Pub2Rsa2048, resp.Data.Auth) // {"attrs":[{"Name":"热词","Key":"hotword","Value":1000},{"Name":"类热词","Key":"classword","Value":1000}],"time":1571909203232224000}
-	app.AuthInfo = string(byt) // eg: {"attrs":[{"Name":"热词","Key":"hotword","Value":1000},{"Name":"类热词","Key":"classword","Value":1000}],"time":1571909203232224000}
+	app.AuthInfo = string(byt)                                          // eg: {"attrs":[{"Name":"热词","Key":"hotword","Value":1000},{"Name":"类热词","Key":"classword","Value":1000}],"time":1571909203232224000}
 	fmt.Println(string(byt), err)
 	app.Lease = resp.Data.Lease
 }

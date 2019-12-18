@@ -18,7 +18,6 @@ import (
 )
 
 var (
-
 	ClientConns   *CliConns
 	StaterClients *StaterClis
 )

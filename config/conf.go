@@ -30,13 +30,14 @@ type config struct {
 	Peers map[string]Node `yaml:"peers" json:"peers"`
 	Dir   string          `yaml:"dir" json:"dir"`
 	State string          `yaml:"state" json:"state"`
+	Web   string          `yaml:"web" json:"web"`
 	Pwd   string          `yaml:"pwd" json:"pwd"`
 }
 
 type Node struct {
 	Peer   string `yaml:"peer" json:"peer"`
 	Client string `yaml:"client" json:"client"`
-	GRpc   string `json:"grpc" json:"grpc"`
+	GRpc   string `yaml:"grpc" json:"grpc"`
 }
 
 func (c *config) LoadYaml(filename string) {
