@@ -75,7 +75,7 @@ func (n *Node) md5() {
 		if err != nil {
 			return
 		}
-		n.Attrs.Hwmd5 = utils.Md5sum(byt, nil)
+		n.Attrs.Hwmd5 = utils.Md5Hex(byt, nil)
 	}
 }
 
