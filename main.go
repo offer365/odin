@@ -60,43 +60,81 @@ func main() {
 		NodeHardware: hw,
 
 		// odin & edda
-		LicenseEncrypt: PubEncryptRsa2048Aes256,
-		LicenseDecrypt: PriDecryptRsa2048Aes256,
-		SerialEncrypt:  PubEncryptRsa2048Aes256,
+		LicenseEncrypt: licenseEncrypt1,
+		LicenseDecrypt: licenseDecrypt1,
+		SerialEncrypt:  serialEncrypt1,
 		// SerialDecrypt:              PubDecryptRsa2048Aes256,
 		// UntiedEncrypt:              PriEncryptRsa2048Aes256,
-		UntiedDecrypt: PubDecryptRsa2048Aes256,
-		TokenHash:     HashFunc,
+		UntiedDecrypt: untiedDecrypt1,
+		TokenHash:     HashFunc1,
 
 		// odin & app
-		VerifyDecrypt: PriDecryptRsa2048,
-		CipherEncrypt: Aes256key1,
-		AuthEncrypt:   Aes256key2,
-		UuidHash:      HashFunc,
+		VerifyDecrypt: verifyDecrypt1,
+		CipherEncrypt: cipherEncrypt1,
+		AuthEncrypt:   authEncrypt1,
+		UuidHash:      HashFunc1,
 	}
 	odinX.Start(cfg)
 }
 
-func PubEncryptRsa2048Aes256(src []byte) ([]byte, error) {
+// odin & edda
+
+// Pub Encrypt Rsa2048 Aes256
+func licenseEncrypt1(src []byte) ([]byte, error) {
 	return endeaesrsa.PubEncrypt(src, []byte(_rsa2048pub1), []byte(_aes256key1))
 }
-
-func PriDecryptRsa2048Aes256(src []byte) ([]byte, error) {
+// Pri Decrypt Rsa2048 Aes256
+func licenseDecrypt1(src []byte) ([]byte, error) {
 	return endeaesrsa.PriDecrypt(src, []byte(_rsa2048pri1), []byte(_aes256key1))
 }
 
-// Ecc256 + Rsa2048 + Aes256
-func PubEncryptEcc256Rsa2048Aes256(src []byte) ([]byte, error) {
+// Pub Encrypt Ecc256 Rsa204 8Aes256
+func licenseEncrypt2(src []byte) ([]byte, error) {
+	return endeaesrsaecc.PubEncrypt(src, []byte(_eccpub1), []byte(_rsa2048pub1), []byte(_aes256key1))
+}
+
+// Pri Decrypt Ecc25 6Rsa2048 Aes256
+func licenseDecrypt2(src []byte) ([]byte, error) {
+	return endeaesrsaecc.PriDecrypt(src, []byte(_eccpri1), []byte(_rsa2048pri1), []byte(_aes256key1))
+}
+
+// Pub Encrypt Rsa2048 Aes256
+func serialEncrypt1(src []byte) ([]byte, error) {
+	return endeaesrsa.PubEncrypt(src, []byte(_rsa2048pub2), []byte(_aes256key2))
+}
+// Pri Decrypt Rsa2048 Aes256
+func serialDecrypt1(src []byte) ([]byte, error) {
+	return endeaesrsa.PriDecrypt(src, []byte(_rsa2048pri2), []byte(_aes256key2))
+}
+
+// Pub Encrypt Ecc256 Rsa204 8Aes256
+func serialEncrypt2(src []byte) ([]byte, error) {
 	return endeaesrsaecc.PubEncrypt(src, []byte(_eccpub2), []byte(_rsa2048pub2), []byte(_aes256key2))
 }
 
-// Ecc256 + Rsa2048 + Aes256
-func PriDecryptEcc256Rsa2048Aes256(src []byte) ([]byte, error) {
+// Pri Decrypt Ecc25 6Rsa2048 Aes256
+func serialDecrypt2(src []byte) ([]byte, error) {
 	return endeaesrsaecc.PriDecrypt(src, []byte(_eccpri2), []byte(_rsa2048pri2), []byte(_aes256key2))
 }
 
-func PubDecryptRsa2048Aes256(src []byte) ([]byte, error) {
-	return endeaesrsa.PubDecrypt(src, []byte(_rsa2048pub3), []byte(_aes256key3))
+
+// Pub Encrypt Rsa2048 Aes256
+func untiedEncrypt1(src []byte) ([]byte, error) {
+	return endeaesrsa.PubEncrypt(src, []byte(_rsa2048pub3), []byte(_aes256key3))
+}
+// Pri Decrypt Rsa2048 Aes256
+func untiedDecrypt1(src []byte) ([]byte, error) {
+	return endeaesrsa.PriDecrypt(src, []byte(_rsa2048pri3), []byte(_aes256key3))
+}
+
+// Pub Encrypt Ecc256 Rsa204 8Aes256
+func untiedEncrypt2(src []byte) ([]byte, error) {
+	return endeaesrsaecc.PubEncrypt(src, []byte(_eccpub3), []byte(_rsa2048pub3), []byte(_aes256key3))
+}
+
+// Pri Decrypt Ecc25 6Rsa2048 Aes256
+func untiedDecrypt2(src []byte) ([]byte, error) {
+	return endeaesrsaecc.PriDecrypt(src, []byte(_eccpri3), []byte(_rsa2048pri3), []byte(_aes256key3))
 }
 
 func PriDecryptRsa2048(src []byte) ([]byte, error) {
@@ -111,9 +149,41 @@ func Aes256key2(src []byte) ([]byte, error) {
 	return endeaes.AesCbcEncrypt(src, []byte(_aes256key4))
 }
 
-func HashFunc(src []byte) string {
+func HashFunc1(src []byte) string {
 	return utils.Sha256Hex(src, []byte(storeHashSalt))
 }
+
+func HashFunc2(src []byte) string {
+	return utils.Sha256Hex(src, []byte(storeHashSalt))
+}
+
+// odin & app
+
+func verifyEncrypt1(src []byte) ([]byte, error)  {
+	return endersa.PubEncrypt(src,[]byte(_rsa2048pub1))
+}
+
+func verifyDecrypt1(src []byte) ([]byte, error)  {
+	return endersa.PriDecrypt(src,[]byte(_rsa2048pri1))
+}
+
+func cipherEncrypt1(src []byte) ([]byte, error)  {
+	return endersa.PubEncrypt(src,[]byte(_rsa2048pub2))
+}
+
+func cipherDecrypt1(src []byte) ([]byte, error)  {
+	return endersa.PriDecrypt(src,[]byte(_rsa2048pri2))
+}
+
+func authEncrypt1(src []byte) ([]byte, error)  {
+	return endersa.PubEncrypt(src,[]byte(_rsa2048pub3))
+}
+
+func authDecrypt1(src []byte) ([]byte, error)  {
+	return endersa.PriDecrypt(src,[]byte(_rsa2048pri3))
+}
+
+
 
 type hardware struct {
 	// linux
