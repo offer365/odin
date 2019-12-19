@@ -15,11 +15,16 @@ func TestRunTime(t *testing.T) {
 }
 
 func TestMd5sum(t *testing.T) {
-	fmt.Println(Md5sum([]byte("123"), nil))
-	fmt.Println(Md5sum([]byte("123"), []byte("456")))
+	fmt.Println(Md5Hex([]byte("123"), nil))
+	fmt.Println(Md5Hex([]byte("123"), []byte("456")))
 }
 
 func TestSha256sum(t *testing.T) {
-	fmt.Println(Sha256sum([]byte("123"), nil))
-	fmt.Println(Sha256sum([]byte("123"), []byte("456")))
+	fmt.Println(Sha256Hex([]byte("123"), nil))
+	fmt.Println(Sha256Hex([]byte("123"), []byte("456")))
+}
+
+func TestScrypt(t *testing.T) {
+	fmt.Println(Scrypt([]byte("123"), nil))
+	fmt.Println(Scrypt([]byte("123"), []byte("456")))
 }

@@ -16,7 +16,8 @@ import (
 // 为odin 生成各种秘钥
 
 const (
-	temp = `
+	temp = `package main
+
 const  (
 	_eccpri1=#{_eccpri1}#
 	_eccpub1=#{_eccpub1}#
@@ -53,17 +54,17 @@ const  (
 )
 
 func main() {
-	endersa.GetRsaKey(2048, "_rsa1024pri1.pem", "_rsa1024pub1.pem")
-	endersa.GetRsaKey(2048, "_rsa1024pri2.pem", "_rsa1024pub2.pem")
-	endersa.GetRsaKey(2048, "_rsa1024pri3.pem", "_rsa1024pub3.pem")
+	endersa.GetRsaKey(1024, "_rsa1024pri1.pem", "_rsa1024pub1.pem")
+	endersa.GetRsaKey(1024, "_rsa1024pri2.pem", "_rsa1024pub2.pem")
+	endersa.GetRsaKey(1024, "_rsa1024pri3.pem", "_rsa1024pub3.pem")
 
 	endersa.GetRsaKey(2048, "_rsa2048pri1.pem", "_rsa2048pub1.pem")
 	endersa.GetRsaKey(2048, "_rsa2048pri2.pem", "_rsa2048pub2.pem")
 	endersa.GetRsaKey(2048, "_rsa2048pri3.pem", "_rsa2048pub3.pem")
 
-	endersa.GetRsaKey(2048, "_rsa4096pri1.pem", "_rsa4096pub1.pem")
-	endersa.GetRsaKey(2048, "_rsa4096pri2.pem", "_rsa4096pub2.pem")
-	endersa.GetRsaKey(2048, "_rsa4096pri3.pem", "_rsa4096pub3.pem")
+	endersa.GetRsaKey(4096, "_rsa4096pri1.pem", "_rsa4096pub1.pem")
+	endersa.GetRsaKey(4096, "_rsa4096pri2.pem", "_rsa4096pub2.pem")
+	endersa.GetRsaKey(4096, "_rsa4096pri3.pem", "_rsa4096pub3.pem")
 
 	endeecc.GetEccKey("_eccpri1.pem", "_eccpub1.pem")
 	endeecc.GetEccKey("_eccpri2.pem", "_eccpub2.pem")
