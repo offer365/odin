@@ -3,6 +3,7 @@ package odinX
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"sync"
 
 	corec "github.com/offer365/example/grpc/core/client"
@@ -42,6 +43,7 @@ func NewNode(name, addr string) (n *Node) {
 	n.Attrs.Name = name
 	n.Attrs.Start = time.Now().Unix()
 	n.Hardware.hw()
+	n.md5()
 	return
 }
 
@@ -53,7 +55,7 @@ func (hd *Hardware) hw() {
 
 	hd.Board.Name, hd.Board.Serial, hd.Board.Vendor = Cfg.NodeHardware.BoardInfo()
 
-	hd.Bios.Vendor = Cfg.NodeHardware.BiosInfo()
+	hd.Bios.Vendor, hd.Bios.Version = Cfg.NodeHardware.BiosInfo()
 
 	hd.Cpu.Vendor, hd.Cpu.Model, hd.Cpu.Threads, hd.Cpu.Cache, hd.Cpu.Cores, hd.Cpu.Cpus, hd.Cpu.Speed = Cfg.NodeHardware.CpuInfo()
 
@@ -70,22 +72,24 @@ func (hd *Hardware) hw() {
 }
 
 func (n *Node) md5() {
-	if n.Attrs.Hwmd5 == "" {
-		byt, err := json.Marshal(n.Hardware)
-		if err != nil {
-			return
-		}
-		n.Attrs.Hwmd5 = utils.Md5Hex(byt, nil)
+	byt, err := json.Marshal(n.Hardware)
+	if err != nil {
+		return
 	}
+	n.Attrs.Hwmd5 = utils.Md5Hex(byt, []byte("983233fb05a75e"))
 }
 
 func (n *Node) Status(ctx context.Context, args *Args) (*Node, error) {
-	n.Hardware.hw()
-	n.md5()
-	n.Attrs.Now = time.Now().Unix()
-	return n, nil
+	if Cfg.GRpcAllNode[args.Name] != args.Addr {
+		n.Hardware.hw()
+		n.md5()
+		n.Attrs.Now = time.Now().Unix()
+		return n, nil
+	}
+	return nil, errors.New("name or addr error")
 }
 
+// 获取所有节点的信息
 func GetAllNodes(ctx context.Context) (nodes map[string]*Node) {
 	var lock sync.Mutex
 	var wait sync.WaitGroup
@@ -107,6 +111,7 @@ func GetAllNodes(ctx context.Context) (nodes map[string]*Node) {
 			cli, ok := StaterClients.Get(remoteN)
 			if ok && cli != nil {
 				n, err := cli.Status(ctx, &Args{Name: Self.Attrs.Name, Addr: Self.Attrs.Addr}, grpc.WaitForReady(true))
+				// 如果status请求发生异常，关闭该node 的连接后，再重新建立连接。
 				if err != nil {
 					if conn, ok := ClientConns.Get(remoteN); conn != nil && ok {
 						conn.Close()
@@ -133,6 +138,7 @@ func GetAllNodes(ctx context.Context) (nodes map[string]*Node) {
 	return
 }
 
+// 访问所有节点client
 func AllNodeGRpcClient(peers map[string]string) {
 	for name, addr := range peers {
 		if name != Self.Attrs.Name && addr != Self.Attrs.Addr {

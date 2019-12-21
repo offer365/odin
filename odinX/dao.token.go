@@ -91,6 +91,7 @@ func GetTokenAndChk(app, id, token string) (exist, register bool) {
 	if result != "" {
 		return
 	}
+
 	// 如果没有获取到即 token == "" ，则判断是否可以注册token
 	if num, err = CountTokenWithApp(app); err != nil {
 		return

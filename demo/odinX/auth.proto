@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package odinX;
+
+// cmd: protoc --go_out=plugins=grpc:. auth.proto
+
+message Request {
+    string app = 1; // 应用名称
+    string id = 2; // 应用ID
+    int64 date = 3; // 当前时间戳,客户端服务端误差不能超过600s
+    string verify = 4; // 该字段是密文,用于校验request的参数,客户端要根据 app,id,date,token(唯一且固定的值)加密生成;eg: {"app":"nlp","date":1571987046,"id":"app01","token":"xxxxxx"} 对此加密
+    string umd5 = 5; // response中返回的 data.cipher 解密后的值的md5;在active 步骤中此参数无效,仅在 keepline 与 offline中有效
+    int64 lease = 6; // 租约ID 在active 步骤中此参数无效,仅在 keepline 与 offline中有效
+}
+
+message Data {
+    bytes auth = 1; // 解密后是应用的一些属性;eg:{"attrs":[{"Name":"热词","Key":"hotword","Value":111},{"Name":"类热词","Key":"classword","Value":111}],"time":1571994906931717352}
+    int64 lease = 2; // 租约ID
+    bytes cipher = 3; // 加密UUID生成的密文。
+}
+
+message Response {
+    int32 code = 1; // 返回状态码 200 OK;
+    Data data = 2;
+    string msg = 3; // 错误 或 成功的消息
+}
+
+service Authorize {
+    rpc Auth (Request) returns (Response); // 认证
+    rpc KeepLine (Request) returns (Response); // 保持在线
+    rpc OffLine (Request) returns (Response); // 下线
+}
+

@@ -15,16 +15,16 @@ const (
 	temp = `package main
 
 const  (
-	server_crt=#{server_crt}#
-    server_csr=#{server_csr}#
-	server_key=#{server_key}#
-	client_crt=#{client_crt}#
-    client_csr=#{client_csr}#
-	client_key=#{client_key}#
-	ca_crt=#{ca_crt}#
-	ca_key=#{ca_key}#
-	ca_srl=#{ca_srl}#
-    server_name=#{server_name}#
+	server_crt = #{server_crt}#
+    server_csr = #{server_csr}#
+	server_key = #{server_key}#
+	client_crt = #{client_crt}#
+    client_csr = #{client_csr}#
+	client_key = #{client_key}#
+	ca_crt = #{ca_crt}#
+	ca_key = #{ca_key}#
+	ca_srl = #{ca_srl}#
+    server_name = #{server_name}#
 
 	clusterToken = "#{sha256sum}#"
 	embedAuthPwd = "#{sha256sum}#"
@@ -33,9 +33,10 @@ const  (
 	storeClearLicenseKey       = "/#{sha256sum}#/#{sha256sum}#"
 	storeClientConfigKeyPrefix = "/#{sha256sum}#/#{sha256sum}#/"
 	storeClientKeyPrefix       = "/#{sha256sum}#/#{sha256sum}#/"
-	storeTokenKey              = "/#{sha256sum}#/#{sha256sum}#"
+	storeTokenKey              = "/#{sha256sum}#/#{sha256sum}#/"
 	storeSerialNumKey          = "/#{sha256sum}#/#{sha256sum}#"
-	storeHashSalt              = "#{sha256sum}#"
+	storeHashSalt1             = "#{sha256sum}#"
+    storeHashSalt2             = "#{sha256sum}#"
 
 	grpcUser      = "#{sha256sum}#"
 	grpcPwd       = "#{sha256sum}#"
@@ -44,12 +45,11 @@ const  (
 )
 
 func main() {
-	str:=temp
-	for strings.Contains(str,"#{sha256sum}#"){
-		s:=tools.Sha256Hex([]byte(tools.RandString(16)),nil)
-		str=strings.Replace(str,"#{sha256sum}#",s,1)
+	str := temp
+	for strings.Contains(str, "#{sha256sum}#") {
+		s := tools.Sha256Hex([]byte(tools.RandString(16)), nil)
+		str = strings.Replace(str, "#{sha256sum}#", s, 1)
 	}
-
 
 	files, err := ioutil.ReadDir("./")
 	if err != nil {
@@ -63,8 +63,10 @@ func main() {
 			fmt.Println(err)
 			return
 		}
+		text:=string(data)
+		text=strings.TrimSpace(text)
 		keys := strings.Split(name, ".")
-		str = strings.Replace(str, "#{"+strings.Join(keys,"_")+"}#", "`"+string(data)+"`", 1)
+		str = strings.Replace(str, "#{"+strings.Join(keys, "_")+"}#", "`"+text+"`", 1)
 	}
 	f, err := os.Create("ssl.go")
 	if err != nil {
@@ -82,6 +84,3 @@ func main() {
 		return
 	}
 }
-
-
-

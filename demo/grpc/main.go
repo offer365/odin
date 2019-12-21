@@ -9,29 +9,43 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/offer365/example/endecrypt"
+	"github.com/offer365/example/endecrypt/endersa"
 	corec "github.com/offer365/example/grpc/core/client"
-	pb "github.com/offer365/odin/demo/proto"
+	pb "github.com/offer365/odin/demo/odinX"
 	"github.com/offer365/odin/utils"
 	"google.golang.org/grpc"
 )
 
 var (
-	auth      *Authentication
-	_username = "C205v406x68f5IM7"
-	_password = "c9bJ3v7FQ11681EP"
+	Cfg *Config
 )
 
-func init() {
-	auth = &Authentication{
-		User:     _username,
-		Password: _password,
-	}
+// 加解密方法
+type CryptFunc func(src []byte) ([]byte, error)
+
+// hash 方法
+type HashFunc func(byt []byte) string
+
+type Config struct {
+	AppName    string
+	ServerAddr []string
+	ServerName string
+	GRpcUser   string
+	GRpcPwd    string
+	ClientCrt  string
+	ClientKey  string
+	CaCrt      string
+
+	// odin & client app
+	VerifyEncrypt CryptFunc // token 密文加密
+	CipherDecrypt CryptFunc // uuid 解密
+	AuthDecrypt   CryptFunc // auth 数据解密
+	UuidHash      HashFunc
 }
 
 type Authentication struct {
-	User     string
-	Password string
+	User     string `json:"user"`
+	Password string `json:"password"`
 }
 
 func (a *Authentication) GetRequestMetadata(context.Context, ...string) (map[string]string, error) {
@@ -41,7 +55,51 @@ func (a *Authentication) RequireTransportSecurity() bool {
 	return true
 }
 
+// odin & app
+
+func verifyEncrypt1(src []byte) ([]byte, error) {
+	return endersa.PubEncrypt(src, []byte(_rsa2048pub1))
+}
+
+func verifyDecrypt1(src []byte) ([]byte, error) {
+	return endersa.PriDecrypt(src, []byte(_rsa2048pri1))
+}
+
+func cipherEncrypt1(src []byte) ([]byte, error) {
+	return endersa.PubEncrypt(src, []byte(_rsa2048pub2))
+}
+
+func cipherDecrypt1(src []byte) ([]byte, error) {
+	return endersa.PriDecrypt(src, []byte(_rsa2048pri2))
+}
+
+func authEncrypt1(src []byte) ([]byte, error) {
+	return endersa.PubEncrypt(src, []byte(_rsa2048pub3))
+}
+
+func authDecrypt1(src []byte) ([]byte, error) {
+	return endersa.PriDecrypt(src, []byte(_rsa2048pri3))
+}
+
+func HashFunc2(src []byte) string {
+	return utils.Sha256Hex(src, []byte(storeHashSalt2))
+}
+
 func main() {
+	Cfg = &Config{
+		AppName:       "nlp",
+		ServerAddr:    []string{"127.0.0.1:1443"},
+		ServerName:    server_name,
+		GRpcUser:      grpcUser,
+		GRpcPwd:       grpcPwd,
+		ClientCrt:     client_crt,
+		ClientKey:     client_key,
+		CaCrt:         ca_crt,
+		VerifyEncrypt: verifyEncrypt1,
+		CipherDecrypt: cipherDecrypt1,
+		AuthDecrypt:   authDecrypt1,
+		UuidHash:      HashFunc2,
+	}
 	ManyApp(1000)
 	select {}
 }
@@ -49,8 +107,8 @@ func main() {
 func ManyApp(ins int) {
 	apps := make([]*Application, 0)
 	for i := 0; i < ins; i++ {
-		token := "app" + strconv.Itoa(i)
-		app := NewApp("nlp", "app"+strconv.Itoa(i), token, []string{"10.0.0.200:9527"}, []byte(pb.Client_crt), []byte(pb.Client_key), []byte(pb.Ca_crt))
+		appID := "app" + strconv.Itoa(i)
+		app := NewApp(Cfg.AppName, appID, appID, Cfg.ServerAddr, []byte(Cfg.ClientCrt), []byte(Cfg.ClientKey), []byte(Cfg.CaCrt))
 		apps = append(apps, app)
 	}
 	for _, ap := range apps {
@@ -64,7 +122,7 @@ func ManyApp(ins int) {
 }
 
 func SingleAPP() {
-	app := NewApp("hotword", "app"+strconv.Itoa(99), "app"+strconv.Itoa(99), pb.Member, []byte(pb.Client_crt), []byte(pb.Client_key), []byte(pb.Ca_crt))
+	app := NewApp("nlp", "app"+strconv.Itoa(99), "app"+strconv.Itoa(99), Cfg.ServerAddr, []byte(Cfg.ClientCrt), []byte(Cfg.ClientKey), []byte(Cfg.CaCrt))
 	app.Active()
 	app.KeepLine()
 	app.OffLine()
@@ -79,9 +137,13 @@ func NewApp(name, id, token string, servers []string, crt, key, ca []byte) (app 
 		Token:   token,
 		Cycle:   new(Cycle),
 	}
+	auth := &Authentication{
+		User:     Cfg.GRpcUser,
+		Password: Cfg.GRpcPwd,
+	}
 	conn, err := corec.NewRpcClient(
 		corec.WithAddr(app.Servers[0]),
-		corec.WithServerName("server.io"),
+		corec.WithServerName(Cfg.ServerName),
 		corec.WithCert(crt),
 		corec.WithKey(key),
 		corec.WithCa(ca),
@@ -126,8 +188,7 @@ func (app *Application) Active() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(string(byt))
-	byt, err = endecrypt.Encrypt(endecrypt.Aes2key32, byt)
+	byt, err = Cfg.VerifyEncrypt(byt)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -140,10 +201,11 @@ func (app *Application) Active() {
 	}
 
 	resp, err := app.cli.Auth(context.TODO(), req)
-	fmt.Println(err)
-	byt, err = endecrypt.Decrypt(endecrypt.Pub2Rsa1024, resp.Data.Cipher)
+	byt, err = Cfg.CipherDecrypt(resp.Data.Cipher)
+
 	app.Uuid = string(byt)
-	byt, err = endecrypt.Decrypt(endecrypt.Pub2Rsa2048, resp.Data.Auth)
+	byt, err = Cfg.AuthDecrypt(resp.Data.Auth)
+
 	app.AuthInfo = string(byt) // eg: {"attrs":[{"Name":"热词","Key":"hotword","Value":1000},{"Name":"类热词","Key":"classword","Value":1000}],"time":1571909203232224000}
 	fmt.Println(string(byt), err)
 	app.Lease = resp.Data.Lease
@@ -155,7 +217,7 @@ func (app *Application) KeepLine() {
 		Id:     app.ID,
 		Date:   time.Now().Unix(),
 		Verify: "",
-		Umd5:   utils.Md5sum([]byte(app.Uuid), nil),
+		Umd5:   Cfg.UuidHash([]byte(app.Uuid)),
 		Lease:  app.Lease,
 	}
 	for range time.Tick(time.Second * 6) {
@@ -173,7 +235,7 @@ func (app *Application) OffLine() {
 		Id:     app.ID,
 		Date:   time.Now().Unix(),
 		Verify: "",
-		Umd5:   utils.Md5sum([]byte(app.Uuid), nil),
+		Umd5:   Cfg.UuidHash([]byte(app.Uuid)),
 		Lease:  app.Lease,
 	}
 	resp, err := app.cli.OffLine(context.TODO(), req)

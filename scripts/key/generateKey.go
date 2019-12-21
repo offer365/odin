@@ -19,36 +19,36 @@ const (
 	temp = `package main
 
 const  (
-	_eccpri1=#{_eccpri1}#
-	_eccpub1=#{_eccpub1}#
-	_eccpri2=#{_eccpri2}#
-	_eccpub2=#{_eccpub2}#
-	_eccpri3=#{_eccpri3}#
-	_eccpub3=#{_eccpub3}#
+	_eccpri1 = #{_eccpri1}#
+	_eccpub1 = #{_eccpub1}#
+	_eccpri2 = #{_eccpri2}#
+	_eccpub2 = #{_eccpub2}#
+	_eccpri3 = #{_eccpri3}#
+	_eccpub3 = #{_eccpub3}#
 
-	_rsa1024pri1=#{_rsa1024pri1}#
-	_rsa1024pub1=#{_rsa1024pub1}#
-	_rsa1024pri2=#{_rsa1024pri2}#
-	_rsa1024pub2=#{_rsa1024pub2}#
-	_rsa1024pri3=#{_rsa1024pri3}#
-	_rsa1024pub3=#{_rsa1024pub3}#
-	_rsa2048pri1=#{_rsa2048pri1}#
-	_rsa2048pub1=#{_rsa2048pub1}#
-	_rsa2048pri2=#{_rsa2048pri2}#
-	_rsa2048pub2=#{_rsa2048pub2}#
-	_rsa2048pri3=#{_rsa2048pri3}#
-	_rsa2048pub3=#{_rsa2048pub3}#
-	_rsa4096pri1=#{_rsa4096pri1}#
-	_rsa4096pub1=#{_rsa4096pub1}#
-	_rsa4096pri2=#{_rsa4096pri2}#
-	_rsa4096pub2=#{_rsa4096pub2}#
-	_rsa4096pri3=#{_rsa4096pri3}#
-	_rsa4096pub3=#{_rsa4096pub3}#
+	_rsa1024pri1 = #{_rsa1024pri1}#
+	_rsa1024pub1 = #{_rsa1024pub1}#
+	_rsa1024pri2 = #{_rsa1024pri2}#
+	_rsa1024pub2 = #{_rsa1024pub2}#
+	_rsa1024pri3 = #{_rsa1024pri3}#
+	_rsa1024pub3 = #{_rsa1024pub3}#
+	_rsa2048pri1 = #{_rsa2048pri1}#
+	_rsa2048pub1 = #{_rsa2048pub1}#
+	_rsa2048pri2 = #{_rsa2048pri2}#
+	_rsa2048pub2 = #{_rsa2048pub2}#
+	_rsa2048pri3 = #{_rsa2048pri3}#
+	_rsa2048pub3 = #{_rsa2048pub3}#
+	_rsa4096pri1 = #{_rsa4096pri1}#
+	_rsa4096pub1 = #{_rsa4096pub1}#
+	_rsa4096pri2 = #{_rsa4096pri2}#
+	_rsa4096pub2 = #{_rsa4096pub2}#
+	_rsa4096pri3 = #{_rsa4096pri3}#
+	_rsa4096pub3 = #{_rsa4096pub3}#
 
-	_aes256key1=#{_aes256key1}#
-	_aes256key2=#{_aes256key2}#
-	_aes256key3=#{_aes256key3}#
-	_aes256key4=#{_aes256key4}#
+	_aes256key1 = #{_aes256key1}#
+	_aes256key2 = #{_aes256key2}#
+	_aes256key3 = #{_aes256key3}#
+	_aes256key4 = #{_aes256key4}#
 )
 `
 )

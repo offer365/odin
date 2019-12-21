@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package proto;
+package odinX;
 
 // cmd: protoc --go_out=plugins=grpc:. node.proto
 
@@ -33,7 +33,7 @@ message Hardware {
 }
 
 message Host {
-    string machineid = 1; // 机器ID eg:f0f31005fb5a436d88e3c6cbf54e25aa
+    string machineid = 1; // 机器ID eg:f0f31005fb5a136d88xxxxxxxxxxxxx
     string hypervisor = 2; // 主控 eg:kvm
     string architecture = 3; // 架构 eg:amd64
 }
@@ -41,19 +41,20 @@ message Host {
 message Product {
     string name = 1; // 产品名 eg:Alibaba Cloud ECS
     string vendor = 2; // 供应商 eg:Alibaba Cloud
-    string serial = 3; // 序列号 eg:5cfe47e7-1c9a-449c-afbe-xxxxxxxxx
+    string serial = 3; // 序列号 eg:xxxxxxxx-1c9a-449c-afbe-xxxxxxxxx
 }
 
 // 主板
 message Board {
     string name = 1; // 名称 eg:X10DRi
     string vendor = 2; // 供应商 eg:Supermicro
-    string serial = 3; // 序列号 eg:NM177S504844
+    string serial = 3; // 序列号 eg:NM177S5xxxxxx
 }
 
 
 message Bios {
     string vendor = 1; // 供应商 eg:American Megatrends Inc.
+    string version = 2; // 版本
 }
 
 message Cpu {
@@ -73,7 +74,7 @@ message Mem {
 
 message Network {
     string driver = 1; // 设备类型 eg:virtio_net or igb or e1000
-    string macaddress = 2; // mac地址 eg:00:0c:29:3b:26:xx
+    string macaddress = 2; // mac地址 eg:00:xx:29:xx:26:xx
     uint32 speed = 3; // 速率 eg:1000
 }
 

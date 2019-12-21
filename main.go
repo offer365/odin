@@ -28,10 +28,11 @@ func main() {
 		EmbedCluster:      config.Cfg.AllPeerAddr(),
 		EmbedAuthPwd:      embedAuthPwd,
 
-		EtcdCliCtx:                 context.TODO(),
-		EtcdCliAddr:                "127.0.0.1:" + config.Cfg.LocalClientPort(),
-		EtcdCliUser:                "root",
-		EtcdCliTimeout:             3 * time.Second,
+		EtcdCliCtx:     context.TODO(),
+		EtcdCliAddr:    "127.0.0.1:" + config.Cfg.LocalClientPort(),
+		EtcdCliUser:    "root",
+		EtcdCliTimeout: 3 * time.Second,
+
 		StoreLicenseKey:            storeLicenseKey,
 		StoreClearLicenseKey:       storeClearLicenseKey,
 		StoreClientConfigKeyPrefix: storeClientConfigKeyPrefix,
@@ -72,7 +73,7 @@ func main() {
 		VerifyDecrypt: verifyDecrypt1,
 		CipherEncrypt: cipherEncrypt1,
 		AuthEncrypt:   authEncrypt1,
-		UuidHash:      HashFunc1,
+		UuidHash:      HashFunc2,
 	}
 	odinX.Start(cfg)
 }
@@ -83,6 +84,7 @@ func main() {
 func licenseEncrypt1(src []byte) ([]byte, error) {
 	return endeaesrsa.PubEncrypt(src, []byte(_rsa2048pub1), []byte(_aes256key1))
 }
+
 // Pri Decrypt Rsa2048 Aes256
 func licenseDecrypt1(src []byte) ([]byte, error) {
 	return endeaesrsa.PriDecrypt(src, []byte(_rsa2048pri1), []byte(_aes256key1))
@@ -102,6 +104,7 @@ func licenseDecrypt2(src []byte) ([]byte, error) {
 func serialEncrypt1(src []byte) ([]byte, error) {
 	return endeaesrsa.PubEncrypt(src, []byte(_rsa2048pub2), []byte(_aes256key2))
 }
+
 // Pri Decrypt Rsa2048 Aes256
 func serialDecrypt1(src []byte) ([]byte, error) {
 	return endeaesrsa.PriDecrypt(src, []byte(_rsa2048pri2), []byte(_aes256key2))
@@ -117,11 +120,11 @@ func serialDecrypt2(src []byte) ([]byte, error) {
 	return endeaesrsaecc.PriDecrypt(src, []byte(_eccpri2), []byte(_rsa2048pri2), []byte(_aes256key2))
 }
 
-
 // Pub Encrypt Rsa2048 Aes256
 func untiedEncrypt1(src []byte) ([]byte, error) {
 	return endeaesrsa.PubEncrypt(src, []byte(_rsa2048pub3), []byte(_aes256key3))
 }
+
 // Pri Decrypt Rsa2048 Aes256
 func untiedDecrypt1(src []byte) ([]byte, error) {
 	return endeaesrsa.PriDecrypt(src, []byte(_rsa2048pri3), []byte(_aes256key3))
@@ -150,40 +153,38 @@ func Aes256key2(src []byte) ([]byte, error) {
 }
 
 func HashFunc1(src []byte) string {
-	return utils.Sha256Hex(src, []byte(storeHashSalt))
-}
-
-func HashFunc2(src []byte) string {
-	return utils.Sha256Hex(src, []byte(storeHashSalt))
+	return utils.Sha256Hex(src, []byte(storeHashSalt1))
 }
 
 // odin & app
 
-func verifyEncrypt1(src []byte) ([]byte, error)  {
-	return endersa.PubEncrypt(src,[]byte(_rsa2048pub1))
+func verifyEncrypt1(src []byte) ([]byte, error) {
+	return endersa.PubEncrypt(src, []byte(_rsa2048pub1))
 }
 
-func verifyDecrypt1(src []byte) ([]byte, error)  {
-	return endersa.PriDecrypt(src,[]byte(_rsa2048pri1))
+func verifyDecrypt1(src []byte) ([]byte, error) {
+	return endersa.PriDecrypt(src, []byte(_rsa2048pri1))
 }
 
-func cipherEncrypt1(src []byte) ([]byte, error)  {
-	return endersa.PubEncrypt(src,[]byte(_rsa2048pub2))
+func cipherEncrypt1(src []byte) ([]byte, error) {
+	return endersa.PubEncrypt(src, []byte(_rsa2048pub2))
 }
 
-func cipherDecrypt1(src []byte) ([]byte, error)  {
-	return endersa.PriDecrypt(src,[]byte(_rsa2048pri2))
+func cipherDecrypt1(src []byte) ([]byte, error) {
+	return endersa.PriDecrypt(src, []byte(_rsa2048pri2))
 }
 
-func authEncrypt1(src []byte) ([]byte, error)  {
-	return endersa.PubEncrypt(src,[]byte(_rsa2048pub3))
+func authEncrypt1(src []byte) ([]byte, error) {
+	return endersa.PubEncrypt(src, []byte(_rsa2048pub3))
 }
 
-func authDecrypt1(src []byte) ([]byte, error)  {
-	return endersa.PriDecrypt(src,[]byte(_rsa2048pri3))
+func authDecrypt1(src []byte) ([]byte, error) {
+	return endersa.PriDecrypt(src, []byte(_rsa2048pri3))
 }
 
-
+func HashFunc2(src []byte) string {
+	return utils.Sha256Hex(src, []byte(storeHashSalt2))
+}
 
 type hardware struct {
 	// linux
@@ -204,8 +205,8 @@ func (h *hardware) BoardInfo() (name, serial, vendor string) {
 	return h.Board.Name, h.Board.Serial, h.Board.Vendor
 }
 
-func (h *hardware) BiosInfo() (vendor string) {
-	return h.BIOS.Vendor
+func (h *hardware) BiosInfo() (vendor, version string) {
+	return h.BIOS.Vendor, h.BIOS.Version
 }
 
 func (h *hardware) CpuInfo() (vendor, model string, threads, cache, cores, cpus, speed uint32) {

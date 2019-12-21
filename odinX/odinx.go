@@ -121,12 +121,12 @@ func NewConfig() *Config {
 
 		EtcdCliTimeout: 3 * time.Second,
 
-		StoreLicenseKey:            "/Mzot24SEaI91buzPv8C74302O905dc13gP7bXo69QSP1ot9Wt7BiET6YN7Zah72S/p5353Ls032rcUbJD8759w059Q70fyjOLGl0dblSDEI2RrTC3t5rHA5hJ540d9504",
-		StoreClearLicenseKey:       "/377B3Rs9A24J5wMX1WCRt8ANtqZh85K9xQ28H901o78jsze0b806P01Y2t1MW7Sf/vPQoG0xW18i93TDO6ec1y54Qz8lbb2tz2G5sG5aaVXKL31Ji927q8hT1v0eZH11V",
-		StoreClientConfigKeyPrefix: "/ABw6T376rymCP8CC8c6Z0a5010xCRgk9AQJ8Y8H29e2mt42ng62fs915X8o9POSH/a1JF81wHq7BN57l3dS23oi5KkXz1JE30R328ys22Z1WoO2PiKZ9Mg00d23G6s18f/",
-		StoreClientKeyPrefix:       "/ogyI0o7jJm0Pb07rAk8v5pI116lWbfJko03c33dYnKxu03i5x2N9j7XS3B6CJ86g/TLx1u38pWD89GdVmymUDQElB9l36dn65t37X1o747RV9c1PTY525216LN8UUN1sJ/",
-		StoreTokenKey:              "/bZdsG90ST0m59evU7obGb2dqST11gVq4GRdjGD0HkBeS2Qh2v7FsOVXIOMDH9nRb/k3KIz7fWos1BV7SW5m88Vh8MYLaNFZ8lwKr09X8V4ewUJ87t55AdC5C0Gq8cRZeC/",
-		StoreSerialNumKey:          "/L30GZduFHLqXZSbrvDWi90Ik87UG1Vsc5FDQZByvL9C3Ad9mD9DWEb17NLZM4dV3/Y4iohWvB55Ef1Sg6b1uxPtvM3rg71182B6wEW1lBnNCwPaKKmq74DBp65c998J25",
+		StoreLicenseKey:            "",
+		StoreClearLicenseKey:       "",
+		StoreClientConfigKeyPrefix: "",
+		StoreClientKeyPrefix:       "",
+		StoreTokenKey:              "",
+		StoreSerialNumKey:          "",
 
 		GRpcServerCrt:  "",
 		GRpcServerKey:  "",
@@ -198,7 +198,7 @@ type HardWare interface {
 	HostInfo() (machineID, architecture, hypervisor string)
 	ProductInfo() (name, serial, vendor string)
 	BoardInfo() (name, serial, vendor string)
-	BiosInfo() (vendor string)
+	BiosInfo() (vendor, version string)
 	CpuInfo() (vendor, model string, threads, cache, cores, cpus, speed uint32)
 	MemInfo() (speed uint32, tp string)
 	NetworksInfo() []*NetDriver

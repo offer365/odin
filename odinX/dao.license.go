@@ -60,6 +60,8 @@ func Str2lic(cipher string) (lic *License, err error) {
 		return
 	}
 	if byt == nil || len(byt) == 0 {
+		err = errors.New("license decode error")
+		log.Sugar.Error(err)
 		return
 	}
 	lic = new(License)
@@ -125,6 +127,10 @@ func ResetLicense() (err error) {
 	} else {
 		// atomic.AddInt64(&(lic.LifeCycle),1)
 		lic.LifeCycle += 1
+		// or
+		// if err = DelLicense(); err != nil {
+		// 	log.Sugar.Error("reset license error. when delete license. ", err)
+		// }
 	}
 
 	// 这里限制了 UpdateTime 只能不断的增大
@@ -134,7 +140,20 @@ func ResetLicense() (err error) {
 	} else {
 		// atomic.AddInt64(&(lic.Update), 60)
 		lic.Update += 60
+		// or
+		// if err = DelLicense(); err != nil {
+		// 	log.Sugar.Error("reset license error. when delete license. ", err)
+		// }
 	}
+	// 检查硬件信息
+	// Self.Hardware.hw()
+	// Self.md5()
+	// if lic.Devices[Self.Attrs.Name] != Self.Attrs.Hwmd5 {
+	// 	if err = DelLicense(); err != nil {
+	// 		log.Sugar.Error("reset license error. when delete license. ", err)
+	// 	}
+	// }
+
 	if cipher, err = lic2Str(lic); err != nil {
 		log.Sugar.Error("reset lic failed. error: ", err)
 		return
@@ -187,9 +206,16 @@ func ChkLicense(cipher string) (lic *License, ok bool, msg string) {
 		return
 	}
 	hw, exist := lic.Devices[Self.Attrs.Name]
+
 	if !exist {
 		msg = "未在授权中找到本机id。"
 		return
+	}
+	for name, node := range nodes {
+		if lic.Devices[name] != node.Attrs.Hwmd5 {
+			msg = "发生硬件信息错误。"
+			return
+		}
 	}
 	if hw != Self.Attrs.Hwmd5 {
 		msg = "绑定硬件信息错误。"
@@ -201,9 +227,9 @@ func ChkLicense(cipher string) (lic *License, ok bool, msg string) {
 		msg = "当前服务器时间不正确。"
 		return
 	}
-	// 授权码6个小时有效期
 
-	if (now-lic.Update) > 60*60*6 || (now-lic.Generate) > 60*60*6 {
+	// 授权码6个小时有效期
+	if (now-lic.Update) > 3600*2 || (now-lic.Generate) > 3600*2 {
 		msg = "授权码超时失效。"
 		return
 	}

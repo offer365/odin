@@ -57,6 +57,7 @@ var (
 	_assetPath    string
 	secrets       = gin.H{"admin": nil}
 	Lock          sync.Mutex
+	gs            *grpc.Server
 )
 
 // 释放静态资源
@@ -84,7 +85,10 @@ func Main() {
 		err   error
 		ready = make(chan struct{})
 	)
-
+	// 生产模式
+	gin.SetMode(gin.ReleaseMode)
+	// 添加basic auth 认证
+	secrets[Cfg.GRpcUser] = Cfg.GRpcPwd
 	Self = NewNode(Cfg.NodeName, Cfg.NodeAddr)
 	RestoreAsset()
 	device = embedder.NewEmbed()
@@ -185,7 +189,7 @@ func Server() {
 	// <- (chan int)(nil)
 }
 
-// 启动程序时加载授权
+// Load authorization when launching the program
 func loadLic() (err error) {
 	var (
 		byt []byte
@@ -197,15 +201,59 @@ func loadLic() (err error) {
 
 	if byt == nil || len(byt) == 0 {
 		lic = new(License)
+		StoreLic(lic)
+		return
+	}
+	// 如果此位置发生错误，则硬盘中的许可证可能无效（数据损坏）
+	if lic, err = Str2lic(string(byt)); err != nil {
+		log.Sugar.Error("load license error. may be data corruption: ", err)
+		if err = DelLicense(); err != nil {
+			log.Sugar.Error("load license error. when delete license. ", err)
+		}
+		lic = new(License)
+		StoreLic(lic)
+		return
+	}
+
+	if lic != nil {
+		now := time.Now().Unix()
+		// 检查服务器当前时间是否小于license 时间
+		if now < lic.Update {
+			log.Sugar.Errorf("check license update time error. %d %d", now, lic.Update)
+			if err = DelLicense(); err != nil {
+				log.Sugar.Error("check license error. when delete license. ", err)
+			}
+			lic = new(License)
+			StoreLic(lic)
+			return
+		}
+		// 检查license 的生存周期
+		if (now-lic.Generate)/60 < lic.LifeCycle {
+			log.Sugar.Errorf("check license life cycle error. %d %d", (now-lic.Generate)/60, lic.LifeCycle)
+			if err = DelLicense(); err != nil {
+				log.Sugar.Error("check license error. when delete license. ", err)
+			}
+			lic = new(License)
+			StoreLic(lic)
+			return
+		}
+		// 检查硬件信息是否匹配
+		if lic.Devices[Self.Attrs.Name] != Self.Attrs.Hwmd5 {
+			log.Sugar.Error("check license hard ware md5 error.")
+			if err = DelLicense(); err != nil {
+				log.Sugar.Error("check license error. when delete license. ", err)
+			}
+			lic = new(License)
+			StoreLic(lic)
+			return
+		}
+
 	} else {
-		lic, err = Str2lic(string(byt))
-		// TODO 启动时检查授权时间合法性。？？？
+		lic = new(License)
 	}
 	StoreLic(lic)
 	return
 }
-
-var gs *grpc.Server
 
 func RunAPI(addr string) {
 	var err error
@@ -264,7 +312,6 @@ func NewTlsListen(crt, key, ca []byte, addr string) (net.Listener, error) {
 
 // gin 路由
 func WebServer() {
-	gin.SetMode(gin.ReleaseMode) // 生产模式
 	r := gin.New()
 	r.Use(gin.Recovery()) // Recovery 中间件从任何 panic 恢复，如果出现 panic，它会写一个 500 错误。
 	// store := cookie.NewStore([]byte("secret"))
@@ -313,7 +360,6 @@ func WebServer() {
 
 // gin 路由
 func apiServer() http.Handler {
-	gin.SetMode(gin.ReleaseMode) // 生产模式
 	r := gin.New()
 	r.Use(gin.Recovery()) // Recovery 中间件从任何 panic 恢复，如果出现 panic，它会写一个 500 错误。
 	// store := cookie.NewStore([]byte("secret"))
@@ -325,6 +371,53 @@ func apiServer() http.Handler {
 	// 客户端接口
 	api.Any("/client/auth", ClientAPI)
 	return r
+}
+
+// 客户端Api
+func ClientAPI(c *gin.Context) {
+	user := c.MustGet(gin.AuthUserKey).(string)
+	if pwd, ok := secrets[user]; ok && pwd == Cfg.GRpcPwd {
+		// app := c.Param("app")
+		// id := c.Param("id")
+		data, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			log.Sugar.Error("ready request body error: ", err)
+			return
+		}
+		req := new(Request)
+		err = json.Unmarshal(data, req)
+		if err != nil {
+			return
+		}
+		switch c.Request.Method {
+		case "POST": // 认证
+			resp, err := Author.Auth(context.TODO(), req)
+			if err != nil {
+				log.Sugar.Error(resp, err)
+				return
+			}
+			c.JSON(statusOk, resp)
+			return
+		case "PUT": // 心跳
+			resp, err := Author.KeepLine(context.TODO(), req)
+			if err != nil {
+				log.Sugar.Error(resp, err)
+				return
+			}
+			c.JSON(statusOk, resp)
+			return
+		case "DELETE": // 关闭
+			resp, err := Author.OffLine(context.TODO(), req)
+			if err != nil {
+				log.Sugar.Error(resp, err)
+				return
+			}
+			c.JSON(statusOk, resp)
+			return
+		default:
+			c.JSON(statusOk, &Response{Code: statusMethodErr, Data: nil, Msg: "method error",})
+		}
+	}
 }
 
 type online struct {
@@ -576,53 +669,6 @@ func ConfAPI(c *gin.Context) {
 			c.JSON(statusOk, gin.H{"code": statusOk, "msg": "Post or Put key success.", "data": ""})
 		default:
 			c.JSON(statusOk, gin.H{"code": statusMethodErr, "msg": "method error", "data": ""})
-		}
-	}
-}
-
-// 客户端Api
-func ClientAPI(c *gin.Context) {
-	user := c.MustGet(gin.AuthUserKey).(string)
-	if _, ok := secrets[user]; ok {
-		// app := c.Param("app")
-		// id := c.Param("id")
-		data, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			log.Sugar.Error("ready request body error: ", err)
-			return
-		}
-		req := new(Request)
-		err = json.Unmarshal(data, req)
-		if err != nil {
-			return
-		}
-		switch c.Request.Method {
-		case "POST": // 认证
-			resp, err := Author.Auth(context.TODO(), req)
-			if err != nil {
-				log.Sugar.Error(resp, err)
-				return
-			}
-			c.JSON(statusOk, resp)
-			return
-		case "PUT": // 心跳
-			resp, err := Author.KeepLine(context.TODO(), req)
-			if err != nil {
-				log.Sugar.Error(resp, err)
-				return
-			}
-			c.JSON(statusOk, resp)
-			return
-		case "DELETE": // 关闭
-			resp, err := Author.OffLine(context.TODO(), req)
-			if err != nil {
-				log.Sugar.Error(resp, err)
-				return
-			}
-			c.JSON(statusOk, resp)
-			return
-		default:
-			c.JSON(statusOk, &Response{Code: statusMethodErr, Data: nil, Msg: "method error",})
 		}
 	}
 }
