@@ -63,8 +63,8 @@ func main() {
 			fmt.Println(err)
 			return
 		}
-		text:=string(data)
-		text=strings.TrimSpace(text)
+		text := string(data)
+		text = strings.TrimSpace(text)
 		keys := strings.Split(name, ".")
 		str = strings.Replace(str, "#{"+strings.Join(keys, "_")+"}#", "`"+text+"`", 1)
 	}

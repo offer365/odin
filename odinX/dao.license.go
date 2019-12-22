@@ -211,6 +211,7 @@ func ChkLicense(cipher string) (lic *License, ok bool, msg string) {
 		msg = "未在授权中找到本机id。"
 		return
 	}
+	// TODO 是否检查所有的硬件信息
 	for name, node := range nodes {
 		if lic.Devices[name] != node.Attrs.Hwmd5 {
 			msg = "发生硬件信息错误。"
@@ -228,7 +229,7 @@ func ChkLicense(cipher string) (lic *License, ok bool, msg string) {
 		return
 	}
 
-	// 授权码6个小时有效期
+	// 授权码2个小时有效期
 	if (now-lic.Update) > 3600*2 || (now-lic.Generate) > 3600*2 {
 		msg = "授权码超时失效。"
 		return

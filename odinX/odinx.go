@@ -47,12 +47,12 @@ type Config struct {
 	EmbedClusterToken string
 	EmbedClusterState string
 	EmbedCluster      map[string]string
+	EmbedAuthUser     string
 	EmbedAuthPwd      string
 
 	// etcd client config
 	EtcdCliCtx     context.Context
 	EtcdCliAddr    string
-	EtcdCliUser    string
 	EtcdCliTimeout time.Duration
 
 	// store key
@@ -101,62 +101,6 @@ type Config struct {
 	CipherEncrypt CryptFunc // uuid 加密
 	AuthEncrypt   CryptFunc // auth 数据加密
 	UuidHash      HashFunc
-}
-
-func NewConfig() *Config {
-	return &Config{
-		EmbedCtx:          context.TODO(),
-		EmbedName:         "",
-		EmbedDir:          "disk/default",
-		EmbedClientAddr:   "127.0.0.1:12379",
-		EmbedPeerAddr:     "127.0.0.1:12380",
-		EmbedClusterToken: "",
-		EmbedClusterState: "new",
-		EmbedCluster:      nil,
-		EmbedAuthPwd:      "",
-
-		EtcdCliCtx:  context.TODO(),
-		EtcdCliAddr: "127.0.0.1:12379",
-		EtcdCliUser: "root",
-
-		EtcdCliTimeout: 3 * time.Second,
-
-		StoreLicenseKey:            "",
-		StoreClearLicenseKey:       "",
-		StoreClientConfigKeyPrefix: "",
-		StoreClientKeyPrefix:       "",
-		StoreTokenKey:              "",
-		StoreSerialNumKey:          "",
-
-		GRpcServerCrt:  "",
-		GRpcServerKey:  "",
-		GRpcClientCrt:  "",
-		GRpcClientKey:  "",
-		GRpcCaCrt:      "",
-		GRpcUser:       "",
-		GRpcPwd:        "",
-		GRpcServerName: "",
-		GRpcAllNode:    nil,
-		GRpcListen:     "0.0.0.0:9527",
-		WebPwd:         "",
-
-		NodeName:     "",
-		NodeAddr:     "",
-		NodeHardware: nil,
-
-		LicenseEncrypt: nil,
-		LicenseDecrypt: nil,
-		SerialEncrypt:  nil,
-		// SerialDecrypt:  nil,
-		// UntiedEncrypt:  nil,
-		UntiedDecrypt: nil,
-		TokenHash:     nil,
-
-		VerifyDecrypt: nil,
-		CipherEncrypt: nil,
-		AuthEncrypt:   nil,
-		UuidHash:      nil,
-	}
 }
 
 func (cfg Config) CheckValue() (err error) {

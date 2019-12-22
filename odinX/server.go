@@ -36,7 +36,6 @@ import (
 )
 
 const (
-	username                  = "root"
 	restfulUser               = "admin"
 	defaultKey                = "default"
 	statusOk            int   = 200
@@ -102,20 +101,20 @@ func Main() {
 		embedder.WithCluster(Cfg.EmbedCluster),
 		embedder.WithLogger(log.Sugar),
 	); err != nil {
-		log.Sugar.Fatal("init embed server failed. error: ", err)
+		log.Sugar.Error("init embed server failed. error: ", err)
 	}
 
 	go func() { // 运行etcd
 		if err = device.Run(ready); err != nil {
-			log.Sugar.Fatal("run embed server error. ", err)
+			log.Sugar.Error("run embed server error. ", err)
 			return
 		}
 	}()
 	select {
 	case <-ready: // 待etcd Ready 运行其他服务
-		err = device.SetAuth(username, Cfg.EmbedAuthPwd)
+		err = device.SetAuth(Cfg.EmbedAuthUser, Cfg.EmbedAuthPwd)
 		if err != nil {
-			log.Sugar.Fatal("set auth embed server failed. error: ", err)
+			log.Sugar.Error("set auth embed server failed. error: ", err)
 		}
 		Server()
 	}
@@ -129,13 +128,12 @@ func Server() {
 	store = dao.NewStore()
 	if err = store.Init(Cfg.EtcdCliCtx,
 		dao.WithAddr(Cfg.EtcdCliAddr),
-		dao.WithUsername(username),
+		dao.WithUsername(Cfg.EmbedAuthUser),
 		dao.WithPassword(Cfg.EmbedAuthPwd),
 		dao.WithTimeout(Cfg.EtcdCliTimeout),
 	); err != nil {
-		log.Sugar.Fatal("init store failed. error: ", err)
+		log.Sugar.Error("init store failed. error: ", err)
 	}
-
 	// 从etcd加载license
 	if err := loadLic(); err != nil {
 		log.Sugar.Error("init license failed. error: ", err)
@@ -259,7 +257,7 @@ func RunAPI(addr string) {
 	var err error
 	gs, err = NodeGRpcServer()
 	if err != nil {
-		log.Sugar.Fatal(err)
+		log.Sugar.Error(err)
 		return
 	}
 	RegisterStaterServer(gs, Self)
@@ -275,12 +273,12 @@ func RunAPI(addr string) {
 	})
 	listener, err := NewTlsListen([]byte(Cfg.GRpcServerCrt), []byte(Cfg.GRpcServerKey), []byte(Cfg.GRpcCaCrt), addr)
 	if err != nil {
-		log.Sugar.Fatal(err)
+		log.Sugar.Error(err)
 		return
 	}
 	err = http.Serve(listener, handle)
 	if err != nil {
-		log.Sugar.Fatal(err)
+		log.Sugar.Error(err)
 		return
 	}
 }
@@ -288,14 +286,14 @@ func RunAPI(addr string) {
 func NewTlsListen(crt, key, ca []byte, addr string) (net.Listener, error) {
 	certificate, err := tls.X509KeyPair(crt, key)
 	if err != nil {
-		log.Sugar.Fatal(err)
+		log.Sugar.Error(err)
 		return nil, err
 	}
 	certPool := x509.NewCertPool()
 
 	if ok := certPool.AppendCertsFromPEM(ca); !ok {
 		err = errors.New("failed to append ca certs")
-		log.Sugar.Fatal(err)
+		log.Sugar.Error(err)
 		return nil, err
 	}
 	tlsConfig := &tls.Config{

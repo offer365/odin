@@ -8,6 +8,7 @@ import (
 	"github.com/offer365/example/endecrypt/endeaesrsa"
 	"github.com/offer365/example/endecrypt/endeaesrsaecc"
 	"github.com/offer365/example/endecrypt/endersa"
+	// "github.com/zcalusic/sysinfo"
 	"github.com/offer365/example/winsysinfo"
 	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/odinX"
@@ -26,12 +27,12 @@ func main() {
 		EmbedClusterToken: clusterToken,
 		EmbedClusterState: config.Cfg.State,
 		EmbedCluster:      config.Cfg.AllPeerAddr(),
+		EmbedAuthUser:     "root",
 		EmbedAuthPwd:      embedAuthPwd,
 
 		EtcdCliCtx:     context.TODO(),
-		EtcdCliAddr:    "127.0.0.1:" + config.Cfg.LocalClientPort(),
-		EtcdCliUser:    "root",
-		EtcdCliTimeout: 3 * time.Second,
+		EtcdCliAddr:    config.Cfg.LocalClientAddr(),
+		EtcdCliTimeout: 5 * time.Second,
 
 		StoreLicenseKey:            storeLicenseKey,
 		StoreClearLicenseKey:       storeClearLicenseKey,

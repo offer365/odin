@@ -80,7 +80,7 @@ func (n *Node) md5() {
 }
 
 func (n *Node) Status(ctx context.Context, args *Args) (*Node, error) {
-	if Cfg.GRpcAllNode[args.Name] != args.Addr {
+	if Cfg.GRpcAllNode[args.Name] == args.Addr {
 		n.Hardware.hw()
 		n.md5()
 		n.Attrs.Now = time.Now().Unix()
