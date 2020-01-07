@@ -116,6 +116,7 @@ func Main() {
 		if err != nil {
 			log.Sugar.Error("set auth embed server failed. error: ", err)
 		}
+		close(ready)
 		Server()
 	}
 }
@@ -179,6 +180,7 @@ func Server() {
 		gs.Stop()
 		device.Close()
 		store.Close()
+		close(signalChan)
 		done <- struct{}{}
 	}()
 	// 阻塞主进程
