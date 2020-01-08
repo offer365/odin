@@ -108,6 +108,7 @@ func Main() {
 			return
 		}
 	}()
+
 	<-ready // 待etcd Ready 运行其他服务
 	err = device.SetAuth(Cfg.EmbedAuthUser, Cfg.EmbedAuthPwd)
 	if err != nil {
