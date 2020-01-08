@@ -191,11 +191,8 @@ type hardware struct {
 	// linux
 	// TODO: 当 sysinfo.SysInfo 为这个实例的全局变量时，在多次获取网卡与磁盘信息时，会导致返回结果不断堆叠。
 	//  解决方法是，修改这个包在 getNetworkInfo for循环前增加 si.Network=make([]NetworkDevice,0) 磁盘同理。
-<<<<<<< HEAD
 	sysinfo.SysInfo  // "github.com/zcalusic/sysinfo"
-=======
 	// sysinfo.SysInfo  // "github.com/zcalusic/sysinfo"
->>>>>>> 2ae8a808efc2075d1a1a04ef06400585e3798b30
 	// windows
 	//winsysinfo.SysInfo // "github.com/offer365/example/winsysinfo"
 }
