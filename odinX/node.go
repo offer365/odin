@@ -55,7 +55,7 @@ func (hd *Hardware) hw() {
 
 	hd.Board.Name, hd.Board.Serial, hd.Board.Vendor = Cfg.NodeHardware.BoardInfo()
 
-	hd.Bios.Vendor, hd.Bios.Version = Cfg.NodeHardware.BiosInfo()
+	hd.Bios.Vendor, hd.Bios.Version,hd.Bios.Date = Cfg.NodeHardware.BiosInfo()
 
 	hd.Cpu.Vendor, hd.Cpu.Model, hd.Cpu.Threads, hd.Cpu.Cache, hd.Cpu.Cores, hd.Cpu.Cpus, hd.Cpu.Speed = Cfg.NodeHardware.CpuInfo()
 

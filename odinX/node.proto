@@ -55,6 +55,7 @@ message Board {
 message Bios {
     string vendor = 1; // 供应商 eg:American Megatrends Inc.
     string version = 2; // 版本
+    string date = 3; // 日期
 }
 
 message Cpu {

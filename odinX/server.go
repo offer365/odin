@@ -80,10 +80,7 @@ func RestoreAsset() {
 }
 
 func Main() {
-	var (
-		err   error
-		ready = make(chan struct{})
-	)
+	var err error
 	// 生产模式
 	gin.SetMode(gin.ReleaseMode)
 	// 添加basic auth 认证
@@ -104,26 +101,24 @@ func Main() {
 		log.Sugar.Error("init embed server failed. error: ", err)
 	}
 
+	var ready = make(chan struct{})
 	go func() { // 运行etcd
 		if err = device.Run(ready); err != nil {
 			log.Sugar.Error("run embed server error. ", err)
 			return
 		}
 	}()
-	select {
-	case <-ready: // 待etcd Ready 运行其他服务
-		err = device.SetAuth(Cfg.EmbedAuthUser, Cfg.EmbedAuthPwd)
-		if err != nil {
-			log.Sugar.Error("set auth embed server failed. error: ", err)
-		}
-		Server()
+	<-ready // 待etcd Ready 运行其他服务
+	err = device.SetAuth(Cfg.EmbedAuthUser, Cfg.EmbedAuthPwd)
+	if err != nil {
+		log.Sugar.Error("set auth embed server failed. error: ", err)
 	}
+	close(ready)
+	Server()
 }
 
 func Server() {
-	var (
-		err error
-	)
+	var err error
 	// 客户端连接
 	store = dao.NewStore()
 	if err = store.Init(Cfg.EtcdCliCtx,
@@ -134,21 +129,24 @@ func Server() {
 	); err != nil {
 		log.Sugar.Error("init store failed. error: ", err)
 	}
+	// 从etcd加载license失败后的操作
+	failOpt := func() {
+		if err := DelLicense(); err != nil {
+			log.Sugar.Error("load license error. when delete license. ", err)
+		}
+		lic := new(License)
+		StoreLic(lic)
+	}
 	// 从etcd加载license
-	if err := loadLic(); err != nil {
+	if err := loadLic(failOpt); err != nil {
 		log.Sugar.Error("init license failed. error: ", err)
 	}
 
-	// 间隔1分钟更新授权
+	// Renew authorization at 1 minute intervals
 	go func() {
 		ticker := time.Tick(1 * time.Minute) // 1分钟
-		// expr := cronexpr.MustParse("* * * * *")
 		for range ticker {
-			// now := time.Date()
-			// next := expr.Next(now)
-			// time.AfterFunc(next.Sub(now), func() {
-			// time.AfterFunc(time.Second, func() {})
-			// 如果是主就更新授权
+			// If it is the master, renew the authorization
 			if device.IsLeader() {
 				log.Sugar.Infof("%s is Leader. ip:%s", Self.Attrs.Name, Self.Attrs.Addr)
 				if err := ResetLicense(); err != nil {
@@ -157,11 +155,14 @@ func Server() {
 			}
 		}
 	}()
-	// 监听授权变化
+	// Listen for authorization changes
 	go WatchLicense()
+	// gRPC & RESTFUL API
 	go RunAPI(Cfg.GRpcListen)
+	// web server
 	go WebServer()
 	AllNodeGRpcClient(Cfg.GRpcAllNode)
+	// Generate default configuration
 	DefaultConf()
 	signalChan := make(chan os.Signal)
 	done := make(chan struct{}, 1)
@@ -179,16 +180,16 @@ func Server() {
 		gs.Stop()
 		device.Close()
 		store.Close()
+		close(signalChan)
 		done <- struct{}{}
 	}()
 	// 阻塞主进程
 	<-done
-	// <-make(chan struct{})
-	// <- (chan int)(nil)
 }
 
+
 // Load authorization when launching the program
-func loadLic() (err error) {
+func loadLic(failOpt func()) (err error) {
 	var (
 		byt []byte
 		lic *License
@@ -198,51 +199,35 @@ func loadLic() (err error) {
 	}
 
 	if byt == nil || len(byt) == 0 {
-		lic = new(License)
-		StoreLic(lic)
+		failOpt()
 		return
 	}
+
 	// 如果此位置发生错误，则硬盘中的许可证可能无效（数据损坏）
 	if lic, err = Str2lic(string(byt)); err != nil {
 		log.Sugar.Error("load license error. may be data corruption: ", err)
-		if err = DelLicense(); err != nil {
-			log.Sugar.Error("load license error. when delete license. ", err)
-		}
-		lic = new(License)
-		StoreLic(lic)
+		failOpt()
 		return
 	}
 
 	if lic != nil {
 		now := time.Now().Unix()
-		// 检查服务器当前时间是否小于license 时间
-		if now < lic.Update {
+		// 检查服务器当前时间是否小于license 时间,误差不能超过12小时。
+		if lic.Update-now > 12*3600 {
 			log.Sugar.Errorf("check license update time error. %d %d", now, lic.Update)
-			if err = DelLicense(); err != nil {
-				log.Sugar.Error("check license error. when delete license. ", err)
-			}
-			lic = new(License)
-			StoreLic(lic)
+			failOpt()
 			return
 		}
-		// 检查license 的生存周期
-		if (now-lic.Generate)/60 < lic.LifeCycle {
+		// 检查license 的生存周期 误差不能超过 720个分钟（周期）
+		if lic.LifeCycle-(now-lic.Generate)/60 > 12*60 {
 			log.Sugar.Errorf("check license life cycle error. %d %d", (now-lic.Generate)/60, lic.LifeCycle)
-			if err = DelLicense(); err != nil {
-				log.Sugar.Error("check license error. when delete license. ", err)
-			}
-			lic = new(License)
-			StoreLic(lic)
+			failOpt()
 			return
 		}
 		// 检查硬件信息是否匹配
 		if lic.Devices[Self.Attrs.Name] != Self.Attrs.Hwmd5 {
 			log.Sugar.Error("check license hard ware md5 error.")
-			if err = DelLicense(); err != nil {
-				log.Sugar.Error("check license error. when delete license. ", err)
-			}
-			lic = new(License)
-			StoreLic(lic)
+			failOpt()
 			return
 		}
 
@@ -252,6 +237,7 @@ func loadLic() (err error) {
 	StoreLic(lic)
 	return
 }
+
 
 func RunAPI(addr string) {
 	var err error

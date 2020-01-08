@@ -8,8 +8,8 @@ import (
 	"github.com/offer365/example/endecrypt/endeaesrsa"
 	"github.com/offer365/example/endecrypt/endeaesrsaecc"
 	"github.com/offer365/example/endecrypt/endersa"
-	// "github.com/zcalusic/sysinfo"
-	"github.com/offer365/example/winsysinfo"
+	"github.com/zcalusic/sysinfo"
+
 	"github.com/offer365/odin/config"
 	"github.com/offer365/odin/odinX"
 	"github.com/offer365/odin/utils"
@@ -189,9 +189,11 @@ func HashFunc2(src []byte) string {
 
 type hardware struct {
 	// linux
-	// sysinfo.SysInfo  // "github.com/zcalusic/sysinfo"
+	// TODO: 当 sysinfo.SysInfo 为这个实例的全局变量时，在多次获取网卡与磁盘信息时，会导致返回结果不断堆叠。
+	//  解决方法是，修改这个包在 getNetworkInfo for循环前增加 si.Network=make([]NetworkDevice,0) 磁盘同理。
+	sysinfo.SysInfo  // "github.com/zcalusic/sysinfo"
 	// windows
-	winsysinfo.SysInfo // "github.com/offer365/example/winsysinfo"
+	//winsysinfo.SysInfo // "github.com/offer365/example/winsysinfo"
 }
 
 func (h *hardware) HostInfo() (machineID, architecture, hypervisor string) {
@@ -206,8 +208,8 @@ func (h *hardware) BoardInfo() (name, serial, vendor string) {
 	return h.Board.Name, h.Board.Serial, h.Board.Vendor
 }
 
-func (h *hardware) BiosInfo() (vendor, version string) {
-	return h.BIOS.Vendor, h.BIOS.Version
+func (h *hardware) BiosInfo() (vendor, version,date string) {
+	return h.BIOS.Vendor, h.BIOS.Version,h.BIOS.Date
 }
 
 func (h *hardware) CpuInfo() (vendor, model string, threads, cache, cores, cpus, speed uint32) {

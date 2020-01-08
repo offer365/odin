@@ -142,7 +142,7 @@ type HardWare interface {
 	HostInfo() (machineID, architecture, hypervisor string)
 	ProductInfo() (name, serial, vendor string)
 	BoardInfo() (name, serial, vendor string)
-	BiosInfo() (vendor, version string)
+	BiosInfo() (vendor, version,date string)
 	CpuInfo() (vendor, model string, threads, cache, cores, cpus, speed uint32)
 	MemInfo() (speed uint32, tp string)
 	NetworksInfo() []*NetDriver
