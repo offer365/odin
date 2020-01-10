@@ -5,11 +5,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"sort"
 	"sync/atomic"
 	"time"
 
 	"github.com/offer365/odin/log"
 	"go.etcd.io/etcd/clientv3"
+	"go.etcd.io/etcd/etcdserver/etcdserverpb"
 )
 
 var atomicLic atomic.Value
@@ -162,6 +164,48 @@ func ResetLicense() (err error) {
 		log.Sugar.Error("reset lic failed. error: ", err)
 	}
 	StoreLic(lic)
+
+	// 如果有多个节点,将主移动到时间最快的节点上。
+	if len(Cfg.EmbedCluster)==1{
+		return
+	}
+
+	all:=GetAllNodes(context.TODO())
+	list,err:=store.MemberList()
+	if err!=nil{
+		log.Sugar.Error("get member list error: ",err)
+		return
+	}
+	var nodes []*Node
+	if len(all)!=len(Cfg.EmbedCluster){
+		log.Sugar.Error("get all nodes error.")
+		return
+	}
+	for _,node:=range all{
+		nodes = append(nodes, node)
+	}
+	sort.Slice(nodes, func(i, j int) bool {
+		return nodes[i].Attrs.Now<nodes[j].Attrs.Now
+	})
+
+	node:=nodes[len(nodes)-1]
+	if node==nil{
+		return
+	}
+	if node.Attrs.Name==Self.Attrs.Name{
+        return
+	}
+
+	var member *etcdserverpb.Member
+	for _,mem:=range list.Members{
+		if mem.Name==node.Attrs.Name{
+			member=mem
+		}
+	}
+	_,err=store.MoveLeader(member.ID)
+	if err!=nil{
+		log.Sugar.Error("move leader error: ",err)
+	}
 	return
 }
 
